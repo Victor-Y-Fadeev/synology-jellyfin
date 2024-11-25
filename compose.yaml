@@ -1,53 +1,64 @@
 name: synology
 
 services:
-  serveo:
-    image: taichunmin/serveo:latest
-    container_name: serveo
-    tty: true
-    stdin_open: true
-    volumes:
-      - .ssh:/root/.ssh
-    command: >
-      autossh -M 0
-      -o ServerAliveInterval=60
-      -o ServerAliveCountMax=3
-      -o ExitOnForwardFailure=yes
-      -o StrictHostKeyChecking=no
-      -R *.synology-plex.serveo.net:80:nginx:80
-      $DOMAIN
-    restart: unless-stopped
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    volumes:
-      - ./default.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - 80:80
-    restart: unless-stopped
+  # serveo:
+  #   image: taichunmin/serveo:latest
+  #   container_name: serveo
+  #   tty: true
+  #   stdin_open: true
+  #   volumes:
+  #     - .ssh:/root/.ssh
+  #   command: >
+  #     autossh -M 0
+  #     -o ServerAliveInterval=60
+  #     -o ServerAliveCountMax=3
+  #     -o ExitOnForwardFailure=yes
+  #     -o StrictHostKeyChecking=no
+  #     -R $SUBDOMAIN:80:nginx:80
+  #     $DOMAIN
+  #   restart: unless-stopped
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   volumes:
+  #     - ./default.conf:/etc/nginx/conf.d/default.conf
+  #   ports:
+  #     - 80:80
+  #   restart: unless-stopped
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - VERSION=docker
     volumes:
       - ./config/plex:/config
       - ./data:/data
     ports:
+      - 80:80
       - 32400:32400
     restart: unless-stopped
   overseerr:
-      image: lscr.io/linuxserver/overseerr:latest
-      container_name: overseerr
-      volumes:
-        - ./config/overseerr:/config
-      ports:
-        - 5055:5055
-      restart: unless-stopped
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/overseerr:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - WEBUI_PORT=8080
     volumes:
       - ./config/qbittorrent:/config
@@ -56,31 +67,42 @@ services:
       - 8080:8080
     restart: unless-stopped
   jackett:
-      image: lscr.io/linuxserver/jackett:latest
-      container_name: jackett
-      environment:
-        - AUTO_UPDATE=true
-      volumes:
-        - ./config/jackett:/config
-        - ./data/downloads:/data/downloads
-      ports:
-        - 9117:9117
-      restart: unless-stopped
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - AUTO_UPDATE=true
+    volumes:
+      - ./config/jackett:/config
+      - ./data/downloads:/data/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
   radarr:
-      image: lscr.io/linuxserver/radarr:latest
-      container_name: radarr
-      volumes:
-        - ./config/radarr:/config
-        - ./data:/data
-      ports:
-        - 7878:7878
-      restart: unless-stopped
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/radarr:/config
+      - ./data:/data
+    ports:
+      - 7878:7878
+    restart: unless-stopped
   sonarr:
-      image: lscr.io/linuxserver/sonarr:latest
-      container_name: sonarr
-      volumes:
-        - ./config/sonarr:/config
-        - ./data:/data
-      ports:
-        - 8989:8989
-      restart: unless-stopped
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/sonarr:/config
+      - ./data:/data
+    ports:
+      - 8989:8989
+    restart: unless-stopped
