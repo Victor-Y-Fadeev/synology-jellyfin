@@ -14,15 +14,16 @@ services:
       -o ServerAliveCountMax=3
       -o ExitOnForwardFailure=yes
       -o StrictHostKeyChecking=no
-      -R $SUBDOMAIN:80:nginx:80
-      -R $SUBDOMAIN:6881:qbittorrent:6881
+      -R *.synology-plex.serveo.net:80:nginx:80
       $DOMAIN
     restart: unless-stopped
   nginx:
     image: nginx:latest
     container_name: nginx
     volumes:
-      - default.conf:/etc/nginx/conf.d/default.conf
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
     restart: unless-stopped
   plex:
     image: lscr.io/linuxserver/plex:latest
@@ -30,75 +31,56 @@ services:
     environment:
       - VERSION=docker
     volumes:
-      - config/plex:/config
-      - data:/data
+      - ./config/plex:/config
+      - ./data:/data
+    ports:
+      - 32400:32400
     restart: unless-stopped
+  overseerr:
+      image: lscr.io/linuxserver/overseerr:latest
+      container_name: overseerr
+      volumes:
+        - ./config/overseerr:/config
+      ports:
+        - 5055:5055
+      restart: unless-stopped
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
       - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
     volumes:
-      - config/qbittorrent:/config
-      - data/downloads:/data/downloads
+      - ./config/qbittorrent:/config
+      - ./data/downloads:/data/downloads
+    ports:
+      - 8080:8080
     restart: unless-stopped
-
-
-
-
-
-  sonarr:
-      image: lscr.io/linuxserver/sonarr:latest
-      container_name: sonarr
-      environment:
-          - PUID=1000
-          - PGID=1000
-          - TZ=Etc/UTC
-      volumes:
-          - /opt/pvr/sonarr:/config
-          - /mnt/plex/tv:/tv
-          - /mnt/plex/downloads:/downloads
-      ports:
-          - 8989:8989
-      restart: unless-stopped
-  radarr:
-      image: lscr.io/linuxserver/radarr:latest
-      container_name: radarr
-      environment:
-          - PUID=1000
-          - PGID=1000
-          - TZ=Etc/UTC
-      volumes:
-          - /opt/pvr/radarr:/config
-          - /mnt/plex/movies:/movies
-          - /mnt/plex/downloads:/downloads
-      ports:
-          - 7878:7878
-      restart: unless-stopped
   jackett:
       image: lscr.io/linuxserver/jackett:latest
       container_name: jackett
       environment:
-          - PUID=1000
-          - PGID=1000
-          - TZ=Etc/UTC
-          - AUTO_UPDATE=true
+        - AUTO_UPDATE=true
       volumes:
-          - /opt/pvr/jackett:/config
-          - /mnt/plex/downloads:/downloads
+        - ./config/jackett:/config
+        - ./data/downloads:/data/downloads
       ports:
-          - 9117:9117
+        - 9117:9117
       restart: unless-stopped
-  overseerr:
-      image: lscr.io/linuxserver/overseerr:latest
-      container_name: overseerr
-      environment:
-          - PUID=1000
-          - PGID=1000
-          - TZ=Etc/UTC
+  radarr:
+      image: lscr.io/linuxserver/radarr:latest
+      container_name: radarr
       volumes:
-          - /opt/pvr/overseerr:/config
+        - ./config/radarr:/config
+        - ./data:/data
       ports:
-          - 5055:5055
+        - 7878:7878
+      restart: unless-stopped
+  sonarr:
+      image: lscr.io/linuxserver/sonarr:latest
+      container_name: sonarr
+      volumes:
+        - ./config/sonarr:/config
+        - ./data:/data
+      ports:
+        - 8989:8989
       restart: unless-stopped
