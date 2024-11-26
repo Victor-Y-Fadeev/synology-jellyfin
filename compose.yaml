@@ -1,22 +1,28 @@
 name: synology
 
 services:
-  # serveo:
-  #   image: taichunmin/serveo:latest
-  #   container_name: serveo
-  #   tty: true
-  #   stdin_open: true
-  #   volumes:
-  #     - .ssh:/root/.ssh
-  #   command: >
-  #     autossh -M 0
-  #     -o ServerAliveInterval=60
-  #     -o ServerAliveCountMax=3
-  #     -o ExitOnForwardFailure=yes
-  #     -o StrictHostKeyChecking=no
-  #     -R $SUBDOMAIN:80:nginx:80
-  #     $DOMAIN
-  #   restart: unless-stopped
+  serveo:
+    image: taichunmin/serveo:latest
+    container_name: serveo
+    tty: true
+    stdin_open: true
+    volumes:
+      - .ssh:/root/.ssh
+    command: >
+      autossh -M 0
+      -o ServerAliveInterval=60
+      -o ServerAliveCountMax=3
+      -o ExitOnForwardFailure=yes
+      -o StrictHostKeyChecking=no
+      -R $SUBDOMAIN:80:host.docker.internal:5001
+      -R plex.$SUBDOMAIN:80:plex:32400
+      -R overseerr.$SUBDOMAIN:80:overseerr:5055
+      -R qbittorrent.$SUBDOMAIN:80:qbittorrent:8080
+      -R jackett.$SUBDOMAIN:80:jackett:9117
+      -R radarr.$SUBDOMAIN:80:radarr:7878
+      -R sonarr.$SUBDOMAIN:80:sonarr:8989
+      $DOMAIN
+    restart: unless-stopped
   # nginx:
   #   image: nginx:latest
   #   container_name: nginx
@@ -37,12 +43,14 @@ services:
       - ./config/plex:/config
       - ./data:/data
     ports:
-      - 80:80
       - 32400:32400
     restart: unless-stopped
   overseerr:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
