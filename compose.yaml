@@ -14,7 +14,6 @@ services:
       -o ServerAliveCountMax=3
       -o ExitOnForwardFailure=yes
       -o StrictHostKeyChecking=no
-      -R $SUBDOMAIN:80:host.docker.internal:5001
       -R plex.$SUBDOMAIN:80:plex:32400
       -R overseerr.$SUBDOMAIN:80:overseerr:5055
       -R qbittorrent.$SUBDOMAIN:80:qbittorrent:8080
