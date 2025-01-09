@@ -93,7 +93,7 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - ./config/qbittorrent:/config
-      - ./data/downloads:/downloads
+      - ./data/downloads:/data/downloads
     ports:
       - 8080:8080
     restart: unless-stopped
@@ -107,7 +107,7 @@ services:
       - AUTO_UPDATE=true
     volumes:
       - ./config/jackett:/config
-      - ./data/downloads:/data/downloads
+      # - ./data/downloads:/data/downloads
     ports:
       - 9117:9117
     restart: unless-stopped
