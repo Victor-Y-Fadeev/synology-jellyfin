@@ -1,6 +1,20 @@
 name: synology
 
 services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+    volumes:
+      - ./config/qbittorrent:/config
+      - ./data:/data
+    ports:
+      - 8080:8080
+    restart: unless-stopped
   # serveo:
   #   image: taichunmin/serveo:latest
   #   container_name: serveo
@@ -95,20 +109,6 @@ services:
   #   restart: unless-stopped
   #   networks:
   #     - proxy-network
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - WEBUI_PORT=8080
-    volumes:
-      - ./config/qbittorrent:/config
-      - ./data/downloads:/data/downloads
-    ports:
-      - 8080:8080
-    restart: unless-stopped
   jackett:
     image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
@@ -154,6 +154,8 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     environment:
+      - HTTP_PROXY=http://host.docker.internal:2080
+      - HTTPS_PROXY=http://host.docker.internal:2080
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
