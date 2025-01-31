@@ -15,6 +15,15 @@ services:
     ports:
       - 8080:8080
     restart: unless-stopped
+  sing-box:
+    image: ghcr.io/sagernet/sing-box
+    container_name: sing-box
+    restart: always
+    volumes:
+      - ./config/sing-box:/etc/sing-box/
+    ports:
+      - 2080:2080
+    command: -D /var/lib/sing-box -C /etc/sing-box/ run
   # serveo:
   #   image: taichunmin/serveo:latest
   #   container_name: serveo
@@ -154,22 +163,19 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     environment:
-      - HTTP_PROXY=http://host.docker.internal:2080
-      - HTTPS_PROXY=http://host.docker.internal:2080
+      # - HTTP_PROXY=http://host.docker.internal:2080
+      # - HTTPS_PROXY=http://host.docker.internal:2080
+      - HTTP_PROXY=http://sing-box:2080
+      - HTTPS_PROXY=http://sing-box:2080
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
       - ./config/jellyfin:/config
-      - ./data/tv:/data/tvshows
-      - ./data/movies:/data/movies
+      - ./data:/data
     ports:
       - 8096:8096
       # - 8920:8920 #optional
       # - 7359:7359/udp #optional
       # - 1900:1900/udp #optional
     restart: unless-stopped
-
-networks:
-  proxy-network:
-    driver: bridge
