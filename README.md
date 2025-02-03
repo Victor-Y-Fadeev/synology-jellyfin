@@ -1,7 +1,7 @@
 
 # <img src="https://raw.githubusercontent.com/SagerNet/sing-box/refs/heads/dev-next/docs/assets/icon.svg" width="32"/> [sing-box](http://localhost:2080/)
 
-<details><summary><h3>/etc/sing-box/config.json</h3></summary><blockquote>
+<details><summary><code>/etc/sing-box/config.json</code></summary><br><blockquote>
 
 ```json
 {
