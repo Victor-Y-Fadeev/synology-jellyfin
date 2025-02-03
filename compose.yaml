@@ -98,3 +98,12 @@ services:
       # - 7359:7359/udp #optional
       # - 1900:1900/udp #optional
     restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    environment:
+      - NO_AUTOUPDATE
+      - TUNNEL_TOKEN=
+    restart: unless-stopped
+    command: tunnel run
