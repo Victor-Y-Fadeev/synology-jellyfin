@@ -1,4 +1,3 @@
-
 # <img src="https://raw.githubusercontent.com/SagerNet/sing-box/refs/heads/dev-next/docs/assets/icon.svg" width="32"/> [sing-box](http://localhost:2080/)
 
 <details><summary><code>/etc/sing-box/config.json</code></summary><br><blockquote>
@@ -82,7 +81,12 @@
 
 - [ ] `Tools`
   - [ ] `Options...`
+    - [ ] `Behavior`
+      - [ ] `Language`
+        - [ ] `User Interface Language:` -> `Russian`
     - [ ] `Downloads`
+      - [ ] `When adding a torrent`
+        - [ ] `Torrent content layout:` -> `Create subfolder`
       - [ ] `Saving Management`
         - [ ] `Default Save Path:` -> `/data/downloads`
         - [ ] `Copy .torrent files to:` -> `/data/torrents`
@@ -91,7 +95,7 @@
     - [ ] `Connection`
       - [ ] `Proxy Server`
         - [ ] `Type:` -> `HTTP`
-        - [ ] `Host:` -> `host.docker.internal`
+        - [ ] `Host:` -> `sing-box`
         - [ ] `Port:` -> `2080`
         - [ ] `Perform hostname lookup via proxy` -> `On`
     - [ ] `WebUI`
