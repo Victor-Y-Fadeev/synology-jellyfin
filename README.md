@@ -1,7 +1,8 @@
 
 # <img src="https://raw.githubusercontent.com/SagerNet/sing-box/refs/heads/dev-next/docs/assets/icon.svg" width="32"/> [sing-box](http://localhost:2080/)
 
-`/etc/sing-box/config.json`:
+<details><summary><h3>/etc/sing-box/config.json</h3></summary><blockquote>
+
 ```json
 {
   "inbounds": [
@@ -14,25 +15,25 @@
   ],
   "outbounds": [
     {
-			"type": "vless",
-			"tag": "proxy",
-			"server": "",
-			"server_port": 443,
-			"uuid": "",
-			"flow": "xtls-rprx-vision",
-			"tls": {
-				"enabled": true,
-				"server_name": "",
-				"utls": {
-					"enabled": true,
-					"fingerprint": "chrome"
-				},
-				"reality": {
-					"enabled": true,
-					"public_key": "",
-					"short_id": ""
-				}
-			}
+      "type": "vless",
+      "tag": "proxy",
+      "server": "",
+      "server_port": 443,
+      "uuid": "",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "reality": {
+          "enabled": true,
+          "public_key": "",
+          "short_id": ""
+        }
+      }
     },
     {
       "type": "direct",
@@ -74,6 +75,8 @@
   }
 }
 ```
+
+</blockquote></details>
 
 # <img src="https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent-tray.svg" width="32"/> [qBittorrent](http://localhost:8080/)
 
