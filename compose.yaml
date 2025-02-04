@@ -1,9 +1,27 @@
 name: synology
 
 services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    command: tunnel run
+
+  sing-box:
+    image: ghcr.io/sagernet/sing-box:latest
+    container_name: sing-box
+    restart: unless-stopped
+    volumes:
+      - ./config/sing-box:/etc/sing-box/
+    ports:
+      - 2080:2080
+    command: -D /var/lib/sing-box -C /etc/sing-box/ run
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -14,46 +32,13 @@ services:
       - ./data:/data
     ports:
       - 8080:8080
-    restart: unless-stopped
-  sing-box:
-    image: ghcr.io/sagernet/sing-box
-    container_name: sing-box
-    restart: always
-    volumes:
-      - ./config/sing-box:/etc/sing-box/
-    ports:
-      - 2080:2080
-    command: -D /var/lib/sing-box -C /etc/sing-box/ run
-
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
-    environment:
-      # - PUID=${PUID}
-      # - PGID=${PGID}
-      - LOG_LEVEL=debug
-      - TZ=${TZ}
-    ports:
-      - 5055:5055
-    volumes:
-      - ./config/jellyseerr:/app/config
-    restart: unless-stopped
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ./config/prowlarr:/config
-    ports:
-      - 9696:9696
-    restart: unless-stopped
+    depends_on:
+      - sing-box
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -63,10 +48,13 @@ services:
       - ./data:/data
     ports:
       - 7878:7878
-    restart: unless-stopped
+    depends_on:
+      - sing-box
+      - qbittorrent
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -76,16 +64,33 @@ services:
       - ./data:/data
     ports:
       - 8989:8989
+    depends_on:
+      - sing-box
+      - qbittorrent
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
     restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/prowlarr:/config
+    ports:
+      - 9696:9696
+    depends_on:
+      - sing-box
+      - qbittorrent
+      - radarr
+      - sonarr
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
+    restart: unless-stopped
     environment:
-      # - HTTP_PROXY=http://host.docker.internal:2080
-      # - HTTPS_PROXY=http://host.docker.internal:2080
       - HTTP_PROXY=http://sing-box:2080
-      - HTTPS_PROXY=http://sing-box:2080
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
@@ -94,16 +99,21 @@ services:
       - ./data:/data
     ports:
       - 8096:8096
-      # - 8920:8920 #optional
-      # - 7359:7359/udp #optional
-      # - 1900:1900/udp #optional
+    depends_on:
+      - sing-box
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
     restart: unless-stopped
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
     environment:
-      - NO_AUTOUPDATE
-      - TUNNEL_TOKEN=
-    restart: unless-stopped
-    command: tunnel run
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
+    ports:
+      - 5055:5055
+    volumes:
+      - ./config/jellyseerr:/app/config
+    depends_on:
+      - sing-box
+      - radarr
+      - sonarr
+      - jellyfin
