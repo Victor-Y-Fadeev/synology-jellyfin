@@ -83,14 +83,13 @@
   - [ ] `Options...`
     - [ ] `Behavior`
       - [ ] `Language`
-        - [ ] `User Interface Language:` -> `English`
+        - [ ] `User Interface Language:` -> `Russian`
     - [ ] `Downloads`
       - [ ] `When adding a torrent`
         - [ ] `Torrent content layout:` -> `Create subfolder`
       - [ ] `Saving Management`
         - [ ] `Default Save Path:` -> `/data/downloads`
         - [ ] `Copy .torrent files to:` -> `/data/torrents`
-        - [ ] `Copy .torrent files for finished downloads to:` -> `/data/torrents`
       - [ ] `Automatically add torrents from:` -> `/data/torrents`
     - [ ] `Connection`
       - [ ] `Connections Limits`
@@ -132,6 +131,30 @@
 # <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
 
 # <img src="https://raw.githubusercontent.com/Sonarr/Sonarr/refs/heads/develop/Logo/Sonarr.svg" width="32"/> [Sonarr](http://localhost:8989/)
+
+- [ ] `Settings` -> `Show Advanced`
+  - [ ] `General`
+    - [ ] `Security`
+      - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+    - [ ] `Proxy`
+      - [ ] `Use Proxy` -> `On`
+      - [ ] `Proxy Type` -> `HTTP(S)`
+      - [ ] `Hostname` -> `sing-box`
+      - [ ] `Port` -> `2080`
+      - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `UI`
+    - [ ] `Calendar`
+      - [ ] `First Day of Week` -> `Monday`
+      - [ ] `Week Column Header` -> `Tue 25/03`
+    - [ ] `Dates`
+      - [ ] `Short Date Format` -> `25 Mar 2014`
+      - [ ] `Long Date Format` -> `Tuesday, 25 March, 2014`
+      - [ ] `Time Format` -> `17:00/17:30`
+      - [ ] `Show Relative Dates` -> `On`
+    - [ ] `Language`
+      - [ ] `UI Language` -> `Russian`
 
 # <img src="https://raw.githubusercontent.com/Prowlarr/Prowlarr/refs/heads/develop/Logo/Prowlarr.svg" width="32"/> [Prowlarr](http://localhost:9696/)
 
