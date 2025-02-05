@@ -1,3 +1,5 @@
+# <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png" width="32"/> [Cloudflare](https://one.dash.cloudflare.com/)
+
 # <img src="https://raw.githubusercontent.com/SagerNet/sing-box/refs/heads/dev-next/docs/assets/icon.svg" width="32"/> [sing-box](http://localhost:2080/)
 
 <details><summary><code>/etc/sing-box/config.json</code></summary><br><blockquote>
@@ -133,6 +135,41 @@
 # <img src="https://raw.githubusercontent.com/Sonarr/Sonarr/refs/heads/develop/Logo/Sonarr.svg" width="32"/> [Sonarr](http://localhost:8989/)
 
 - [ ] `Settings` -> `Show Advanced`
+  - [ ] `Media Management`
+    - [ ] `Episode Naming`
+      - [ ] `Rename Episodes` -> `On`
+      - [ ] `Replace Illegal Characters` -> `On`
+      - [ ] `Colon Replacement` -> `Smart Replace`
+      - [ ] `Standard Episode Format` -> `s{season:00}e{episode:00} {Episode Title}`
+      - [ ] `Daily Episode Format` -> `{Air.Date} {Episode Title}`
+      - [ ] `Anime Episode Format` -> `s{season:00}e{episode:00} {Episode Title}`
+      - [ ] `Series Folder Format` -> `{Series TitleYear} [tvdbid-{TvdbId}]`
+      - [ ] `Season Folder Format` -> `Season {season:00}`
+      - [ ] `Specials Folder Format` -> `Specials`
+      - [ ] `Multi Episode Style` -> `Range`
+    - [ ] `Folders`
+      - [ ] `Create Empty Series Folders` - > `Off`
+      - [ ] `Delete Empty Folders` - > `On`
+    - [ ] `Importing`
+      - [ ] `Use Hardlinks instead of Copy` - > `On`
+      - [ ] `Import Extra Files` - > `On`
+    - [ ] `File Management`
+      - [ ] `Unmonitor Deleted Episodes` - > `On`
+      - [ ] `Propers and Repacks` -> `Do not Prefer`
+    - [ ] `Root Folders`
+      - [ ] `/data/anime`
+      - [ ] `/data/cartoons`
+      - [ ] `/data/series`
+  - [ ] `Download Clients`
+    - [ ] `qBittorrent`
+      - [ ] `Name` -> `qBittorrent`
+      - [ ] `Host` -> `qbittorrent`
+      - [ ] `Port` -> `8080`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+      - [ ] `Category` -> `tv-sonarr`
+      - [ ] `Completed Download Handling`
+        - [ ] `Remove Completed` -> `Off`
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
