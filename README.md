@@ -83,7 +83,7 @@
   - [ ] `Options...`
     - [ ] `Behavior`
       - [ ] `Language`
-        - [ ] `User Interface Language:` -> `Russian`
+        - [ ] `User Interface Language:` -> `English`
     - [ ] `Downloads`
       - [ ] `When adding a torrent`
         - [ ] `Torrent content layout:` -> `Create subfolder`
@@ -93,11 +93,34 @@
         - [ ] `Copy .torrent files for finished downloads to:` -> `/data/torrents`
       - [ ] `Automatically add torrents from:` -> `/data/torrents`
     - [ ] `Connection`
+      - [ ] `Connections Limits`
+        - [ ] `Global maximum number of connections:` -> `Off`
+        - [ ] `Maximum number of connections per torrent:` -> `Off`
+        - [ ] `Global maximum number of upload slots:` -> `Off`
+        - [ ] `Maximum number of upload slots per torrent:` -> `Off`
       - [ ] `Proxy Server`
         - [ ] `Type:` -> `HTTP`
         - [ ] `Host:` -> `sing-box`
         - [ ] `Port:` -> `2080`
         - [ ] `Perform hostname lookup via proxy` -> `On`
+        - [ ] `Use proxy for BitTorrent purposes` -> `On`
+          - [ ] `Use proxy for peer connections` -> `Off`/`On`
+        - [ ] `Use proxy for RSS purposes` -> `On`
+        - [ ] `Use proxy for general purposes` -> `On`
+    - [ ] `Speed`
+      - [ ] `Global Rate Limits`
+        - [ ] `Upload:` -> `0`
+        - [ ] `Download:` -> `0`
+      - [ ] `Alternative Rate Limits`
+        - [ ] `Upload:` -> `0`
+        - [ ] `Download:` -> `0`
+      - [ ] `Rate Limits Settings`
+        - [ ] `Apply rate limit to µTP protocol` -> `Off`
+        - [ ] `Apply rate limit to transport overhead` -> `Off`
+        - [ ] `Apply rate limit to peers on LAN` -> `Off`
+    - [ ] `BitTorrent`
+      - [ ] `Max active checking torrents:` -> `-1`
+      - [ ] `Torrent Queueing` - > `Off`
     - [ ] `WebUI`
       - [ ] `Authentication`
         - [ ] `Username:` -> `admin`
