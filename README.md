@@ -125,6 +125,9 @@
       - [ ] `Authentication`
         - [ ] `Username:` -> `admin`
         - [ ] `Password:` -> `adminadmin`
+    - [ ] `Advanced`
+      - [ ] `libtorrent Section`
+        - [ ] `Hashing threads:` -> `32`
 
 # <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
 
