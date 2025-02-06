@@ -89,6 +89,8 @@
     - [ ] `Downloads`
       - [ ] `When adding a torrent`
         - [ ] `Torrent content layout:` -> `Create subfolder`
+        - [ ] `When duplicate torrent is being added`
+          - [ ] `Merge trackers to existing torrent` -> `On`
       - [ ] `Saving Management`
         - [ ] `Default Save Path:` -> `/data/downloads`
         - [ ] `Copy .torrent files to:` -> `/data/torrents`
@@ -131,6 +133,63 @@
         - [ ] `Hashing threads:` -> `32`
 
 # <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
+
+- [ ] `Settings` -> `Show Advanced`
+  - [ ] `Media Management`
+    - [ ] `Movie Naming`
+      - [ ] `Rename Movies` -> `On`
+      - [ ] `Replace Illegal Characters` -> `On`
+      - [ ] `Colon Replacement` -> `Smart Replace`
+      - [ ] `Standard Movie Format` -> `{Movie Title} ({Release Year})`
+      - [ ] `Movie Folder Format` -> `{Movie Title} ({Release Year}) [tmdbid-{TmdbId}]`
+    - [ ] `Folders`
+      - [ ] `Create empty movie folders` - > `Off`
+      - [ ] `Delete empty Folders` - > `On`
+    - [ ] `Importing`
+      - [ ] `Use Hardlinks instead of Copy` - > `On`
+      - [ ] `Import Extra Files` - > `On`
+    - [ ] `File Management`
+      - [ ] `Unmonitor Deleted Movies` - > `On`
+      - [ ] `Propers and Repacks` -> `Do not Prefer`
+    - [ ] `Root Folders`
+      - [ ] `/data/anime`
+      - [ ] `/data/cartoons`
+      - [ ] `/data/movies`
+  - [ ] `Download Clients`
+    - [ ] `qBittorrent`
+      - [ ] `Name` -> `qBittorrent`
+      - [ ] `Host` -> `qbittorrent`
+      - [ ] `Port` -> `8080`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+      - [ ] `Category` -> `radarr`
+      - [ ] `Completed Download Handling`
+        - [ ] `Remove Completed` -> `Off`
+  - [ ] `General`
+    - [ ] `Security`
+      - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+    - [ ] `Proxy`
+      - [ ] `Use Proxy` -> `On`
+      - [ ] `Proxy Type` -> `HTTP(S)`
+      - [ ] `Hostname` -> `sing-box`
+      - [ ] `Port` -> `2080`
+      - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `UI`
+    - [ ] `Calendar`
+      - [ ] `First Day of Week` -> `Monday`
+      - [ ] `Week Column Header` -> `Tue 25/03`
+    - [ ] `Movies`
+      - [ ] `Runtime Format` -> `1h 15m`
+    - [ ] `Dates`
+      - [ ] `Short Date Format` -> `25 Mar 2014`
+      - [ ] `Long Date Format` -> `Tuesday, 25 March, 2014`
+      - [ ] `Time Format` -> `17:00/17:30`
+      - [ ] `Show Relative Dates` -> `On`
+    - [ ] `Language`
+      - [ ] `Movie Info Language` -> `Russian`
+      - [ ] `UI Language` -> `Russian`
 
 # <img src="https://raw.githubusercontent.com/Sonarr/Sonarr/refs/heads/develop/Logo/Sonarr.svg" width="32"/> [Sonarr](http://localhost:8989/)
 
@@ -194,6 +253,55 @@
       - [ ] `UI Language` -> `Russian`
 
 # <img src="https://raw.githubusercontent.com/Prowlarr/Prowlarr/refs/heads/develop/Logo/Prowlarr.svg" width="32"/> [Prowlarr](http://localhost:9696/)
+
+- [ ] `Settings` -> `Show Advanced`
+  - [ ] `Apps`
+    - [ ] `Applications`
+      - [ ] `Radarr`
+        - [ ] `Name` -> `Radarr`
+        - [ ] `Sync Level` -> `Full Sync`
+        - [ ] `Prowlarr Server` -> `http://prowlarr:9696`
+        - [ ] `Radarr Server` -> `http://radarr:7878`
+        - [ ] [`API Key`](http://localhost:7878/settings/general)
+      - [ ] `Sonarr`
+        - [ ] `Name` -> `Sonarr`
+        - [ ] `Sync Level` -> `Full Sync`
+        - [ ] `Prowlarr Server` -> `http://prowlarr:9696`
+        - [ ] `Sonarr Server` -> `http://sonarr:8989`
+        - [ ] [`API Key`](http://localhost:8989/settings/general)
+        - [ ] `Sync Anime Standard Format Search` -> `On`
+    - [ ] `Sync Profiles`
+      - [ ] `Standard`
+        - [ ] `Enable RSS` -> `Off`
+        - [ ] `Enable Automatic Search` -> `Off`
+        - [ ] `Enable Interactive Search` -> `Off`
+  - [ ] `Download Clients`
+    - [ ] `qBittorrent`
+      - [ ] `Name` -> `qBittorrent`
+      - [ ] `Host` -> `qbittorrent`
+      - [ ] `Port` -> `8080`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+      - [ ] `Category` -> `prowlarr`
+  - [ ] `General`
+    - [ ] `Security`
+      - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+    - [ ] `Proxy`
+      - [ ] `Use Proxy` -> `On`
+      - [ ] `Proxy Type` -> `HTTP(S)`
+      - [ ] `Hostname` -> `sing-box`
+      - [ ] `Port` -> `2080`
+      - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `UI`
+    - [ ] `Dates`
+      - [ ] `Short Date Format` -> `25 Mar 2014`
+      - [ ] `Long Date Format` -> `Tuesday, 25 March, 2014`
+      - [ ] `Time Format` -> `17:00/17:30`
+      - [ ] `Show Relative Dates` -> `On`
+    - [ ] `Language`
+      - [ ] `UI Language` -> `Russian`
 
 # <img src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/SVG/icon-transparent.svg" width="32"/> [Jellyfin](http://localhost:8096/)
 
