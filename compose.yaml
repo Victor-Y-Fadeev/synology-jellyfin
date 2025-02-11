@@ -27,11 +27,14 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
     ports:
       - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
     depends_on:
       - sing-box
 
@@ -95,11 +98,15 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN}
     volumes:
       - ./config/jellyfin:/config
       - ./data:/data
     ports:
       - 8096:8096
+      - 8920:8920
+      - 7359:7359/udp
+      - 1900:1900/udp
     depends_on:
       - sing-box
   jellyseerr:

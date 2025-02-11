@@ -81,56 +81,58 @@
 
 # <img src="https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent-tray.svg" width="32"/> [qBittorrent](http://localhost:8080/)
 
-- [ ] `Tools`
-  - [ ] `Options...`
-    - [ ] `Behavior`
-      - [ ] `Language`
-        - [ ] `User Interface Language:` -> `Russian`
-    - [ ] `Downloads`
-      - [ ] `When adding a torrent`
-        - [ ] `Torrent content layout:` -> `Create subfolder`
-        - [ ] `When duplicate torrent is being added`
-          - [ ] `Merge trackers to existing torrent` -> `On`
-      - [ ] `Saving Management`
-        - [ ] `Default Save Path:` -> `/data/downloads`
-        - [ ] `Copy .torrent files to:` -> `/data/torrents`
-      - [ ] `Automatically add torrents from:` -> `/data/torrents`
-    - [ ] `Connection`
-      - [ ] `Connections Limits`
-        - [ ] `Global maximum number of connections:` -> `Off`
-        - [ ] `Maximum number of connections per torrent:` -> `Off`
-        - [ ] `Global maximum number of upload slots:` -> `Off`
-        - [ ] `Maximum number of upload slots per torrent:` -> `Off`
-      - [ ] `Proxy Server`
-        - [ ] `Type:` -> `HTTP`
-        - [ ] `Host:` -> `sing-box`
-        - [ ] `Port:` -> `2080`
-        - [ ] `Perform hostname lookup via proxy` -> `On`
-        - [ ] `Use proxy for BitTorrent purposes` -> `On`
-          - [ ] `Use proxy for peer connections` -> `Off`/`On`
-        - [ ] `Use proxy for RSS purposes` -> `On`
-        - [ ] `Use proxy for general purposes` -> `On`
-    - [ ] `Speed`
-      - [ ] `Global Rate Limits`
-        - [ ] `Upload:` -> `0`
-        - [ ] `Download:` -> `0`
-      - [ ] `Alternative Rate Limits`
-        - [ ] `Upload:` -> `0`
-        - [ ] `Download:` -> `0`
-      - [ ] `Rate Limits Settings`
-        - [ ] `Apply rate limit to µTP protocol` -> `Off`
-        - [ ] `Apply rate limit to transport overhead` -> `Off`
-        - [ ] `Apply rate limit to peers on LAN` -> `Off`
-    - [ ] `BitTorrent`
-      - [ ] `Max active checking torrents:` -> `-1`
-      - [ ] `Torrent Queueing` - > `Off`
-    - [ ] `WebUI`
-      - [ ] `Authentication`
-        - [ ] `Username:` -> `admin`
-        - [ ] `Password:` -> `adminadmin`
-    - [ ] `Advanced`
-      - [ ] `libtorrent Section`
-        - [ ] `Hashing threads:` -> `32`
+- [ ] `Tools` -> `Options...`
+  - [ ] `Behavior`
+    - [ ] `Language`
+      - [ ] `User Interface Language:` -> `Russian`
+  - [ ] `Downloads`
+    - [ ] `When adding a torrent`
+      - [ ] `Torrent content layout:` -> `Create subfolder`
+      - [ ] `When duplicate torrent is being added`
+        - [ ] `Merge trackers to existing torrent` -> `On`
+    - [ ] `Saving Management`
+      - [ ] `Default Torrent Management Mode:` -> `Automatic`
+      - [ ] `When Torrent Category changed:` -> `Relocate torrent`
+      - [ ] `When Default Save Path changed:` -> `Relocate affected torrents`
+      - [ ] `When Category Save Path changed:` -> `Relocate affected torrents`
+      - [ ] `Default Save Path:` -> `/data/downloads`
+      - [ ] `Copy .torrent files to:` -> `/data/torrents`
+  - [ ] `Connection`
+    - [ ] `Connections Limits`
+      - [ ] `Global maximum number of connections:` -> `Off`
+      - [ ] `Maximum number of connections per torrent:` -> `Off`
+      - [ ] `Global maximum number of upload slots:` -> `Off`
+      - [ ] `Maximum number of upload slots per torrent:` -> `Off`
+    - [ ] `Proxy Server`
+      - [ ] `Type:` -> `HTTP`
+      - [ ] `Host:` -> `sing-box`
+      - [ ] `Port:` -> `2080`
+      - [ ] `Perform hostname lookup via proxy` -> `On`
+      - [ ] `Use proxy for BitTorrent purposes` -> `On`
+        - [ ] `Use proxy for peer connections` -> `Off`/`On`
+      - [ ] `Use proxy for RSS purposes` -> `On`
+      - [ ] `Use proxy for general purposes` -> `On`
+  - [ ] `Speed`
+    - [ ] `Global Rate Limits`
+      - [ ] `Upload:` -> `0`
+      - [ ] `Download:` -> `0`
+    - [ ] `Alternative Rate Limits`
+      - [ ] `Upload:` -> `0`
+      - [ ] `Download:` -> `0`
+    - [ ] `Rate Limits Settings`
+      - [ ] `Apply rate limit to µTP protocol` -> `Off`
+      - [ ] `Apply rate limit to transport overhead` -> `Off`
+      - [ ] `Apply rate limit to peers on LAN` -> `Off`
+  - [ ] `BitTorrent`
+    - [ ] `Max active checking torrents:` -> `-1`
+    - [ ] `Torrent Queueing` - > `Off`
+  - [ ] `WebUI`
+    - [ ] `Authentication`
+      - [ ] `Username:` -> `admin`
+      - [ ] `Password:` -> `adminadmin`
+  - [ ] `Advanced`
+    - [ ] `libtorrent Section`
+      - [ ] `Hashing threads:` -> `32`
 
 # <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
 
@@ -152,9 +154,9 @@
       - [ ] `Unmonitor Deleted Movies` - > `On`
       - [ ] `Propers and Repacks` -> `Do not Prefer`
     - [ ] `Root Folders`
-      - [ ] `/data/anime`
-      - [ ] `/data/cartoons`
-      - [ ] `/data/movies`
+      - [ ] `/data/movies/anime`
+      - [ ] `/data/movies/cartoons`
+      - [ ] `/data/movies/films`
   - [ ] `Download Clients`
     - [ ] `qBittorrent`
       - [ ] `Name` -> `qBittorrent`
@@ -165,9 +167,13 @@
       - [ ] `Category` -> `radarr`
       - [ ] `Completed Download Handling`
         - [ ] `Remove Completed` -> `Off`
+  - [ ] `Metadata`
+    - [ ] `Options`
+      - [ ] `Certification Country` -> `United States`
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Authentication Required` -> `Enabled`
       - [ ] `Username` -> `admin`
       - [ ] `Password` -> `adminadmin`
     - [ ] `Proxy`
@@ -216,9 +222,9 @@
       - [ ] `Unmonitor Deleted Episodes` - > `On`
       - [ ] `Propers and Repacks` -> `Do not Prefer`
     - [ ] `Root Folders`
-      - [ ] `/data/anime`
-      - [ ] `/data/cartoons`
-      - [ ] `/data/series`
+      - [ ] `/data/series/anime`
+      - [ ] `/data/series/cartoons`
+      - [ ] `/data/series/tv`
   - [ ] `Download Clients`
     - [ ] `qBittorrent`
       - [ ] `Name` -> `qBittorrent`
@@ -232,6 +238,7 @@
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Authentication Required` -> `Enabled`
       - [ ] `Username` -> `admin`
       - [ ] `Password` -> `adminadmin`
     - [ ] `Proxy`
@@ -286,6 +293,7 @@
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Authentication Required` -> `Enabled`
       - [ ] `Username` -> `admin`
       - [ ] `Password` -> `adminadmin`
     - [ ] `Proxy`
@@ -304,5 +312,44 @@
       - [ ] `UI Language` -> `Russian`
 
 # <img src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/SVG/icon-transparent.svg" width="32"/> [Jellyfin](http://localhost:8096/)
+
+- [ ] `Administration` -> `Dashboard`
+  - [ ] `Server`
+    - [ ] `General`
+      - [ ] `Settings`
+        - [ ] `Server name` -> `DS723+`
+        - [ ] `Preferred display language` -> `Russian`
+    - [ ] `Libraries`
+      - [ ] `Libraries` -> `Add Media Library`
+        - [ ] `Anime`
+          - [ ] `Content type` -> `Mixed Movies and Shows`
+          - [ ] `Display name` -> `Anime`
+          - [ ] `Folders`
+            - [ ] `/data/movies/anime`
+            - [ ] `/data/series/anime`
+        - [ ] `Cartoons`
+          - [ ] `Content type` -> `Mixed Movies and Shows`
+          - [ ] `Display name` -> `Cartoons`
+          - [ ] `Folders`
+            - [ ] `/data/movies/cartoons`
+            - [ ] `/data/series/cartoons`
+        - [ ] `Movies`
+          - [ ] `Content type` -> `Movies`
+          - [ ] `Display name` -> `Movies`
+          - [ ] `Folders`
+            - [ ] `/data/movies/films`
+        - [ ] `Shows`
+          - [ ] `Content type` -> `Shows`
+          - [ ] `Display name` -> `Shows`
+          - [ ] `Folders`
+            - [ ] `/data/series/tv`
+      - [ ] `Metadata`
+        - [ ] `Preferred Metadata Language`
+          - [ ] `Language` -> `Russian`
+          - [ ] `Country/Region` -> `United States`
+  - [ ] `Plugins`
+    - [ ] `Catalog`
+      - [ ] `Metadata`
+        - [ ] `TheTVDB` -> `Install`
 
 # <img src="https://raw.githubusercontent.com/Fallenbagel/jellyseerr/refs/heads/develop/public/os_icon.svg" width="32"/> [Jellyseerr](http://localhost:5055/)
