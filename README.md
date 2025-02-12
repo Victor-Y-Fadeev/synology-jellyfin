@@ -319,6 +319,10 @@
       - [ ] `Settings`
         - [ ] `Server name` -> `DS723+`
         - [ ] `Preferred display language` -> `Russian`
+    - [ ] `Users`
+      - [ ] `Users` -> `Edit user`
+        - [ ] `Allow ...` -> `On`
+        - [ ] `Hide this user from login screens` -> `On`
     - [ ] `Libraries`
       - [ ] `Libraries` -> `Add Media Library`
         - [ ] `Anime`
