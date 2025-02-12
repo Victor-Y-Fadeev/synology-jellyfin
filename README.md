@@ -357,3 +357,52 @@
         - [ ] `TheTVDB` -> `Install`
 
 # <img src="https://raw.githubusercontent.com/Fallenbagel/jellyseerr/refs/heads/develop/public/os_icon.svg" width="32"/> [Jellyseerr](http://localhost:5055/)
+
+- [ ] `Settings`
+  - [ ] `General`
+    - [ ] `Enable Image Caching` -> `On`
+    - [ ] `Display Language` -> `Russian`
+    - [ ] `Streaming Region` -> `United States`
+    - [ ] `Hide Available MediaExperimental` -> `On`
+    - [ ] `Allow Partial Series Requests` -> `On`
+    - [ ] `Allow Special Episodes Requests` -> `On`
+    - [ ] `HTTP(S) Proxy` -> `On`
+      - [ ] `Proxy Hostname` -> `sing-box`
+      - [ ] `Proxy Port` -> `2080`
+      - [ ] `Proxy Ignored Addresses` -> `jellyfin, radarr, sonarr`
+      - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `Jellyfin`
+    - [ ] `Jellyfin Libraries` -> `Sync Libraries`
+      - [ ] `Anime` -> `On`
+      - [ ] `Cartoons` -> `On`
+      - [ ] `Movies` -> `On`
+      - [ ] `Shows` -> `On`
+    - [ ] `Jellyfin Settings`
+      - [ ] `Hostname or IP Address` -> `jellyfin`
+      - [ ] `Port` -> `8096`
+      - [ ] [`API key`](http://localhost:8096/web/#/dashboard/keys)
+  - [ ] `Services`
+    - [ ] `Radarr Settings` -> `Add Radarr Server`
+      - [ ] `Default Server` -> `On`
+      - [ ] `Server Name` -> `Radarr`
+      - [ ] `Hostname or IP Address` -> `radarr`
+      - [ ] `Port` -> `7878`
+      - [ ] [`API Key`](http://localhost:7878/settings/general)
+      - [ ] `Quality Profile` -> `Any`
+      - [ ] `Root Folder` -> `/data/movies/films`
+      - [ ] `Minimum Availability` -> `Released`
+      - [ ] `Enable Automatic Search` -> `On`
+    - [ ] `Sonarr Settings` -> `Add Sonarr Server`
+      - [ ] `Default Server` -> `On`
+      - [ ] `Server Name` -> `Sonarr`
+      - [ ] `Hostname or IP Address` -> `sonarr`
+      - [ ] `Port` -> `8989`
+      - [ ] [`API Key`](http://localhost:8989/settings/general)
+      - [ ] `Series Type` -> `Standard`
+      - [ ] `Quality Profile` -> `Any`
+      - [ ] `Root Folder` -> `/data/series/tv`
+      - [ ] `Anime Series Type` -> `Standard`
+      - [ ] `Anime Quality Profile` -> `Any`
+      - [ ] `Anime Root Folder` -> `/data/series/anime`
+      - [ ] `Season Folders` -> `On`
+      - [ ] `Enable Automatic Search` -> `On`

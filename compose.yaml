@@ -18,15 +18,15 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
+      # - WEBUI_PORT=8080
+      # - TORRENTING_PORT=6881
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
     ports:
       - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
+      # - 6881:6881
+      # - 6881:6881/udp
     depends_on:
       - sing-box
 
@@ -96,17 +96,17 @@ services:
       - ./data:/data
     ports:
       - 8096:8096
-      - 8920:8920
-      - 7359:7359/udp
-      - 1900:1900/udp
+      # - 8920:8920
+      # - 7359:7359/udp
+      # - 1900:1900/udp
     depends_on:
       - sing-box
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:develop
     container_name: jellyseerr
     restart: unless-stopped
     environment:
-      - LOG_LEVEL=debug
+      # - LOG_LEVEL=debug
       - TZ=${TZ}
     ports:
       - 5055:5055
@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
     environment:
       # - NO_AUTOUPDATE
-      - TUNNEL_LOGLEVEL=debug
+      # - TUNNEL_LOGLEVEL=debug
       # - TUNNEL_TRANSPORT_PROTOCOL=http2
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     depends_on:
