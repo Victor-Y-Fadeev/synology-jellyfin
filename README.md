@@ -381,6 +381,7 @@
       - [ ] `Hostname or IP Address` -> `jellyfin`
       - [ ] `Port` -> `8096`
       - [ ] [`API key`](http://localhost:8096/web/#/dashboard/keys)
+      - [ ] `External URL` -> `https://jellyfin.*`
   - [ ] `Services`
     - [ ] `Radarr Settings` -> `Add Radarr Server`
       - [ ] `Default Server` -> `On`
@@ -391,7 +392,22 @@
       - [ ] `Quality Profile` -> `Any`
       - [ ] `Root Folder` -> `/data/movies/films`
       - [ ] `Minimum Availability` -> `Released`
+      - [ ] `External URL` -> `https://radarr.*`
+      - [ ] `Enable Scan` -> `On`
       - [ ] `Enable Automatic Search` -> `On`
+      - [ ] `Override Rules` -> `New Override Rule`
+        - [ ] `Anime`
+          - [ ] `Conditions`
+            - [ ] `Keywords` -> `anime`
+          - [ ] `Settings`
+            - [ ] `Root Folder` -> `/data/movies/anime`
+            - [ ] `Quality Profile` -> `Any`
+        - [ ] `Cartoons`
+          - [ ] `Conditions`
+            - [ ] `Genres` -> `Animation`
+          - [ ] `Settings`
+            - [ ] `Root Folder` -> `/data/movies/cartoons`
+            - [ ] `Quality Profile` -> `Any`
     - [ ] `Sonarr Settings` -> `Add Sonarr Server`
       - [ ] `Default Server` -> `On`
       - [ ] `Server Name` -> `Sonarr`
@@ -405,4 +421,13 @@
       - [ ] `Anime Quality Profile` -> `Any`
       - [ ] `Anime Root Folder` -> `/data/series/anime`
       - [ ] `Season Folders` -> `On`
+      - [ ] `External URL` -> `https://sonarr.*`
+      - [ ] `Enable Scan` -> `On`
       - [ ] `Enable Automatic Search` -> `On`
+      - [ ] `Override Rules` -> `New Override Rule`
+        - [ ] `Cartoons`
+          - [ ] `Conditions`
+            - [ ] `Genres` -> `Animation`
+          - [ ] `Settings`
+            - [ ] `Root Folder` -> `/data/series/cartoons`
+            - [ ] `Quality Profile` -> `Any`

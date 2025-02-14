@@ -102,7 +102,7 @@ services:
     depends_on:
       - sing-box
   jellyseerr:
-    image: fallenbagel/jellyseerr:develop
+    image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: unless-stopped
     environment:
