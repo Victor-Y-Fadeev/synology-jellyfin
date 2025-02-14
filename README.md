@@ -371,6 +371,9 @@
       - [ ] `Proxy Port` -> `2080`
       - [ ] `Proxy Ignored Addresses` -> `jellyfin, radarr, sonarr`
       - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `Users`
+    - [ ] `Enable Local Sign-In` -> `Off`
+    - [ ] `Enable New Jellyfin Sign-In` -> `Off`
   - [ ] `Jellyfin`
     - [ ] `Jellyfin Libraries` -> `Sync Libraries`
       - [ ] `Anime` -> `On`
