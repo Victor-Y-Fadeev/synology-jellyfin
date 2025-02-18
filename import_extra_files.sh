@@ -105,7 +105,10 @@ function rename_file {
 
     for file in "${array[@]}"; do
         local postfix="${file##"$old_absolute"}"
-        mv --force "$file" "${new_absolute}${postfix}"
+        local destination="${new_absolute}${postfix}"
+
+        mv --force "$file" "$destination"
+        echo "Move '$file' => '$destination'"
     done
 }
 
@@ -122,7 +125,14 @@ function rename_extra_files {
 }
 
 
-# import_extra_files "$(realpath "$1")" "$(realpath "$2")"
+function remove_extra_files {
+    search_extra_files array "$1" 1
+
+    for file in "${array[@]}"; do
+        rm --force "$file"
+        echo "Remove '$file'"
+    done
+}
 
 
 case "$sonarr_eventtype" in
@@ -135,5 +145,6 @@ case "$sonarr_eventtype" in
         rename_extra_files "$sonarr_episodefile_previouspaths" "$sonarr_episodefile_paths"
         ;;
     "EpisodeFileDelete")
+        remove_extra_files "$sonarr_episodefile_path"
         ;;
 esac
