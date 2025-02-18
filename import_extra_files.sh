@@ -8,24 +8,51 @@ function file_to_dictionary {
     local -r file="$2"
     local -r name="$(basename "$file")"
 
-    if [[ -n "${map["$name"]}" ]] ; then
-        map["$name"]+="|$file"
+    if [[ -n "${map[$name]}" ]]; then
+        map[$name]+=$'\n'"$file"
     else
-        map["$name"]="$file"
+        map[$name]="$file"
     fi
 }
 
 function dictionary_to_commentary {
-    local -n from="${1}"
-    local -n to="${2}"
+    local -n from="$1"
+    local -n to="$2"
 
     for key in "${!from[@]}"; do
-        readarray -d '|' -t list <<< "${from[$key]}"
+        # readarray -d '\n' -t list <<< "${from[$key]}"
+        # echo "$(wc -l <<< "${from[$key]}")"
+        local value="${from[$key]}"
+        local count="$(wc -l <<< "$value")"
 
-        if (( "${#list[@]}" > 1 )) ; then
-            echo "$key -> ${#list[@]}"
-            # printf "abg\nabc\nabjuyuj\nab\nac4545\n" | sed -e 'N;s/^\(.*\).*\n\1.*$/\1\n\1/;D'
+        if (( count > 1 )); then
+            # echo "$key -> ${#list[@]}"
+            # printf "abg\nabc\nabjuyuj\nab\nac4545\n" | sed -e 'N;s|^\(.*\).*\n\1.*$|\1\n\1|;D'
             # https://stackoverflow.com/questions/6973088/longest-common-prefix-of-two-strings-in-bash
+
+            local prefix="$(sed -e 'N;s|^\(.*/\).*\n\1.*$|\1\n\1|;D' <<< "$value")"
+            local postfix="$(sed -e 'N;s|^.*\(/.*\)\n.*\1$|\1\n\1|;D' <<< "$value")"
+
+            # for line in "$(echo "$value")"; do
+            #     # echo "${line#"$prefix"}"
+            #     # echo "${line%"$postfix"}"
+            #     echo "'$line'"
+            # done
+            while read -r line; do
+                local comment="${line#"$prefix"}"
+                comment="${comment%"$postfix"}"
+                comment="$comment/$comment//$comment/$comment"
+                comment="${comment//// }"
+                echo "$comment"
+            done <<< "$value"
+
+            # echo "${value}"
+            # echo "$prefix"
+            # echo "$postfix"
+            # sed 's/@@ /\n/g'
+            # echo "${from[$key]//|/@@}"
+            # echo 
+            # echo -e "${from[$key]}"
         fi
     done
 }
