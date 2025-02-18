@@ -97,12 +97,16 @@ function import_extra_files {
 
 function rename_file {
     local old_path="$1"
-    local old_name="$(basename "${old_path%.*}")"
+    local old_absolute="${old_path%.*}"
     search_extra_files array "$old_path" 1
 
     local new_path="$2"
     local new_absolute="${new_path%.*}"
 
+    for file in "${array[@]}"; do
+        local postfix="${file##"$old_absolute"}"
+        mv --force "$file" "${new_absolute}${postfix}"
+    done
 }
 
 
