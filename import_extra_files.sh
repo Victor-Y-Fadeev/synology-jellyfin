@@ -45,8 +45,12 @@ function import_file {
     local source_path="$1"
     local destination_path="$2"
 
-    echo
-    echo "'$source_path' -> '$destination_path'"
+    if ln --force "$source_path" "$destination_path"; then
+        echo "Hardlink '$source_path' => '$destination_path'"
+    else
+        cp --force "$source_path" "$destination_path"
+        echo "Copy '$source_path' => '$destination_path'"
+    fi
 }
 
 
@@ -71,24 +75,25 @@ function search_extra_files {
     dictionary_to_commentary dictionary commentary
 
     local destination_path="$2"
-    # local destination_folder="$(dirname "$destination_path")"
-    # local destination_filename="$(basename "$destination_path")"
-    # local destination_name="${destination_filename%.*}"
     local destination_absolute="${destination_path%.*}"
 
     for file in "${array[@]}"; do
         local extension="${file##*"$source_name"}"
         local suffix="${commentary[$file]}"
 
-        # if [[ -n "$suffix" ]]; then
-            import_file "$file" "${destination_absolute}${suffix}${extension}"
-        # else
-        #     import_file "$file" "${destination_absolute}${extension}"
-        # fi
+        import_file "$file" "${destination_absolute}${suffix}${extension}"
     done
 }
 
-search_extra_files "$(realpath "$1")" "$(realpath "$2")"
+# search_extra_files "$(realpath "$1")" "$(realpath "$2")"
+
+
+import_file "/mnt/d/Desktop/synology-plex/link_test/1" "/mnt/c/Games/1"
+# import_file "/mnt/d/Desktop/synology-plex/link_test/1" "/mnt/c/1"
+import_file "/mnt/d/Desktop/synology-plex/link_test/1" "/mnt/d/Desktop/synology-plex/link_test/41"
+
+
+
 
 
 case "$sonarr_eventtype" in
