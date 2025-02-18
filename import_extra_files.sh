@@ -3,6 +3,22 @@
 set -e
 
 
+function search_extra_files {
+    local -n output="$1"
+    local origin="$2"
+    local levels="${3:-10}"
+
+    local folder="$(dirname "$origin")"
+    local file="$(basename "$origin")"
+
+    local file_escape="$(printf '%q' "$file")"
+    local name_escape="${file_escape%.*}"
+
+    readarray -d '' output < <(find "$folder" -maxdepth "$levels" -type f \
+        -name "${name_escape}.*" ! -name "$file_escape" -print0)
+}
+
+
 function file_to_dictionary {
     local -n map="$1"
     local file="$2"
@@ -54,17 +70,10 @@ function import_file {
 }
 
 
-function search_extra_files {
+function import_extra_files {
     local source_path="$1"
-    local source_folder="$(dirname "$source_path")"
-    local source_file="$(basename "$source_path")"
-    local source_name="${source_file%.*}"
-
-    local source_file_escape="$(printf '%q' "$source_file")"
-    local source_name_escape="$(printf '%q' "$source_name")"
-
-    readarray -d '' array < <(find "$source_folder" -type f \
-        -name "${source_name_escape}.*" ! -name "$source_file_escape" -print0)
+    local source_name="$(basename "${source_path%.*}")"
+    search_extra_files array "$source_path"
 
     local -A dictionary
     for file in "${array[@]}"; do
@@ -85,24 +94,41 @@ function search_extra_files {
     done
 }
 
-# search_extra_files "$(realpath "$1")" "$(realpath "$2")"
+
+function rename_file {
+    local old_path="$1"
+    local old_name="$(basename "${old_path%.*}")"
+    search_extra_files array "$old_path" 1
+
+    local new_path="$2"
+    local new_absolute="${new_path%.*}"
+
+}
 
 
-import_file "/mnt/d/Desktop/synology-plex/link_test/1" "/mnt/c/Games/1"
-# import_file "/mnt/d/Desktop/synology-plex/link_test/1" "/mnt/c/1"
-import_file "/mnt/d/Desktop/synology-plex/link_test/1" "/mnt/d/Desktop/synology-plex/link_test/41"
+function rename_extra_files {
+    readarray -d '|' -t old_paths <<< "$1"
+    readarray -d '|' -t new_paths <<< "$2"
+
+    local length="${#old_paths[@]}"
+
+    for (( i = 0; i < length; ++i )); do
+        rename_file "${old_paths[$i]}" "${new_paths[$i]}"
+    done
+}
 
 
-
+# import_extra_files "$(realpath "$1")" "$(realpath "$2")"
 
 
 case "$sonarr_eventtype" in
     "Download")
-        if [[ ! -z "$sonarr_isupgrade" ]] ; then
-            search_extra_files "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
+        if [[ ! -z "$sonarr_isupgrade" ]]; then
+            import_extra_files "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
         fi
         ;;
     "Rename")
+        rename_extra_files "$sonarr_episodefile_previouspaths" "$sonarr_episodefile_paths"
         ;;
     "EpisodeFileDelete")
         ;;
