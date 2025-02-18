@@ -17,22 +17,45 @@ function file_to_dictionary {
 
 
 function dictionary_to_commentary {
-    local -n from="$1"
-    local -n to="$2"
+    local -n input="$1"
+    local -n output="$2"
 
-    for key in "${!from[@]}"; do
-        local value="${from[$key]}"
+    for key in "${!input[@]}"; do
+        local value="${input[$key]}"
         local count="$(wc -l <<< "$value")"
 
         if (( count > 1 )); then
             local prefix="$(sed -e 'N;s|^\(.*/\).*\n\1.*$|\1\n\1|;D' <<< "$value")"
             local postfix="$(sed -e 'N;s|^.*\(/.*\)\n.*\1$|\1\n\1|;D' <<< "$value")"
 
+            # echo $prefix $postfix
+            local prefix_length="${#prefix}"
+            local postfix_length="${#postfix}"
+            prefix="${#prefix}"
+            postfix="${#postfix}"
+            # echo $prefix_length $postfix_length
+
             while read -r line; do
-                local comment="${line#"$prefix"}"
-                comment="${comment%"$postfix"}"
-                comment="${comment//// }"
-                to[$line]="$comment"
+                if (( prefix + postfix < ${#line} )); then
+                    output[$line]="${line:prefix:-postfix}"
+                fi
+
+                # if (( prefix_length + postfix_length < ${#line} )); then
+                #     to[$line]="${line:prefix_length:-postfix_length}"
+                # fi
+
+
+                # local comment="${line#"$prefix"}"
+                # comment="${comment%"$postfix"}"
+                # comment="${comment//// }"
+                # to[$line]="$comment"
+
+                # echo "'${line:$prefix_length}'"
+                # if (( prefix_length + postfix_length < ${#line} )); then
+                # echo "'${line:$prefix_length:-$postfix_length}'"
+                # else
+                # echo ''
+                # fi
             done <<< "$value"
         fi
     done
@@ -70,7 +93,7 @@ function import_file {
     dictionary_to_commentary dictionary commentary
 
     for file in "${array[@]}"; do
-        echo "$file -> ${commentary[$file]}"
+        echo "'$file' -> '${commentary[$file]}'"
     done
 
     # for key in "${!dictionary[@]}"; do
