@@ -5,8 +5,8 @@ set -e
 
 function file_to_dictionary {
     local -n map="$1"
-    local file="$2"
-    local name="$(basename "$file")"
+    local -r file="$2"
+    local -r name="$(basename "$file")"
 
     if [[ -n "${map["$name"]}" ]] ; then
         map["$name"]+="|$file"
@@ -24,32 +24,34 @@ function dictionary_to_commentary {
 
         if (( "${#list[@]}" > 1 )) ; then
             echo "$key -> ${#list[@]}"
+            # printf "abg\nabc\nabjuyuj\nab\nac4545\n" | sed -e 'N;s/^\(.*\).*\n\1.*$/\1\n\1/;D'
+            # https://stackoverflow.com/questions/6973088/longest-common-prefix-of-two-strings-in-bash
         fi
     done
 }
 
 
 function import_file {
-    local source_path="$1"
-    local source_folder="$(dirname "$source_path")"
-    local source_file="$(basename "$source_path")"
-    local source_escape_file="$(printf '%q' "$source_file")"
-    local source_escape_name="${source_escape_file%.*}"
+    local -r source_path="$1"
+    local -r source_folder="$(dirname "$source_path")"
+    local -r source_file="$(basename "$source_path")"
+    local -r source_escape_file="$(printf '%q' "$source_file")"
+    local -r source_escape_name="${source_escape_file%.*}"
 
-    local destination_path="$2"
-    local destination_folder="$(dirname "$destination_path")"
-    local destination_filename="$(basename "$destination_path")"
-    local destination_name="${destination_filename%.*}"
+    local -r destination_path="$2"
+    local -r destination_folder="$(dirname "$destination_path")"
+    local -r destination_filename="$(basename "$destination_path")"
+    local -r destination_name="${destination_filename%.*}"
 
     readarray -d '' array < <(find "$source_folder" -type f -name "${source_escape_name}.*" \
                                 ! -name "$source_escape_file" -print0)
 
-    declare -A dictionary
+    local -A dictionary
     for file in "${array[@]}"; do
         file_to_dictionary dictionary "$file"
     done
 
-    declare -A commentary
+    local -A commentary
     dictionary_to_commentary dictionary commentary
 
     # for key in "${!dictionary[@]}"; do
@@ -60,10 +62,10 @@ function import_file {
 import_file "$(realpath "${1}")" "$(realpath "${2}")"
 
 
-case "${sonarr_eventtype}" in
+case "$sonarr_eventtype" in
     "Download")
-        if [[ ! -z "${sonarr_isupgrade}" ]] ; then
-            import_file "${sonarr_episodefile_sourcepath}" "${sonarr_episodefile_path}"
+        if [[ ! -z "$sonarr_isupgrade" ]] ; then
+            import_file "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
         fi
         ;;
     "Rename")
