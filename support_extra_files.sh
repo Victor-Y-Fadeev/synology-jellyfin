@@ -135,6 +135,19 @@ function remove_extra_files {
 }
 
 
+case "$radarr_eventtype" in
+    "Download")
+        import_extra_files "$radarr_moviefile_sourcepath" "$radarr_moviefile_path"
+        ;;
+    "Rename")
+        rename_extra_files "$radarr_moviefile_previouspaths" "$radarr_moviefile_paths"
+        ;;
+    "MovieFileDelete")
+        remove_extra_files "$radarr_moviefile_path"
+        ;;
+esac
+
+
 case "$sonarr_eventtype" in
     "Download")
         if [[ ! -z "$sonarr_isupgrade" ]]; then
