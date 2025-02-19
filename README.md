@@ -1,5 +1,3 @@
-# <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png" width="32"/> [Cloudflare](https://one.dash.cloudflare.com/)
-
 # <img src="https://raw.githubusercontent.com/SagerNet/sing-box/refs/heads/dev-next/docs/assets/icon.svg" width="32"/> [sing-box](http://localhost:2080/)
 
 <details><summary><code>/etc/sing-box/config.json</code></summary><br><blockquote>
@@ -149,7 +147,6 @@
       - [ ] `Delete empty Folders` - > `On`
     - [ ] `Importing`
       - [ ] `Use Hardlinks instead of Copy` - > `On`
-      - [ ] `Import Extra Files` - > `On`
     - [ ] `File Management`
       - [ ] `Unmonitor Deleted Movies` - > `On`
       - [ ] `Propers and Repacks` -> `Do not Prefer`
@@ -167,6 +164,17 @@
       - [ ] `Category` -> `radarr`
       - [ ] `Completed Download Handling`
         - [ ] `Remove Completed` -> `Off`
+  - [ ] `Connect`
+    - [ ] `Connections`
+      - [ ] `Add Connection` -> `Custom Script`
+        - [ ] `Name` -> `Support Extra Files`
+        - [ ] `Notification Triggers` -> `Off`
+          - [ ] `On File Import` -> `On`
+          - [ ] `On File Upgrade` -> `On`
+          - [ ] `On Rename` -> `On`
+          - [ ] `On Movie File Delete` -> `On`
+          - [ ] `On Movie File Delete For Upgrade` -> `On`
+        - [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](./support_extra_files.sh)
   - [ ] `Metadata`
     - [ ] `Options`
       - [ ] `Certification Country` -> `United States`
@@ -217,7 +225,6 @@
       - [ ] `Delete Empty Folders` - > `On`
     - [ ] `Importing`
       - [ ] `Use Hardlinks instead of Copy` - > `On`
-      - [ ] `Import Extra Files` - > `On`
     - [ ] `File Management`
       - [ ] `Unmonitor Deleted Episodes` - > `On`
       - [ ] `Propers and Repacks` -> `Do not Prefer`
@@ -235,6 +242,17 @@
       - [ ] `Category` -> `tv-sonarr`
       - [ ] `Completed Download Handling`
         - [ ] `Remove Completed` -> `Off`
+  - [ ] `Connect`
+    - [ ] `Connections`
+      - [ ] `Add Connection` -> `Custom Script`
+        - [ ] `Name` -> `Support Extra Files`
+        - [ ] `Notification Triggers` -> `Off`
+          - [ ] `On File Import` -> `On`
+          - [ ] `On File Upgrade` -> `On`
+          - [ ] `On Rename` -> `On`
+          - [ ] `On Episode File Delete` -> `On`
+          - [ ] `On Episode File Delete For Upgrade` -> `On`
+        - [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](./support_extra_files.sh)
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
@@ -363,7 +381,6 @@
     - [ ] `Enable Image Caching` -> `On`
     - [ ] `Display Language` -> `Russian`
     - [ ] `Streaming Region` -> `United States`
-    - [ ] `Hide Available MediaExperimental` -> `On`
     - [ ] `Allow Partial Series Requests` -> `On`
     - [ ] `Allow Special Episodes Requests` -> `On`
     - [ ] `HTTP(S) Proxy` -> `On`
@@ -434,3 +451,5 @@
           - [ ] `Settings`
             - [ ] `Root Folder` -> `/data/series/cartoons`
             - [ ] `Quality Profile` -> `Any`
+
+# <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png" width="32"/> [Cloudflare](https://one.dash.cloudflare.com/)
