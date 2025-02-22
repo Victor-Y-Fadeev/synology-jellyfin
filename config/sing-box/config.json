@@ -1,10 +1,48 @@
 {
+  "dns": {
+    "servers": [
+      {
+        "tag": "google",
+        "address": "tls://8.8.8.8"
+      },
+      {
+        "tag": "local",
+        "address": "local",
+        "detour": "direct"
+      }
+    ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "local"
+      }
+    ]
+  },
   "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun",
+      "interface_name": "tun0",
+      "address": [
+        "172.40.0.1/16"
+      ],
+      "mtu": 9000,
+      "auto_route": true,
+      "auto_redirect": true,
+      "strict_route": true,
+      "stack": "system",
+      "sniff_override_destination": true,
+      "sniff": true
+    },
     {
       "type": "mixed",
       "tag": "mixed",
-      "listen": "::",
-      "listen_port": 2080
+      "listen": "0.0.0.0",
+      "listen_port": 2080,
+      "sniff_override_destination": true,
+      "sniff": true,
+      "udp_fragment": true,
+      "udp_disable_domain_unmapping": true
     }
   ],
   "outbounds": [
@@ -15,6 +53,10 @@
     {
       "type": "direct",
       "tag": "direct"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
     }
   ],
   "route": {
@@ -24,30 +66,39 @@
         "outbound": "direct"
       },
       {
-        "rule_set": "geoip-ru",
+        "protocol": "dns",
+        "outbound": "dns-out"
+      },
+      {
+        "protocol": "bittorrent",
         "outbound": "direct"
       },
       {
-        "rule_set": "geosite-category-ru",
+        "rule_set": "geoip",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite",
         "outbound": "direct"
       }
     ],
     "rule_set": [
       {
-        "tag": "geoip-ru",
+        "tag": "geoip",
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-ru.srs",
         "download_detour": "proxy"
       },
       {
-        "tag": "geosite-category-ru",
+        "tag": "geosite",
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ru.srs",
         "download_detour": "proxy"
       }
     ],
-    "final": "proxy"
+    "final": "proxy",
+    "auto_detect_interface": true
   }
 }
