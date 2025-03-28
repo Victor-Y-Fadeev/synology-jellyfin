@@ -18,7 +18,7 @@ services:
     ports:
       - 2080:2080
       - 2080:2080/udp
-      - 8080:8080
+      # - 8080:8080
     command: -D /var/lib/sing-box -C /etc/sing-box/ run
   flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
@@ -45,13 +45,13 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
-      # ports:
-      #   - 8080:8080
+    ports:
+      - 8080:8080
       # - 6881:6881
       # - 6881:6881/udp
     depends_on:
       - sing-box
-    network_mode: service:sing-box
+    # network_mode: service:sing-box
     # network_mode: host
 
   radarr:
