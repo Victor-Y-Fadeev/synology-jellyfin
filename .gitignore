@@ -1,5 +1,11 @@
-.vscode/
-.ssh/
+.vscode/*
+.ssh/*
 
-config/
-data/
+config/*
+data/*
+
+.env
+
+*.txt
+*.log
+*.json
