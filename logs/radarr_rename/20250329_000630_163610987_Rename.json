@@ -1,0 +1,21 @@
+{
+  "radarr_applicationurl": "",
+  "radarr_eventtype": "Rename",
+  "radarr_instancename": "Radarr",
+  "radarr_movie_genres": "Animation|Science Fiction|Action|Drama",
+  "radarr_movie_id": "5",
+  "radarr_movie_imdbid": "tt0169858",
+  "radarr_movie_in_cinemas_date": "07/19/1997 00:00:00",
+  "radarr_movie_originallanguage": "jpn",
+  "radarr_movie_path": "/data/movies/anime/Neon Genesis Evangelion - The End of Evangelion (1997) [tmdbid-18491]",
+  "radarr_movie_physical_release_date": "07/19/1997 00:00:00",
+  "radarr_movie_tags": "anime",
+  "radarr_movie_title": "Neon Genesis Evangelion: The End of Evangelion",
+  "radarr_movie_tmdbid": "18491",
+  "radarr_movie_year": "1997",
+  "radarr_moviefile_ids": "16",
+  "radarr_moviefile_paths": "/data/movies/anime/Neon Genesis Evangelion - The End of Evangelion (1997) [tmdbid-18491]/Neon Genesis Evangelion - The End of Evangelion (1997).mkv",
+  "radarr_moviefile_previouspaths": "/data/movies/anime/Neon Genesis Evangelion - The End of Evangelion (1997) [tmdbid-18491]/Neon Genesis Evangelion - The End of Evangelion (1997).pt2.mkv",
+  "radarr_moviefile_previousrelativepaths": "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.mkv",
+  "radarr_moviefile_relativepaths": "Neon Genesis Evangelion - The End of Evangelion (1997).mkv"
+}
