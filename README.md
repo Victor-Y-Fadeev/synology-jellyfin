@@ -1,82 +1,5 @@
 # <img src="https://raw.githubusercontent.com/SagerNet/sing-box/refs/heads/dev-next/docs/assets/icon.svg" width="32"/> [sing-box](http://localhost:2080/)
 
-<details><summary><code>/etc/sing-box/config.json</code></summary><br><blockquote>
-
-```json
-{
-  "inbounds": [
-    {
-      "type": "mixed",
-      "tag": "mixed",
-      "listen": "::",
-      "listen_port": 2080
-    }
-  ],
-  "outbounds": [
-    {
-      "type": "vless",
-      "tag": "proxy",
-      "server": "",
-      "server_port": 443,
-      "uuid": "",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "",
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        },
-        "reality": {
-          "enabled": true,
-          "public_key": "",
-          "short_id": ""
-        }
-      }
-    },
-    {
-      "type": "direct",
-      "tag": "direct"
-    }
-  ],
-  "route": {
-    "rules": [
-      {
-        "ip_is_private": true,
-        "outbound": "direct"
-      },
-      {
-        "rule_set": "geoip-ru",
-        "outbound": "direct"
-      },
-      {
-        "rule_set": "geosite-category-ru",
-        "outbound": "direct"
-      }
-    ],
-    "rule_set": [
-      {
-        "tag": "geoip-ru",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-ru.srs",
-        "download_detour": "proxy"
-      },
-      {
-        "tag": "geosite-category-ru",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ru.srs",
-        "download_detour": "proxy"
-      }
-    ],
-    "final": "proxy"
-  }
-}
-```
-
-</blockquote></details>
-
 # <img src="https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent-tray.svg" width="32"/> [qBittorrent](http://localhost:8080/)
 
 - [ ] `Tools` -> `Options...`
@@ -93,6 +16,8 @@
       - [ ] `When Torrent Category changed:` -> `Relocate torrent`
       - [ ] `When Default Save Path changed:` -> `Relocate affected torrents`
       - [ ] `When Category Save Path changed:` -> `Relocate affected torrents`
+      - [ ] `Use Subcategories` -> `On`
+      - [ ] `Use Category paths in Manual Mode` -> `On`
       - [ ] `Default Save Path:` -> `/data/downloads`
       - [ ] `Copy .torrent files to:` -> `/data/torrents`
   - [ ] `Connection`
@@ -101,15 +26,6 @@
       - [ ] `Maximum number of connections per torrent:` -> `Off`
       - [ ] `Global maximum number of upload slots:` -> `Off`
       - [ ] `Maximum number of upload slots per torrent:` -> `Off`
-    - [ ] `Proxy Server`
-      - [ ] `Type:` -> `HTTP`
-      - [ ] `Host:` -> `sing-box`
-      - [ ] `Port:` -> `2080`
-      - [ ] `Perform hostname lookup via proxy` -> `On`
-      - [ ] `Use proxy for BitTorrent purposes` -> `On`
-        - [ ] `Use proxy for peer connections` -> `Off`/`On`
-      - [ ] `Use proxy for RSS purposes` -> `On`
-      - [ ] `Use proxy for general purposes` -> `On`
   - [ ] `Speed`
     - [ ] `Global Rate Limits`
       - [ ] `Upload:` -> `0`
@@ -131,6 +47,125 @@
   - [ ] `Advanced`
     - [ ] `libtorrent Section`
       - [ ] `Hashing threads:` -> `32`
+- [ ] `CATEGORIES` -> `Add category...`
+  - [ ] `movies` -> `Add subcategory...`
+    - [ ] `movies/anime`
+    - [ ] `movies/cartoons`
+    - [ ] `movies/films`
+  - [ ] `series` -> `Add subcategory...`
+    - [ ] `series/anime`
+    - [ ] `series/cartoons`
+    - [ ] `series/tv`
+
+# <img src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/SVG/icon-transparent.svg" width="32"/> [Jellyfin](http://localhost:8096/)
+
+- [ ] `Administration` -> `Dashboard`
+  - [ ] `Plugins`
+    - [ ] `Catalog`
+      - [ ] `Metadata`
+        - [ ] `TheTVDB` -> `Install`
+    - [ ] `My Plugins`
+      - [ ] `TMDb`
+        - [ ] `Include adult content in search results.` -> `On`
+        - [ ] `Import season name from metadata fetched for series.` -> `On`
+      - [ ] `TheTVDB`
+        - [ ] `TheTVDB Settings:`
+          - [ ] `Fallback Languages:` -> `English`
+          - [ ] `Import season name from provider` -> `On`
+          - [ ] `Fallback to Original Language (Last resort if other fallback languages fails)` -> `On`
+          - [ ] `Include original country of the movie or series in tags.` -> `On`
+        - [ ] `Missing Episode Provider Settings:`
+          - [ ] `Include missing specials` -> `Off`
+          - [ ] `Remove All Missing Episodes On Refresh` -> `On`
+        - [ ] `Check for Metadata Updates Scheduled Task Settings:`
+          - [ ] `Update` -> `On`
+  - [ ] `Server`
+    - [ ] `General`
+      - [ ] `Settings`
+        - [ ] `Server name` -> `DS723+`
+        - [ ] `Preferred display language` -> `Russian`
+    - [ ] `Users`
+      - [ ] `Users` -> `Edit user`
+        - [ ] `Allow ...` -> `On`
+        - [ ] `Hide this user from login screens` -> `On`
+    - [ ] `Libraries`
+      - [ ] `Libraries` -> `Add Media Library`
+        - [ ] `Anime`
+          - [ ] `Content type` -> `Mixed Movies and Shows`
+          - [ ] `Display name` -> `Anime`
+          - [ ] `Folders`
+            - [ ] `/data/movies/anime`
+            - [ ] `/data/series/anime`
+        - [ ] `Cartoons`
+          - [ ] `Content type` -> `Mixed Movies and Shows`
+          - [ ] `Display name` -> `Cartoons`
+          - [ ] `Folders`
+            - [ ] `/data/movies/cartoons`
+            - [ ] `/data/series/cartoons`
+        - [ ] `Movies`
+          - [ ] `Content type` -> `Movies`
+          - [ ] `Display name` -> `Movies`
+          - [ ] `Folders`
+            - [ ] `/data/movies/films`
+        - [ ] `Shows`
+          - [ ] `Content type` -> `Shows`
+          - [ ] `Display name` -> `Shows`
+          - [ ] `Folders`
+            - [ ] `/data/series/tv`
+      - [ ] `Manage library` -> `Library Settings`
+        - [ ] `Metadata downloaders (TV Shows)`
+          - [ ] `Missing Episode Fetcher`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `TheTVDB`
+        - [ ] `Metadata downloaders (Seasons)`
+          - [ ] `TheMovieDb`
+          - [ ] `TheTVDB`
+        - [ ] `Metadata downloaders (Episodes)`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `TheTVDB`
+        - [ ] `Metadata downloaders (Movies)`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `TheTVDB`
+        - [ ] `Image fetchers (TV Shows)`
+          - [ ] `Fetcher Settings`
+            - [ ] `Primary` -> `On`
+            - [ ] `Clearart` -> `On`
+            - [ ] `Banner` -> `On`
+            - [ ] `Logo` -> `On`
+            - [ ] `Thumb` -> `On`
+          - [ ] `TheMovieDb`
+          - [ ] `TheTVDB`
+        - [ ] `Image fetchers (Seasons)`
+          - [ ] `Fetcher Settings`
+            - [ ] `Primary` -> `On`
+            - [ ] `Banner` -> `On`
+          - [ ] `TheMovieDb`
+          - [ ] `TheTVDB`
+        - [ ] `Image fetchers (Episodes)`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `TheTVDB`
+          - [ ] `Embedded Image Extractor`
+          - [ ] `Screen Grabber`
+        - [ ] `Image fetchers (Movies)`
+          - [ ] `Fetcher Settings`
+            - [ ] `Primary` -> `On`
+            - [ ] `Clearart` -> `On`
+            - [ ] `Banner` -> `On`
+            - [ ] `Logo` -> `On`
+            - [ ] `Thumb` -> `On`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `TheTVDB`
+          - [ ] `Embedded Image Extractor`
+          - [ ] `Screen Grabber`
+      - [ ] `Metadata`
+        - [ ] `Preferred Metadata Language`
+          - [ ] `Language` -> `Russian`
+          - [ ] `Country/Region` -> `United States`
 
 # <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
 
@@ -161,11 +196,16 @@
       - [ ] `Port` -> `8080`
       - [ ] `Username` -> `admin`
       - [ ] `Password` -> `adminadmin`
-      - [ ] `Category` -> `radarr`
+      - [ ] `Category` -> `movies`
       - [ ] `Completed Download Handling`
         - [ ] `Remove Completed` -> `Off`
   - [ ] `Connect`
     - [ ] `Connections`
+      - [ ] `Add Connection` -> `Emby / Jellyfin`
+        - [ ] `Name` -> `Jellyfin`
+        - [ ] `Host` -> `jellyfin`
+        - [ ] `Port` -> `8096`
+        - [ ] [`API Key`](http://localhost:8096/web/#/dashboard/keys)
       - [ ] `Add Connection` -> `Custom Script`
         - [ ] `Name` -> `Support Extra Files`
         - [ ] `Notification Triggers` -> `Off`
@@ -174,7 +214,7 @@
           - [ ] `On Rename` -> `On`
           - [ ] `On Movie File Delete` -> `On`
           - [ ] `On Movie File Delete For Upgrade` -> `On`
-        - [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](./support_extra_files.sh)
+        - [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](b4ea1ee58bcb8db43da25125616aeccf/support_extra_files.sh)
   - [ ] `Metadata`
     - [ ] `Options`
       - [ ] `Certification Country` -> `United States`
@@ -239,11 +279,16 @@
       - [ ] `Port` -> `8080`
       - [ ] `Username` -> `admin`
       - [ ] `Password` -> `adminadmin`
-      - [ ] `Category` -> `tv-sonarr`
+      - [ ] `Category` -> `series`
       - [ ] `Completed Download Handling`
         - [ ] `Remove Completed` -> `Off`
   - [ ] `Connect`
     - [ ] `Connections`
+      - [ ] `Add Connection` -> `Emby / Jellyfin`
+        - [ ] `Name` -> `Jellyfin`
+        - [ ] `Host` -> `jellyfin`
+        - [ ] `Port` -> `8096`
+        - [ ] [`API Key`](http://localhost:8096/web/#/dashboard/keys)
       - [ ] `Add Connection` -> `Custom Script`
         - [ ] `Name` -> `Support Extra Files`
         - [ ] `Notification Triggers` -> `Off`
@@ -252,7 +297,7 @@
           - [ ] `On Rename` -> `On`
           - [ ] `On Episode File Delete` -> `On`
           - [ ] `On Episode File Delete For Upgrade` -> `On`
-        - [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](./support_extra_files.sh)
+        - [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](b4ea1ee58bcb8db43da25125616aeccf/support_extra_files.sh)
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
@@ -307,7 +352,7 @@
       - [ ] `Port` -> `8080`
       - [ ] `Username` -> `admin`
       - [ ] `Password` -> `adminadmin`
-      - [ ] `Category` -> `prowlarr`
+      - [ ] `Category` -> ` `
   - [ ] `General`
     - [ ] `Security`
       - [ ] `Authentication` -> `Forms (Login Page)`
@@ -329,51 +374,6 @@
     - [ ] `Language`
       - [ ] `UI Language` -> `Russian`
 
-# <img src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/SVG/icon-transparent.svg" width="32"/> [Jellyfin](http://localhost:8096/)
-
-- [ ] `Administration` -> `Dashboard`
-  - [ ] `Server`
-    - [ ] `General`
-      - [ ] `Settings`
-        - [ ] `Server name` -> `DS723+`
-        - [ ] `Preferred display language` -> `Russian`
-    - [ ] `Users`
-      - [ ] `Users` -> `Edit user`
-        - [ ] `Allow ...` -> `On`
-        - [ ] `Hide this user from login screens` -> `On`
-    - [ ] `Libraries`
-      - [ ] `Libraries` -> `Add Media Library`
-        - [ ] `Anime`
-          - [ ] `Content type` -> `Mixed Movies and Shows`
-          - [ ] `Display name` -> `Anime`
-          - [ ] `Folders`
-            - [ ] `/data/movies/anime`
-            - [ ] `/data/series/anime`
-        - [ ] `Cartoons`
-          - [ ] `Content type` -> `Mixed Movies and Shows`
-          - [ ] `Display name` -> `Cartoons`
-          - [ ] `Folders`
-            - [ ] `/data/movies/cartoons`
-            - [ ] `/data/series/cartoons`
-        - [ ] `Movies`
-          - [ ] `Content type` -> `Movies`
-          - [ ] `Display name` -> `Movies`
-          - [ ] `Folders`
-            - [ ] `/data/movies/films`
-        - [ ] `Shows`
-          - [ ] `Content type` -> `Shows`
-          - [ ] `Display name` -> `Shows`
-          - [ ] `Folders`
-            - [ ] `/data/series/tv`
-      - [ ] `Metadata`
-        - [ ] `Preferred Metadata Language`
-          - [ ] `Language` -> `Russian`
-          - [ ] `Country/Region` -> `United States`
-  - [ ] `Plugins`
-    - [ ] `Catalog`
-      - [ ] `Metadata`
-        - [ ] `TheTVDB` -> `Install`
-
 # <img src="https://raw.githubusercontent.com/Fallenbagel/jellyseerr/refs/heads/develop/public/os_icon.svg" width="32"/> [Jellyseerr](http://localhost:5055/)
 
 - [ ] `Settings`
@@ -383,11 +383,6 @@
     - [ ] `Streaming Region` -> `United States`
     - [ ] `Allow Partial Series Requests` -> `On`
     - [ ] `Allow Special Episodes Requests` -> `On`
-    - [ ] `HTTP(S) Proxy` -> `On`
-      - [ ] `Proxy Hostname` -> `sing-box`
-      - [ ] `Proxy Port` -> `2080`
-      - [ ] `Proxy Ignored Addresses` -> `jellyfin, radarr, sonarr`
-      - [ ] `Bypass Proxy for Local Addresses` -> `On`
   - [ ] `Users`
     - [ ] `Enable Local Sign-In` -> `Off`
     - [ ] `Enable New Jellyfin Sign-In` -> `Off`
@@ -415,19 +410,6 @@
       - [ ] `External URL` -> `https://radarr.*`
       - [ ] `Enable Scan` -> `On`
       - [ ] `Enable Automatic Search` -> `On`
-      - [ ] `Override Rules` -> `New Override Rule`
-        - [ ] `Anime`
-          - [ ] `Conditions`
-            - [ ] `Keywords` -> `anime`
-          - [ ] `Settings`
-            - [ ] `Root Folder` -> `/data/movies/anime`
-            - [ ] `Quality Profile` -> `Any`
-        - [ ] `Cartoons`
-          - [ ] `Conditions`
-            - [ ] `Genres` -> `Animation`
-          - [ ] `Settings`
-            - [ ] `Root Folder` -> `/data/movies/cartoons`
-            - [ ] `Quality Profile` -> `Any`
     - [ ] `Sonarr Settings` -> `Add Sonarr Server`
       - [ ] `Default Server` -> `On`
       - [ ] `Server Name` -> `Sonarr`
@@ -444,12 +426,32 @@
       - [ ] `External URL` -> `https://sonarr.*`
       - [ ] `Enable Scan` -> `On`
       - [ ] `Enable Automatic Search` -> `On`
-      - [ ] `Override Rules` -> `New Override Rule`
+    - [ ] `Override Rules` -> `New Override Rule`
+      - [ ] `Service` -> `Radarr`
+        - [ ] `Anime`
+          - [ ] `Conditions`
+            - [ ] `Keywords` -> `anime`
+          - [ ] `Settings`
+            - [ ] `Root Folder` -> `/data/movies/anime`
+            - [ ] `Quality Profile` -> `Any`
+        - [ ] `Cartoons`
+          - [ ] `Conditions`
+            - [ ] `Genres` -> `Animation`
+          - [ ] `Settings`
+            - [ ] `Root Folder` -> `/data/movies/cartoons`
+            - [ ] `Quality Profile` -> `Any`
+      - [ ] `Service` -> `Sonarr`
         - [ ] `Cartoons`
           - [ ] `Conditions`
             - [ ] `Genres` -> `Animation`
           - [ ] `Settings`
             - [ ] `Root Folder` -> `/data/series/cartoons`
             - [ ] `Quality Profile` -> `Any`
+  - [ ] `Network`
+    - [ ] `HTTP(S) Proxy` -> `On`
+      - [ ] `Proxy Hostname` -> `sing-box`
+      - [ ] `Proxy Port` -> `2080`
+      - [ ] `Proxy Ignored Addresses` -> `jellyfin, radarr, sonarr`
+      - [ ] `Bypass Proxy for Local Addresses` -> `On`
 
 # <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png" width="32"/> [Cloudflare](https://one.dash.cloudflare.com/)
