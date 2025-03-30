@@ -1,0 +1,51 @@
+# <img src="https://raw.githubusercontent.com/Prowlarr/Prowlarr/refs/heads/develop/Logo/Prowlarr.svg" width="32"/> [Prowlarr](http://localhost:9696/)
+
+- [ ] `Settings` -> `Show Advanced`
+  - [ ] `Apps`
+    - [ ] `Applications`
+      - [ ] `Radarr`
+        - [ ] `Name` -> `Radarr`
+        - [ ] `Sync Level` -> `Full Sync`
+        - [ ] `Prowlarr Server` -> `http://prowlarr:9696`
+        - [ ] `Radarr Server` -> `http://radarr:7878`
+        - [ ] [`API Key`](http://localhost:7878/settings/general)
+      - [ ] `Sonarr`
+        - [ ] `Name` -> `Sonarr`
+        - [ ] `Sync Level` -> `Full Sync`
+        - [ ] `Prowlarr Server` -> `http://prowlarr:9696`
+        - [ ] `Sonarr Server` -> `http://sonarr:8989`
+        - [ ] [`API Key`](http://localhost:8989/settings/general)
+        - [ ] `Sync Anime Standard Format Search` -> `On`
+    - [ ] `Sync Profiles`
+      - [ ] `Standard`
+        - [ ] `Enable RSS` -> `Off`
+        - [ ] `Enable Automatic Search` -> `Off`
+        - [ ] `Enable Interactive Search` -> `Off`
+  - [ ] `Download Clients`
+    - [ ] `qBittorrent`
+      - [ ] `Name` -> `qBittorrent`
+      - [ ] `Host` -> `qbittorrent`
+      - [ ] `Port` -> `8080`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+      - [ ] `Category` -> ` `
+  - [ ] `General`
+    - [ ] `Security`
+      - [ ] `Authentication` -> `Forms (Login Page)`
+      - [ ] `Authentication Required` -> `Enabled`
+      - [ ] `Username` -> `admin`
+      - [ ] `Password` -> `adminadmin`
+    - [ ] `Proxy`
+      - [ ] `Use Proxy` -> `On`
+      - [ ] `Proxy Type` -> `HTTP(S)`
+      - [ ] `Hostname` -> `sing-box`
+      - [ ] `Port` -> `2080`
+      - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `UI`
+    - [ ] `Dates`
+      - [ ] `Short Date Format` -> `25 Mar 2014`
+      - [ ] `Long Date Format` -> `Tuesday, 25 March, 2014`
+      - [ ] `Time Format` -> `17:00/17:30`
+      - [ ] `Show Relative Dates` -> `On`
+    - [ ] `Language`
+      - [ ] `UI Language` -> `Russian`

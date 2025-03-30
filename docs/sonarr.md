@@ -1,0 +1,76 @@
+# <img src="https://raw.githubusercontent.com/Sonarr/Sonarr/refs/heads/develop/Logo/Sonarr.svg" width="32"/> [Sonarr](http://localhost:8989/)
+
+- [ ] `Settings` -> `Show Advanced`
+  - [ ] `Media Management`
+	- [ ] `Episode Naming`
+	  - [ ] `Rename Episodes` -> `On`
+	  - [ ] `Replace Illegal Characters` -> `On`
+	  - [ ] `Colon Replacement` -> `Smart Replace`
+	  - [ ] `Standard Episode Format` -> `s{season:00}e{episode:00} {Episode Title}`
+	  - [ ] `Daily Episode Format` -> `{Air.Date} {Episode Title}`
+	  - [ ] `Anime Episode Format` -> `s{season:00}e{episode:00} {Episode Title}`
+	  - [ ] `Series Folder Format` -> `{Series TitleYear} [tvdbid-{TvdbId}]`
+	  - [ ] `Season Folder Format` -> `Season {season:00}`
+	  - [ ] `Specials Folder Format` -> `Specials`
+	  - [ ] `Multi Episode Style` -> `Range`
+	- [ ] `Folders`
+	  - [ ] `Create Empty Series Folders` - > `Off`
+	  - [ ] `Delete Empty Folders` - > `On`
+	- [ ] `Importing`
+	  - [ ] `Use Hardlinks instead of Copy` - > `On`
+	- [ ] `File Management`
+	  - [ ] `Unmonitor Deleted Episodes` - > `On`
+	  - [ ] `Propers and Repacks` -> `Do not Prefer`
+	- [ ] `Root Folders`
+	  - [ ] `/data/series/anime`
+	  - [ ] `/data/series/cartoons`
+	  - [ ] `/data/series/tv`
+  - [ ] `Download Clients`
+	- [ ] `qBittorrent`
+	  - [ ] `Name` -> `qBittorrent`
+	  - [ ] `Host` -> `qbittorrent`
+	  - [ ] `Port` -> `8080`
+	  - [ ] `Username` -> `admin`
+	  - [ ] `Password` -> `adminadmin`
+	  - [ ] `Category` -> `series`
+	  - [ ] `Completed Download Handling`
+		- [ ] `Remove Completed` -> `Off`
+  - [ ] `Connect`
+	- [ ] `Connections`
+	  - [ ] `Add Connection` -> `Emby / Jellyfin`
+		- [ ] `Name` -> `Jellyfin`
+		- [ ] `Host` -> `jellyfin`
+		- [ ] `Port` -> `8096`
+		- [ ] [`API Key`](http://localhost:8096/web/#/dashboard/keys)
+	  - [ ] `Add Connection` -> `Custom Script`
+		- [ ] `Name` -> `Support Extra Files`
+		- [ ] `Notification Triggers` -> `Off`
+		  - [ ] `On File Import` -> `On`
+		  - [ ] `On File Upgrade` -> `On`
+		  - [ ] `On Rename` -> `On`
+		  - [ ] `On Episode File Delete` -> `On`
+		  - [ ] `On Episode File Delete For Upgrade` -> `On`
+		- [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](b4ea1ee58bcb8db43da25125616aeccf/support_extra_files.sh)
+  - [ ] `General`
+	- [ ] `Security`
+	  - [ ] `Authentication` -> `Forms (Login Page)`
+	  - [ ] `Authentication Required` -> `Enabled`
+	  - [ ] `Username` -> `admin`
+	  - [ ] `Password` -> `adminadmin`
+	- [ ] `Proxy`
+	  - [ ] `Use Proxy` -> `On`
+	  - [ ] `Proxy Type` -> `HTTP(S)`
+	  - [ ] `Hostname` -> `sing-box`
+	  - [ ] `Port` -> `2080`
+	  - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `UI`
+	- [ ] `Calendar`
+	  - [ ] `First Day of Week` -> `Monday`
+	  - [ ] `Week Column Header` -> `Tue 25/03`
+	- [ ] `Dates`
+	  - [ ] `Short Date Format` -> `25 Mar 2014`
+	  - [ ] `Long Date Format` -> `Tuesday, 25 March, 2014`
+	  - [ ] `Time Format` -> `17:00/17:30`
+	  - [ ] `Show Relative Dates` -> `On`
+	- [ ] `Language`
+	  - [ ] `UI Language` -> `Russian`

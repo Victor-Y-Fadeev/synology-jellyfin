@@ -1,0 +1,56 @@
+# <img src="https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent-tray.svg" width="32"/> [qBittorrent](http://localhost:8080/)
+
+- [ ] `Tools` -> `Options...`
+  - [ ] `Behavior`
+    - [ ] `Language`
+      - [ ] `User Interface Language:` -> `Russian`
+  - [ ] `Downloads`
+    - [ ] `When adding a torrent`
+      - [ ] `Torrent content layout:` -> `Create subfolder`
+      - [ ] `When duplicate torrent is being added`
+        - [ ] `Merge trackers to existing torrent` -> `On`
+    - [ ] `Saving Management`
+      - [ ] `Default Torrent Management Mode:` -> `Automatic`
+      - [ ] `When Torrent Category changed:` -> `Relocate torrent`
+      - [ ] `When Default Save Path changed:` -> `Relocate affected torrents`
+      - [ ] `When Category Save Path changed:` -> `Relocate affected torrents`
+      - [ ] `Use Subcategories` -> `On`
+      - [ ] `Use Category paths in Manual Mode` -> `On`
+      - [ ] `Default Save Path:` -> `/data/downloads`
+      - [ ] `Copy .torrent files to:` -> `/data/torrents`
+  - [ ] `Connection`
+    - [ ] `Connections Limits`
+      - [ ] `Global maximum number of connections:` -> `Off`
+      - [ ] `Maximum number of connections per torrent:` -> `Off`
+      - [ ] `Global maximum number of upload slots:` -> `Off`
+      - [ ] `Maximum number of upload slots per torrent:` -> `Off`
+  - [ ] `Speed`
+    - [ ] `Global Rate Limits`
+      - [ ] `Upload:` -> `0`
+      - [ ] `Download:` -> `0`
+    - [ ] `Alternative Rate Limits`
+      - [ ] `Upload:` -> `0`
+      - [ ] `Download:` -> `0`
+    - [ ] `Rate Limits Settings`
+      - [ ] `Apply rate limit to µTP protocol` -> `Off`
+      - [ ] `Apply rate limit to transport overhead` -> `Off`
+      - [ ] `Apply rate limit to peers on LAN` -> `Off`
+  - [ ] `BitTorrent`
+    - [ ] `Max active checking torrents:` -> `-1`
+    - [ ] `Torrent Queueing` - > `Off`
+  - [ ] `WebUI`
+    - [ ] `Authentication`
+      - [ ] `Username:` -> `admin`
+      - [ ] `Password:` -> `adminadmin`
+  - [ ] `Advanced`
+    - [ ] `libtorrent Section`
+      - [ ] `Hashing threads:` -> `32`
+- [ ] `CATEGORIES` -> `Add category...`
+  - [ ] `movies` -> `Add subcategory...`
+    - [ ] `movies/anime`
+    - [ ] `movies/cartoons`
+    - [ ] `movies/films`
+  - [ ] `series` -> `Add subcategory...`
+    - [ ] `series/anime`
+    - [ ] `series/cartoons`
+    - [ ] `series/tv`

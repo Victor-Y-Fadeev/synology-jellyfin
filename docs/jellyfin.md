@@ -1,0 +1,109 @@
+# <img src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/SVG/icon-transparent.svg" width="32"/> [Jellyfin](http://localhost:8096/)
+
+- [ ] `Administration` -> `Dashboard`
+  - [ ] `Plugins`
+    - [ ] `Catalog`
+      - [ ] `Metadata`
+        - [ ] `TheTVDB` -> `Install`
+    - [ ] `My Plugins`
+      - [ ] `TMDb`
+        - [ ] `Include adult content in search results.` -> `On`
+        - [ ] `Import season name from metadata fetched for series.` -> `On`
+      - [ ] `TheTVDB`
+        - [ ] `TheTVDB Settings:`
+          - [ ] `Fallback Languages:` -> ` `
+          - [ ] `Import season name from provider` -> `Off`
+          - [ ] `Fallback to Original Language (Last resort if other fallback languages fails)` -> `Off`
+          - [ ] `Include original country of the movie or series in tags.` -> `Off`
+        - [ ] `Missing Episode Provider Settings:`
+          - [ ] `Include missing specials` -> `Off`
+          - [ ] `Remove All Missing Episodes On Refresh` -> `On`
+        - [ ] `Check for Metadata Updates Scheduled Task Settings:`
+          - [ ] `Update` -> `On`
+  - [ ] `Server`
+    - [ ] `General`
+      - [ ] `Settings`
+        - [ ] `Server name` -> `DS723+`
+        - [ ] `Preferred display language` -> `Russian`
+    - [ ] `Users`
+      - [ ] `Users` -> `Edit user`
+        - [ ] `Allow ...` -> `On`
+        - [ ] `Hide this user from login screens` -> `On`
+    - [ ] `Libraries`
+      - [ ] `Libraries` -> `Add Media Library`
+        - [ ] `Anime`
+          - [ ] `Content type` -> `Mixed Movies and Shows`
+          - [ ] `Display name` -> `Anime`
+          - [ ] `Folders`
+            - [ ] `/data/movies/anime`
+            - [ ] `/data/series/anime`
+        - [ ] `Cartoons`
+          - [ ] `Content type` -> `Mixed Movies and Shows`
+          - [ ] `Display name` -> `Cartoons`
+          - [ ] `Folders`
+            - [ ] `/data/movies/cartoons`
+            - [ ] `/data/series/cartoons`
+        - [ ] `Movies`
+          - [ ] `Content type` -> `Movies`
+          - [ ] `Display name` -> `Movies`
+          - [ ] `Folders`
+            - [ ] `/data/movies/films`
+        - [ ] `Shows`
+          - [ ] `Content type` -> `Shows`
+          - [ ] `Display name` -> `Shows`
+          - [ ] `Folders`
+            - [ ] `/data/series/tv`
+      - [ ] `Manage library` -> `Library Settings`
+        - [ ] `Metadata downloaders (TV Shows)`
+          - [ ] `Missing Episode Fetcher`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+        - [ ] `Metadata downloaders (Seasons)`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+        - [ ] `Metadata downloaders (Episodes)`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+        - [ ] `Metadata downloaders (Movies)`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+        - [ ] `Image fetchers (TV Shows)`
+          - [ ] `Fetcher Settings`
+            - [ ] `Primary` -> `On`
+            - [ ] `Clearart` -> `On`
+            - [ ] `Banner` -> `On`
+            - [ ] `Logo` -> `On`
+            - [ ] `Thumb` -> `On`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+        - [ ] `Image fetchers (Seasons)`
+          - [ ] `Fetcher Settings`
+            - [ ] `Primary` -> `On`
+            - [ ] `Banner` -> `On`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+        - [ ] `Image fetchers (Episodes)`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `Embedded Image Extractor`
+          - [ ] `Screen Grabber`
+        - [ ] `Image fetchers (Movies)`
+          - [ ] `Fetcher Settings`
+            - [ ] `Primary` -> `On`
+            - [ ] `Clearart` -> `On`
+            - [ ] `Banner` -> `On`
+            - [ ] `Logo` -> `On`
+            - [ ] `Thumb` -> `On`
+          - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
+          - [ ] `The Open Movie Database`
+          - [ ] `Embedded Image Extractor`
+          - [ ] `Screen Grabber`
+      - [ ] `Metadata`
+        - [ ] `Preferred Metadata Language`
+          - [ ] `Language` -> `Russian`
+          - [ ] `Country/Region` -> `United States`

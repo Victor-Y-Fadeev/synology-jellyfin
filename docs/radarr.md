@@ -1,0 +1,77 @@
+# <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
+
+- [ ] `Settings` -> `Show Advanced`
+  - [ ] `Media Management`
+	- [ ] `Movie Naming`
+	  - [ ] `Rename Movies` -> `On`
+	  - [ ] `Replace Illegal Characters` -> `On`
+	  - [ ] `Colon Replacement` -> `Smart Replace`
+	  - [ ] `Standard Movie Format` -> `{Movie Title} ({Release Year})`
+	  - [ ] `Movie Folder Format` -> `{Movie Title} ({Release Year}) [tmdbid-{TmdbId}]`
+	- [ ] `Folders`
+	  - [ ] `Create empty movie folders` - > `Off`
+	  - [ ] `Delete empty Folders` - > `On`
+	- [ ] `Importing`
+	  - [ ] `Use Hardlinks instead of Copy` - > `On`
+	- [ ] `File Management`
+	  - [ ] `Unmonitor Deleted Movies` - > `On`
+	  - [ ] `Propers and Repacks` -> `Do not Prefer`
+	- [ ] `Root Folders`
+	  - [ ] `/data/movies/anime`
+	  - [ ] `/data/movies/cartoons`
+	  - [ ] `/data/movies/films`
+  - [ ] `Download Clients`
+	- [ ] `qBittorrent`
+	  - [ ] `Name` -> `qBittorrent`
+	  - [ ] `Host` -> `qbittorrent`
+	  - [ ] `Port` -> `8080`
+	  - [ ] `Username` -> `admin`
+	  - [ ] `Password` -> `adminadmin`
+	  - [ ] `Category` -> `movies`
+	  - [ ] `Completed Download Handling`
+		- [ ] `Remove Completed` -> `Off`
+  - [ ] `Connect`
+	- [ ] `Connections`
+	  - [ ] `Add Connection` -> `Emby / Jellyfin`
+		- [ ] `Name` -> `Jellyfin`
+		- [ ] `Host` -> `jellyfin`
+		- [ ] `Port` -> `8096`
+		- [ ] [`API Key`](http://localhost:8096/web/#/dashboard/keys)
+	  - [ ] `Add Connection` -> `Custom Script`
+		- [ ] `Name` -> `Support Extra Files`
+		- [ ] `Notification Triggers` -> `Off`
+		  - [ ] `On File Import` -> `On`
+		  - [ ] `On File Upgrade` -> `On`
+		  - [ ] `On Rename` -> `On`
+		  - [ ] `On Movie File Delete` -> `On`
+		  - [ ] `On Movie File Delete For Upgrade` -> `On`
+		- [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](b4ea1ee58bcb8db43da25125616aeccf/support_extra_files.sh)
+  - [ ] `Metadata`
+	- [ ] `Options`
+	  - [ ] `Certification Country` -> `United States`
+  - [ ] `General`
+	- [ ] `Security`
+	  - [ ] `Authentication` -> `Forms (Login Page)`
+	  - [ ] `Authentication Required` -> `Enabled`
+	  - [ ] `Username` -> `admin`
+	  - [ ] `Password` -> `adminadmin`
+	- [ ] `Proxy`
+	  - [ ] `Use Proxy` -> `On`
+	  - [ ] `Proxy Type` -> `HTTP(S)`
+	  - [ ] `Hostname` -> `sing-box`
+	  - [ ] `Port` -> `2080`
+	  - [ ] `Bypass Proxy for Local Addresses` -> `On`
+  - [ ] `UI`
+	- [ ] `Calendar`
+	  - [ ] `First Day of Week` -> `Monday`
+	  - [ ] `Week Column Header` -> `Tue 25/03`
+	- [ ] `Movies`
+	  - [ ] `Runtime Format` -> `1h 15m`
+	- [ ] `Dates`
+	  - [ ] `Short Date Format` -> `25 Mar 2014`
+	  - [ ] `Long Date Format` -> `Tuesday, 25 March, 2014`
+	  - [ ] `Time Format` -> `17:00/17:30`
+	  - [ ] `Show Relative Dates` -> `On`
+	- [ ] `Language`
+	  - [ ] `Movie Info Language` -> `Russian`
+	  - [ ] `UI Language` -> `Russian`
