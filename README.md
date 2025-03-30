@@ -70,10 +70,10 @@
         - [ ] `Import season name from metadata fetched for series.` -> `On`
       - [ ] `TheTVDB`
         - [ ] `TheTVDB Settings:`
-          - [ ] `Fallback Languages:` -> `English`
-          - [ ] `Import season name from provider` -> `On`
-          - [ ] `Fallback to Original Language (Last resort if other fallback languages fails)` -> `On`
-          - [ ] `Include original country of the movie or series in tags.` -> `On`
+          - [ ] `Fallback Languages:` -> ` `
+          - [ ] `Import season name from provider` -> `Off`
+          - [ ] `Fallback to Original Language (Last resort if other fallback languages fails)` -> `Off`
+          - [ ] `Include original country of the movie or series in tags.` -> `Off`
         - [ ] `Missing Episode Provider Settings:`
           - [ ] `Include missing specials` -> `Off`
           - [ ] `Remove All Missing Episodes On Refresh` -> `On`
@@ -115,20 +115,20 @@
       - [ ] `Manage library` -> `Library Settings`
         - [ ] `Metadata downloaders (TV Shows)`
           - [ ] `Missing Episode Fetcher`
+          - [ ] `TheTVDB`
           - [ ] `TheMovieDb`
           - [ ] `The Open Movie Database`
-          - [ ] `TheTVDB`
         - [ ] `Metadata downloaders (Seasons)`
-          - [ ] `TheMovieDb`
           - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
         - [ ] `Metadata downloaders (Episodes)`
+          - [ ] `TheTVDB`
           - [ ] `TheMovieDb`
           - [ ] `The Open Movie Database`
-          - [ ] `TheTVDB`
         - [ ] `Metadata downloaders (Movies)`
+          - [ ] `TheTVDB`
           - [ ] `TheMovieDb`
           - [ ] `The Open Movie Database`
-          - [ ] `TheTVDB`
         - [ ] `Image fetchers (TV Shows)`
           - [ ] `Fetcher Settings`
             - [ ] `Primary` -> `On`
@@ -136,18 +136,18 @@
             - [ ] `Banner` -> `On`
             - [ ] `Logo` -> `On`
             - [ ] `Thumb` -> `On`
-          - [ ] `TheMovieDb`
           - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
         - [ ] `Image fetchers (Seasons)`
           - [ ] `Fetcher Settings`
             - [ ] `Primary` -> `On`
             - [ ] `Banner` -> `On`
-          - [ ] `TheMovieDb`
           - [ ] `TheTVDB`
+          - [ ] `TheMovieDb`
         - [ ] `Image fetchers (Episodes)`
+          - [ ] `TheTVDB`
           - [ ] `TheMovieDb`
           - [ ] `The Open Movie Database`
-          - [ ] `TheTVDB`
           - [ ] `Embedded Image Extractor`
           - [ ] `Screen Grabber`
         - [ ] `Image fetchers (Movies)`
@@ -157,9 +157,9 @@
             - [ ] `Banner` -> `On`
             - [ ] `Logo` -> `On`
             - [ ] `Thumb` -> `On`
+          - [ ] `TheTVDB`
           - [ ] `TheMovieDb`
           - [ ] `The Open Movie Database`
-          - [ ] `TheTVDB`
           - [ ] `Embedded Image Extractor`
           - [ ] `Screen Grabber`
       - [ ] `Metadata`
