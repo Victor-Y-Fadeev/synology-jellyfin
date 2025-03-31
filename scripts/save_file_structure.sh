@@ -37,29 +37,22 @@ function find_unusual_folders {
 }
 
 
-function generate_file_structure {
+function generate_json_structure {
     local extensions="(${EXCLUDE_EXTENSIONS})"
-    local escape="$(printf '%q' "$extensions")"
+    local escape_extensions="$(printf '%q' "$extensions")"
     local json="{}"
 
     while read -r line; do
+        local escape_line="$(echo "$line" | sed 's|\W|\\\0|g')"
+        local value="$(find "$line" -type f ! -iregex ".*\.${escape_extensions}$" \
+            | sed --posix --regexp-extended "s|^${escape_line}/(.*)$|\"\1\"|" \
+            | jq -s 'map((if contains("/") then sub("/[^/]*$"; "") else "." end) as $key
+                         | {"key": $key, "value": ltrimstr($key + "/")})
+                     | group_by(.key)
+                     | map(.[0].key as $key | {"key": $key, "value": map(.value)})
+                     | from_entries')"
+
         local folder="/data/${line#*/data/}"
-        local files="$(find "$line" -type f ! -iregex ".*\.${escape}$")"
-        local value="{}"
-
-        while read -r file; do
-            local relative="${file#"${line}/"}"
-            local subfolder="${relative%/*}"
-            local name="${relative##*/}"
-
-            if [[ "$name" == "$relative" ]]; then
-                subfolder="."
-            fi
-
-            value="$(echo "$value" | jq -S '.[$key] += [$value]' \
-                     --arg key "$subfolder" --arg value "$name")"
-        done <<< "$files"
-
         json="$(echo "$json" | jq -S '.[$key] = $value' \
                 --arg key "$folder" --argjson value "$value")"
     done <<< "$(find_unusual_folders)"
@@ -69,4 +62,4 @@ function generate_file_structure {
 
 
 parse_input_arguments "$@"
-generate_file_structure
+generate_json_structure

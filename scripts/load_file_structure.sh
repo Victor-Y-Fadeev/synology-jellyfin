@@ -25,7 +25,7 @@ function flat_json_processing {
             map(builder(path; .)) | .[]
         else
             path + "/" + .
-        end; builder(""; .) | .[1:] | gsub("/\\.?/"; "/")')"
+        end; builder(""; .) | .[1:] | sub("/\\.?/"; "/")')"
 
     while read -r line; do
         local file="$destination/$line"
