@@ -126,12 +126,43 @@ function recursive_json_processing {
 
 
 
-echo '[{"a":{".":["1", "2"], "b":["3", "4"]}, "c":{".":["5"]}}, {"path":["a", "b", {"1":["4","5"]}], "f": {"g":"4"}}]' \
-    | jq 'walk(if type != "object" then .
-               else to_entries | map(.key as $key | .value
-                    | if type == "array" then .[] else . end
-                    | [{"key": $key, "value": .}] | from_entries) end)'
+# echo '[{"a":{".":["1", "2"], "b":["3", "4"]}, "c":{".":["5"]}}, {"path":["a", "b", {"1":["4","5"]}], "f": {"g":"4"}}]' \
+    # | jq 'walk(if type != "object" then .
+    #            else to_entries | map(.key as $key | .value
+    #                                  | if type == "string" then $key + "/" + .
+    #                                    elif type == "object" then with_entries(.key |= $key + "/" + .)
+    #                                    else map([{"key": $key, "value": .}] | from_entries) end
+    #            ) | flatten end)'
+    # | jq 'walk(if type != "object" then .
+    #            else to_entries | map(.key as $key | .value
+    #                                  | if type == "string" then $key + "/" + .
+    #                                    elif type == "object" then with_entries(.key |= $key + "/" + .)
+    #                                    else map([{"key": $key, "value": .}] | from_entries) end
+    #            ) end)'
+
+    # | jq 'walk(if type != "object" then .
+    #            else with_entries(.key as $key | .value |=
+    #                              if type != "object" then .
+    #                                else with_entries(.key |= $key + "/" + .) end) end)'
+
+            #    else to_entries | map(.key as $key | .value
+            #         | if type == "array" then .[] else . end
+            #         | [{"key": $key, "value": .}] | from_entries) end)'
             #    walk(if type != "object" then .
             #      else to_entries | .[]|.key as $key | .value
             #           | if type != "object" then $key + "/" + .
             #             else with_entries(.key |= $key + "/" + .) end end)'
+
+
+# echo '{"1":["b"]}' | jq 'recurse(if type == "object" then .[] else . end, type == "array")'
+
+# echo '["1","2f","3f",["f4","5f","6f"]]' \
+echo '[{"/a":{".":["1", "2"], "b":["3", "4"]}, "c":{".":["5"]}}, {"path":["a", "b", {"1":["4","5"]}], "f": {"g":"4"}}]' \
+    | jq 'def builder(path; value): value |
+            if type == "object" then
+              to_entries | map(.key as $key | builder(path + "/" + $key; .value)) | .[]
+            elif type == "array" then
+              map(builder(path; .)) | .[]
+            else
+              path + "/" + .
+            end; builder(""; .)'

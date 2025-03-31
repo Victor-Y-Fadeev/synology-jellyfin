@@ -1,8 +1,8 @@
-.vscode/*
-.ssh/*
+.vscode/
+.ssh/
 
-config/*
-data/*
+config/
+data/
 
 .env
 
