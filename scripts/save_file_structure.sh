@@ -4,7 +4,8 @@ set -e
 
 
 MEDIA_EXTENSIONS="mkv|mp4|avi"
-EXCLUDE_EXTENSIONS="jpg|png"
+EXTERNAL_EXTENSIONS="nfo|ass|srt|mks|mka|ssa|mp3"
+EXCLUDE_EXTENSIONS="jpg|png|webp|delete|txt|otf|ttf|PFB|PFM"
 
 
 function parse_input_arguments {
@@ -45,12 +46,12 @@ function generate_json_structure {
     while read -r line; do
         local escape_line="$(echo "$line" | sed 's|\W|\\\0|g')"
         local value="$(find "$line" -type f ! -iregex ".*\.${escape_extensions}$" \
-            | sed --posix --regexp-extended "s|^${escape_line}/(.*)$|\"\1\"|" \
-            | jq -s 'map((if contains("/") then sub("/[^/]*$"; "") else "." end) as $key
-                         | {"key": $key, "value": ltrimstr($key + "/")})
-                     | group_by(.key)
-                     | map(.[0].key as $key | {"key": $key, "value": map(.value)})
-                     | from_entries')"
+            | sed --posix --regexp-extended "s|^${escape_line}/(.*)$|\"\1\"|" | sort \
+            | jq -s -S 'map((if contains("/") then sub("/[^/]*$"; "") else "." end) as $key
+                            | {"key": $key, "value": ltrimstr($key + "/")})
+                        | group_by(.key)
+                        | map(.[0].key as $key | {"key": $key, "value": map(.value)})
+                        | from_entries')"
 
         local folder="/data/${line#*/data/}"
         json="$(echo "$json" | jq -S '.[$key] = $value' \
