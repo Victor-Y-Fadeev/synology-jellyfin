@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "True",
+  "sonarr_series_genres": "Animation|Anime|Comedy|Drama|Romance|Science Fiction",
+  "sonarr_series_id": "4",
+  "sonarr_series_imdbid": "tt0326672",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Chobits (2002) [tvdbid-72070]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Chobits",
+  "sonarr_series_titleslug": "chobits",
+  "sonarr_series_tmdbid": "37527",
+  "sonarr_series_tvdbid": "72070",
+  "sonarr_series_tvmazeid": "5284",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2002"
+}
