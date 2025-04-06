@@ -4,14 +4,11 @@ set -e
 
 
 function json_to_paths {
-    echo "${1:-"$(cat)"}" | jq -r 'def builder(path; value): value |
-        if type == "object" then
-            to_entries | map(.key as $key | builder(path + "/" + $key; .value)) | .[]
-        elif type == "array" then
-            map(builder(path; .)) | .[]
-        else
-            path + "/" + .
-        end; builder(""; .) | .[1:] | sub("/\\.?/"; "/")'
+    local input="${1:-"$(cat)"}"
+    local directory="$(dirname "${BASH_SOURCE[0]}")"
+    local source="$directory/json_to_paths.jq"
+
+    jq -r -f "$source" <<< "$input"
 }
 
 
