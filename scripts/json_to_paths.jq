@@ -1,3 +1,5 @@
+#!/usr/bin/env -S jq -nrf
+
 def builder(path; value):
   value
   | if type == "object" then
@@ -12,6 +14,7 @@ def builder(path; value):
     path + "/" + .
   end;
 
-builder(""; .)
+inputs
+| builder(""; .)
 | .[1:]
 | sub("/\\.?/"; "/")
