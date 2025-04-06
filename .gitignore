@@ -9,3 +9,7 @@ data/
 *.txt
 *.log
 *.man
+
+*.avi
+*.mp4
+*.mkv
