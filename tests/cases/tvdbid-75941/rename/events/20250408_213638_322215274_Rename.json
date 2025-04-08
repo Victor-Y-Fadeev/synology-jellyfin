@@ -1,0 +1,23 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_episodefile_ids": "1,2,3,4,5,6,7,8,9,10,11,12,13,14",
+  "sonarr_episodefile_paths": "/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e01 - A Chance Encounter.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e02 - Annihilation.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e03 - Deep Feelings.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e04 - Attack.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e05 - Receipt.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e06 - Innermost Feelings.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e07 - Confrontation.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e08 - Beginning.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e09 - Reminiscence.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e10 - Infant.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Specials/s00e01 - In the Passing Rain.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e11 - Complication.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e12 - Quagmire.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e13 - No Return.mkv",
+  "sonarr_episodefile_previouspaths": "/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e01 A Chance Encounter.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e02 Annihilation.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e03 Deep Feelings.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e04 Attack.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e05 Receipt.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e06 Innermost Feelings.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e07 Confrontation.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e08 Beginning.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e09 Reminiscence.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e10 Infant.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Specials/s00e01 In the Passing Rain.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e11 Complication.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e12 Quagmire.mkv|/data/series/anime/Elfen Lied (2004) [tvdbid-75941]/Season 01/s01e13 No Return.mkv",
+  "sonarr_episodefile_previousrelativepaths": "Season 01/s01e01 A Chance Encounter.mkv|Season 01/s01e02 Annihilation.mkv|Season 01/s01e03 Deep Feelings.mkv|Season 01/s01e04 Attack.mkv|Season 01/s01e05 Receipt.mkv|Season 01/s01e06 Innermost Feelings.mkv|Season 01/s01e07 Confrontation.mkv|Season 01/s01e08 Beginning.mkv|Season 01/s01e09 Reminiscence.mkv|Season 01/s01e10 Infant.mkv|Specials/s00e01 In the Passing Rain.mkv|Season 01/s01e11 Complication.mkv|Season 01/s01e12 Quagmire.mkv|Season 01/s01e13 No Return.mkv",
+  "sonarr_episodefile_relativepaths": "Season 01/s01e01 - A Chance Encounter.mkv|Season 01/s01e02 - Annihilation.mkv|Season 01/s01e03 - Deep Feelings.mkv|Season 01/s01e04 - Attack.mkv|Season 01/s01e05 - Receipt.mkv|Season 01/s01e06 - Innermost Feelings.mkv|Season 01/s01e07 - Confrontation.mkv|Season 01/s01e08 - Beginning.mkv|Season 01/s01e09 - Reminiscence.mkv|Season 01/s01e10 - Infant.mkv|Specials/s00e01 - In the Passing Rain.mkv|Season 01/s01e11 - Complication.mkv|Season 01/s01e12 - Quagmire.mkv|Season 01/s01e13 - No Return.mkv",
+  "sonarr_eventtype": "Rename",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Action|Animation|Anime|Drama|Horror|Mystery|Romance|Science Fiction|Thriller",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0480489",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Elfen Lied (2004) [tvdbid-75941]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Elfen Lied",
+  "sonarr_series_titleslug": "elfen-lied",
+  "sonarr_series_tmdbid": "42671",
+  "sonarr_series_tvdbid": "75941",
+  "sonarr_series_tvmazeid": "2061",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2004"
+}
