@@ -27,21 +27,17 @@ def merger($lhs; $rhs):
 
 
 def reducer:
-  if length == 1 and keys[0] == "." then
-    .[]
-  else
-    to_entries
-    | map(.key as $key
-          | if .value | type == "object" then
-            .value
-            | with_entries(.key |= $key + "/" + .)
-            | reducer
-            | to_entries[]
-          else
-            .key |= sub("/\\.$"; "")
-          end)
-    | from_entries
-  end;
+  to_entries
+  | map(.key as $key
+        | if .value | type == "object" then
+          .value
+          | with_entries(.key |= $key + "/" + .)
+          | reducer
+          | to_entries[]
+        else
+          .key |= sub("/\\.$"; "")
+        end)
+  | from_entries;
 
 
 def compressor:
