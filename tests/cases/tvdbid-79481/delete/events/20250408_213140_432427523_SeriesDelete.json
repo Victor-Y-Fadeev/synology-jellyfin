@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "False",
+  "sonarr_series_genres": "Anime|Crime|Fantasy|Horror|Suspense|Thriller",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0877057",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Death Note (2006) [tvdbid-79481]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Death Note",
+  "sonarr_series_titleslug": "death-note",
+  "sonarr_series_tmdbid": "13916",
+  "sonarr_series_tvdbid": "79481",
+  "sonarr_series_tvmazeid": "40",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2006"
+}
