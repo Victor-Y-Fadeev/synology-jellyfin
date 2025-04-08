@@ -1,0 +1,18 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesAdd",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Action|Adventure|Animation|Anime|Comedy|Drama|Fantasy|Science Fiction",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0421357",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Fullmetal Alchemist (2003) [tvdbid-75579]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Fullmetal Alchemist",
+  "sonarr_series_titleslug": "fullmetal-alchemist",
+  "sonarr_series_tmdbid": "37863",
+  "sonarr_series_tvdbid": "75579",
+  "sonarr_series_tvmazeid": "4297",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2003"
+}
