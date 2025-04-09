@@ -1,0 +1,18 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesAdd",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Action|Animation|Anime|Comedy|Fantasy|Romance",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt1216222",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/To LOVE-Ru (2008) [tvdbid-81831]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "To LOVE-Ru",
+  "sonarr_series_titleslug": "to-love-ru",
+  "sonarr_series_tmdbid": "34742",
+  "sonarr_series_tvdbid": "81831",
+  "sonarr_series_tvmazeid": "5196",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2008"
+}
