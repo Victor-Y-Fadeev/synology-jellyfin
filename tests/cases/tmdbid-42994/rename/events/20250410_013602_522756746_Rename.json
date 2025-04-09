@@ -1,0 +1,21 @@
+{
+  "radarr_applicationurl": "",
+  "radarr_eventtype": "Rename",
+  "radarr_instancename": "Radarr",
+  "radarr_movie_genres": "Fantasy|Animation|Science Fiction",
+  "radarr_movie_id": "1",
+  "radarr_movie_imdbid": "tt0113799",
+  "radarr_movie_in_cinemas_date": "12/23/1995 00:00:00",
+  "radarr_movie_originallanguage": "jpn",
+  "radarr_movie_path": "/data/movies/anime/Memories (1995) [tmdbid-42994]",
+  "radarr_movie_physical_release_date": "02/24/2004 00:00:00",
+  "radarr_movie_tags": "",
+  "radarr_movie_title": "Memories",
+  "radarr_movie_tmdbid": "42994",
+  "radarr_movie_year": "1995",
+  "radarr_moviefile_ids": "4",
+  "radarr_moviefile_paths": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories 1995.mkv",
+  "radarr_moviefile_previouspaths": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories (1995).pt1.mkv",
+  "radarr_moviefile_previousrelativepaths": "Memories (1995).pt1.mkv",
+  "radarr_moviefile_relativepaths": "Memories 1995.mkv"
+}

@@ -1,0 +1,15 @@
+{
+  "radarr_applicationurl": "",
+  "radarr_eventtype": "MovieAdded",
+  "radarr_instancename": "Radarr",
+  "radarr_movie_addmethod": "Manual",
+  "radarr_movie_genres": "Fantasy|Animation|Science Fiction",
+  "radarr_movie_id": "1",
+  "radarr_movie_imdbid": "tt0113799",
+  "radarr_movie_originallanguage": "jpn",
+  "radarr_movie_path": "/data/movies/anime/Memories (1995) [tmdbid-42994]",
+  "radarr_movie_tags": "",
+  "radarr_movie_title": "Memories",
+  "radarr_movie_tmdbid": "42994",
+  "radarr_movie_year": "1995"
+}
