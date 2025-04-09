@@ -15,7 +15,7 @@
 	  - [ ] `Multi Episode Style` -> `Range`
 	- [ ] `Folders`
 	  - [ ] `Create Empty Series Folders` - > `Off`
-	  - [ ] `Delete Empty Folders` - > `On`
+	  - [ ] `Delete Empty Folders` - > `Off`
 	- [ ] `Importing`
 	  - [ ] `Use Hardlinks instead of Copy` - > `On`
 	- [ ] `File Management`

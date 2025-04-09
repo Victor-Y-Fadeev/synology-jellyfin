@@ -10,7 +10,7 @@
 	  - [ ] `Movie Folder Format` -> `{Movie Title} ({Release Year}) [tmdbid-{TmdbId}]`
 	- [ ] `Folders`
 	  - [ ] `Create empty movie folders` - > `Off`
-	  - [ ] `Delete empty Folders` - > `On`
+	  - [ ] `Delete empty Folders` - > `Off`
 	- [ ] `Importing`
 	  - [ ] `Use Hardlinks instead of Copy` - > `On`
 	- [ ] `File Management`
