@@ -14,8 +14,8 @@
   "radarr_movie_tmdbid": "42994",
   "radarr_movie_year": "1995",
   "radarr_moviefile_ids": "4",
-  "radarr_moviefile_paths": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories 1995.mkv",
+  "radarr_moviefile_paths": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories - (1995).mkv",
   "radarr_moviefile_previouspaths": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories (1995).pt1.mkv",
   "radarr_moviefile_previousrelativepaths": "Memories (1995).pt1.mkv",
-  "radarr_moviefile_relativepaths": "Memories 1995.mkv"
+  "radarr_moviefile_relativepaths": "Memories - (1995).mkv"
 }
