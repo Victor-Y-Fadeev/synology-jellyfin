@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "False",
+  "sonarr_series_genres": "Action|Adventure|Animation|Anime|Comedy|Drama|Fantasy|Horror|Mini-Series|Science Fiction|Thriller",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0186385",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Night Warriors: DarkStalkers' Revenge",
+  "sonarr_series_titleslug": "night-warriors-darkstalkers-revenge",
+  "sonarr_series_tmdbid": "88506",
+  "sonarr_series_tvdbid": "82119",
+  "sonarr_series_tvmazeid": "0",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "1997"
+}

@@ -1,0 +1,23 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_episodefile_ids": "1,2,3,4",
+  "sonarr_episodefile_paths": "/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e01 - Return of the DarkStalkers.mkv|/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e02 - Blood of Darkness, Power of Darkness.mkv|/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e03 - Pyron Descending.mkv|/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e04 - For Whom They Fight.mkv",
+  "sonarr_episodefile_previouspaths": "/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e01 Return of the DarkStalkers.mkv|/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e02 Blood of Darkness, Power of Darkness.mkv|/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e03 Pyron Descending.mkv|/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]/Season 01/s01e04 For Whom They Fight.mkv",
+  "sonarr_episodefile_previousrelativepaths": "Season 01/s01e01 Return of the DarkStalkers.mkv|Season 01/s01e02 Blood of Darkness, Power of Darkness.mkv|Season 01/s01e03 Pyron Descending.mkv|Season 01/s01e04 For Whom They Fight.mkv",
+  "sonarr_episodefile_relativepaths": "Season 01/s01e01 - Return of the DarkStalkers.mkv|Season 01/s01e02 - Blood of Darkness, Power of Darkness.mkv|Season 01/s01e03 - Pyron Descending.mkv|Season 01/s01e04 - For Whom They Fight.mkv",
+  "sonarr_eventtype": "Rename",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Action|Adventure|Animation|Anime|Comedy|Drama|Fantasy|Horror|Mini-Series|Science Fiction|Thriller",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0186385",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Night Warriors: DarkStalkers' Revenge",
+  "sonarr_series_titleslug": "night-warriors-darkstalkers-revenge",
+  "sonarr_series_tmdbid": "88506",
+  "sonarr_series_tvdbid": "82119",
+  "sonarr_series_tvmazeid": "0",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "1997"
+}
