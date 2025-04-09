@@ -1,0 +1,18 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesAdd",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Animation|Anime|Comedy|Fantasy|Romance",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt4831392",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Monster Musume - Everyday Life with Monster Girls (2015) [tvdbid-293119]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Monster Musume: Everyday Life with Monster Girls",
+  "sonarr_series_titleslug": "monster-musume-everyday-life-with-monster-girls",
+  "sonarr_series_tmdbid": "63187",
+  "sonarr_series_tvdbid": "293119",
+  "sonarr_series_tvmazeid": "0",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2015"
+}
