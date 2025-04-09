@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "False",
+  "sonarr_series_genres": "Action|Animation|Anime|Drama|Science Fiction",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0112159",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Neon Genesis Evangelion",
+  "sonarr_series_titleslug": "neon-genesis-evangelion",
+  "sonarr_series_tmdbid": "890",
+  "sonarr_series_tvdbid": "70350",
+  "sonarr_series_tvmazeid": "1925",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "1995"
+}
