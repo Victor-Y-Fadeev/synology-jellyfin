@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "False",
+  "sonarr_series_genres": "Action|Adventure|Animation|Anime|Fantasy|Romance",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0100044",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Record of Lodoss War (1990) [tvdbid-78777]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Record of Lodoss War",
+  "sonarr_series_titleslug": "record-of-lodoss-war",
+  "sonarr_series_tmdbid": "42713",
+  "sonarr_series_tvdbid": "78777",
+  "sonarr_series_tvmazeid": "17972",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "1990"
+}
