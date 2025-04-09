@@ -1,0 +1,18 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesAdd",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Action|Adventure|Animation|Anime|Comedy|Drama|Fantasy",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt0112166",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Slayers (1995) [tvdbid-77681]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Slayers",
+  "sonarr_series_titleslug": "slayers",
+  "sonarr_series_tmdbid": "26318",
+  "sonarr_series_tvdbid": "77681",
+  "sonarr_series_tvmazeid": "6338",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "1995"
+}
