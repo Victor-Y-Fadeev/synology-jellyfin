@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "False",
+  "sonarr_series_genres": "Adventure|Animation|Anime|Drama|Fantasy|History|Romance",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt1158671",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Spice and Wolf (2008) [tvdbid-81178]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Spice and Wolf",
+  "sonarr_series_titleslug": "spice-and-wolf",
+  "sonarr_series_tmdbid": "26707",
+  "sonarr_series_tvdbid": "81178",
+  "sonarr_series_tvmazeid": "6608",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2008"
+}
