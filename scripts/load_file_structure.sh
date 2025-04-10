@@ -9,23 +9,16 @@ function parse_input_arguments {
     fi
 
     SRC="$(realpath "$1")"
-    JSON="$(cat "$SRC")"
     DEST="$(realpath "${2:-.}")"
+
+    DIR="$(dirname "${BASH_SOURCE[0]}")"
+    DIR="$(realpath "${DIR}")"
+    SCRIPT="${DIR}/json_to_paths.jq"
 }
 
 
-function flat_json_processing {
-    local json="$1"
-    local destination="$2"
-
-    local list="$(echo "$JSON" | jq -r 'def builder(path; value): value |
-        if type == "object" then
-            to_entries | map(.key as $key | builder(path + "/" + $key; .value)) | .[]
-        elif type == "array" then
-            map(builder(path; .)) | .[]
-        else
-            path + "/" + .
-        end; builder(""; .) | .[1:] | sub("/\\.?/"; "/")')"
+function build_files_tree {
+    local destination="$1"
 
     while read -r line; do
         local file="$destination/$line"
@@ -33,9 +26,9 @@ function flat_json_processing {
 
         mkdir --parents "$folder"
         echo "$line" > "$file"
-    done <<< "$list"
+    done <<< "$(cat)"
 }
 
 
 parse_input_arguments "$@"
-flat_json_processing "$JSON" "$DEST"
+"$SCRIPT" "$SRC" | build_files_tree "$DEST"

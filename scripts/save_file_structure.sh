@@ -46,6 +46,4 @@ function find_folder_files {
 
 
 parse_input_arguments "$@"
-find_unusual_folders "$SRC" \
-    | find_folder_files \
-    | "$SCRIPT" > "$DEST"
+find_unusual_folders "$SRC" | find_folder_files | "$SCRIPT" > "$DEST"
