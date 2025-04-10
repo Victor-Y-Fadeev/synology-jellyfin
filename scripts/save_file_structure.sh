@@ -10,57 +10,42 @@ EXCLUDE_EXTENSIONS="jpg|png|webp|delete|txt|otf|ttf|PFB|PFM"
 
 function parse_input_arguments {
     SRC="$(realpath "${1:-.}")"
-    if [[ ! "$SRC" =~ "/data/" ]]; then
+    if [[ ! "${SRC}" =~ "/data/" ]]; then
         exit
     fi
 
-    DEPTH="$(echo "${SRC%%/data/*}" | tr -cd '/' | wc -c)"
     DEST="${SRC#*/data/}"
     DEST="${DEST%%/*}"
 
-    if [[ "$DEST" == "downloads" ]]; then
-        DEPTH=$(( DEPTH + 6 ))
-    else
-        DEPTH=$(( DEPTH + 5 ))
-    fi
-
-    DIR="$(dirname "$0")"
-    DIR="$(realpath "$DIR")"
+    DIR="$(dirname "${BASH_SOURCE[0]}")"
+    DIR="$(realpath "${DIR}")"
     DEST="${DIR}/${DEST}.json"
+    SCRIPT="${DIR}/json_from_paths.jq"
 }
 
 
 function find_unusual_folders {
     local extensions="(${MEDIA_EXTENSIONS}|${EXCLUDE_EXTENSIONS})"
     local escape="$(printf '%q' "$extensions")"
-    find "$SRC" -type f ! -iregex ".*\.${escape}$" \
-        | cut -d'/' -f1-"$DEPTH" | sort | uniq
+
+    find "$1" -type f ! -iregex ".*\.${escape}$" \
+        | sed --posix --regexp-extended 's;(/(series|movies)(/[^/]*){2})/.*$;\1;' \
+        | sort | uniq
 }
 
 
-function generate_json_structure {
+function find_folder_files {
     local extensions="(${EXCLUDE_EXTENSIONS})"
-    local escape_extensions="$(printf '%q' "$extensions")"
-    local json="{}"
+    local escape="$(printf '%q' "$extensions")"
 
     while read -r line; do
-        local escape_line="$(echo "$line" | sed 's|\W|\\\0|g')"
-        local value="$(find "$line" -type f ! -iregex ".*\.${escape_extensions}$" \
-            | sed --posix --regexp-extended "s|^${escape_line}/(.*)$|\"\1\"|" | sort \
-            | jq -s -S 'map((if contains("/") then sub("/[^/]*$"; "") else "." end) as $key
-                            | {"key": $key, "value": ltrimstr($key + "/")})
-                        | group_by(.key)
-                        | map(.[0].key as $key | {"key": $key, "value": map(.value)})
-                        | from_entries')"
-
-        local folder="/data/${line#*/data/}"
-        json="$(echo "$json" | jq -S '.[$key] = $value' \
-                --arg key "$folder" --argjson value "$value")"
-    done <<< "$(find_unusual_folders)"
-
-    echo "$json" > "$DEST"
+        find "$line" -type f ! -iregex ".*\.${escape}$" \
+            | sed --posix --regexp-extended 's|^.*(/data/)|\1|'
+    done <<< "$(cat)"
 }
 
 
 parse_input_arguments "$@"
-generate_json_structure
+find_unusual_folders "$SRC" \
+    | find_folder_files \
+    | "$SCRIPT" > "$DEST"
