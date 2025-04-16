@@ -150,7 +150,7 @@ esac
 
 case "$sonarr_eventtype" in
     "Download")
-        if [[ ! -z "$sonarr_isupgrade" ]]; then
+        if [[ -n "$sonarr_isupgrade" ]]; then
             import_extra_files "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
         fi
         ;;
