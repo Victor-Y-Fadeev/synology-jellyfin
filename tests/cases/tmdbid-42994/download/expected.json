@@ -1,0 +1,33 @@
+[
+  [
+    {
+      "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]": "/data/movies/anime/Memories (1995) [tmdbid-42994]"
+    },
+    {
+      "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv": "Memories (1995).pt1.mkv",
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv": "Memories (1995).pt2.mkv",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv": "Memories (1995).pt3.mkv",
+      "VIDEO_TS.nfo": "movie.nfo"
+    }
+  ],
+  [
+    {
+      "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]/nfo": "/data/movies/anime/Memories (1995) [tmdbid-42994]"
+    },
+    {
+      "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo": "Memories (1995).pt1.nfo",
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo": "Memories (1995).pt2.nfo",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo": "Memories (1995).pt3.nfo"
+    }
+  ],
+  [
+    {
+      "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]/srt": "/data/movies/anime/Memories (1995) [tmdbid-42994]"
+    },
+    {
+      "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.srt": "Memories (1995).pt1.srt",
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.srt": "Memories (1995).pt2.srt",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.srt": "Memories (1995).pt3.srt"
+    }
+  ]
+]
