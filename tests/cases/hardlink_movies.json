@@ -1,0 +1,56 @@
+[
+  [
+    {
+      "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]": "/data/movies/anime/Memories (1995) [tmdbid-42994]"
+    },
+    {
+      "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv": "Memories (1995).pt1.mkv",
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv": "Memories (1995).pt2.mkv",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv": "Memories (1995).pt3.mkv",
+      "VIDEO_TS.nfo": "movie.nfo"
+    }
+  ],
+  [
+    {
+      "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]/nfo": "/data/movies/anime/Memories (1995) [tmdbid-42994]"
+    },
+    {
+      "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo": "Memories (1995).pt1.nfo",
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo": "Memories (1995).pt2.nfo",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo": "Memories (1995).pt3.nfo"
+    }
+  ],
+  [
+    {
+      "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]/srt": "/data/movies/anime/Memories (1995) [tmdbid-42994]"
+    },
+    {
+      "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.srt": "Memories (1995).pt1.srt",
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.srt": "Memories (1995).pt2.srt",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.srt": "Memories (1995).pt3.srt"
+    }
+  ],
+  [
+    {
+      "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion": "/data/movies/anime/Neon Genesis Evangelion - The End of Evangelion (1997) [tmdbid-18491]"
+    },
+    {
+      "25. (The End of Evangelion) 01. AIR (Воздух).mkv": "Neon Genesis Evangelion - The End of Evangelion (1997).pt1.mkv",
+      "25. (The End of Evangelion) 01. AIR (Воздух).nfo": "Neon Genesis Evangelion - The End of Evangelion (1997).pt1.nfo",
+      "26. (The End of Evangelion) 02. My Pure Heart For You (Искренне Ваш...).mkv": "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.mkv",
+      "26. (The End of Evangelion) 02. My Pure Heart For You (Искренне Ваш...).nfo": "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.nfo",
+      "VIDEO_TS.nfo": "movie.nfo"
+    }
+  ],
+  [
+    {
+      "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials": "/data/movies/anime/Neon Genesis Evangelion - The End of Evangelion (1997) [tmdbid-18491]"
+    },
+    {
+      "s00e02 Neon Genesis Evangelion - The End of Evangelion.pt1.mkv": "Neon Genesis Evangelion - The End of Evangelion (1997).pt1.mkv",
+      "s00e02 Neon Genesis Evangelion - The End of Evangelion.pt1.nfo": "Neon Genesis Evangelion - The End of Evangelion (1997).pt1.nfo",
+      "s00e02 Neon Genesis Evangelion - The End of Evangelion.pt2.mkv": "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.mkv",
+      "s00e02 Neon Genesis Evangelion - The End of Evangelion.pt2.nfo": "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.nfo"
+    }
+  ]
+]

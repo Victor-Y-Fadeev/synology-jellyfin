@@ -14,7 +14,7 @@ function parse_input_arguments {
 
     SRC="$(realpath "$1")"
     ROOT="${ROOT%%/data/*}"
-    DEST="${DIR}/hardlinks.json"
+    DEST="${DIR}/hardlink_$(basename "${SRC}")"
 
     READER="${DIR}/json_to_paths.jq"
     WRITER="${DIR}/json_from_kv.jq"
