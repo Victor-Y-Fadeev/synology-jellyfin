@@ -12,9 +12,9 @@ function setup_environment {
 
     SRC="$(realpath "$1" 2>/dev/null)"
     if [[ -d "${SRC}" ]]; then
-        ROOT="${SRC%%/data/*}"
+        ROOT="${SRC%%/data*}"
     else
-        ROOT="${DIR%%/data/*}"
+        ROOT="${DIR%%/data*}"
     fi
 
     if [[ ! -e "${SRC}" || ! -d "${ROOT}/data" ]]; then
@@ -30,7 +30,7 @@ function search_hardlinks {
 
         while read -r source; do
             if [[ -n "$source" ]]; then
-                echo "${source#"${ROOT}"}|${destination}"
+                echo "${source#"${ROOT}"}|${destination#"${ROOT}"}"
             fi
         done <<< "$(find "$ROOT" -samefile "$file" ! -path "$escape" 2>/dev/null)"
     done <<< "$(cat)"
