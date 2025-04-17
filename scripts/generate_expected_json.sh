@@ -26,7 +26,7 @@ for test in "${TESTS}"/*/; do
     file="${SRC}/${name}.json"
 
     if [[ -f "$file" ]]; then
-        mv "$file" "${test}/download/expected.json"
+        cp "$file" "${test}/download/expected.json"
 
         list="$("$TO_KV" "$file" | sed --posix --regexp-extended 's/^[^\|]*\|//' | sort | uniq)"
         dict="$(echo "$list" | sed --posix --regexp-extended \
