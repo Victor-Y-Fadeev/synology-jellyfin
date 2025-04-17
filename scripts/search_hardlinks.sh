@@ -7,23 +7,19 @@ function setup_environment {
     DIR="$(dirname "${BASH_SOURCE[0]}")"
     DIR="$(realpath "${DIR}")"
 
-    if [[ -d "$2" ]]; then
-        FILTER="$(realpath "$2")"
-        ROOT="${FILTER%%/data/*}"
-        FILTER="${FILTER#"${ROOT}"}"
+    READER="${DIR}/json_to_paths.jq"
+    WRITER="${DIR}/json_from_kv.jq"
+
+    SRC="$(realpath "$1" 2>/dev/null)"
+    if [[ -d "${SRC}" ]]; then
+        ROOT="${SRC%%/data/*}"
     else
         ROOT="${DIR%%/data/*}"
     fi
 
-    if [[ ! -f "$1" || ! -d "${ROOT}/data" ]]; then
+    if [[ ! -e "${SRC}" || ! -d "${ROOT}/data" ]]; then
         exit
     fi
-
-    SRC="$(realpath "$1")"
-    DEST="${DIR}/hardlink_$(basename "${SRC}")"
-
-    READER="${DIR}/json_to_paths.jq"
-    WRITER="${DIR}/json_from_kv.jq"
 }
 
 
@@ -41,8 +37,9 @@ function search_hardlinks {
 }
 
 
-function get_ids {
-    sed --posix --regexp-extended 's|.*\[([a-z]+-[0-9]+)\].*|\1|; t; d' <<< "${1:-"$(cat)"}"
+function get_id {
+    local input="${1:-"$(cat)"}"
+    sed --posix --regexp-extended 's|.*\[([a-z]+-[0-9]+)\].*|\1|; t; d' <<< "$input"
 }
 
 
@@ -51,29 +48,25 @@ function process_input {
         local keys="$(jq -r 'keys[]' "$SRC")"
         local keys_count="$(wc -l <<< "$keys")"
 
-        local ids="$(get_ids <<< "$keys")"
+        local ids="$(get_id "$keys")"
         local ids_count="$(wc -l <<< "$ids")"
 
         if [[ -n "$ids" && "$keys_count" == "$ids_count" ]]; then
             while read -r key; do
-                local id="$(get_ids <<< "$key")"
+                local id="$(get_id "$key")"
 
                 jq --arg key "$key" 'to_entries | map(select(.key == $key)) | from_entries' "$SRC" \
                     | "$READER" | search_hardlinks | "$WRITER" > "${DIR}/${id}.json"
             done <<< "$keys"
         else
-            "$READER" "$SRC" | search_hardlinks | "$WRITER" > "${DIR}/hardlinks_$(basename "${SRC}")"
+            "$READER" "$SRC" | search_hardlinks | "$WRITER" > "${DIR}/hardlinks.json"
         fi
-    elif [[ "${SRC}" =~ (^|/)[a-z]+$ ]]; then
-        echo "2 'hardlinks_${SRC##*/}.json'"
-    elif [[ -n "$(get_ids <<< "$SRC")" ]]; then
-        echo "3 '$(get_ids <<< "$SRC").json'"
     else
-        echo "4 'hardlinks.json'"
+        local id="$(get_id "$SRC")"
+        find "$SRC" -type f | search_hardlinks | "$WRITER" > "${DIR}/${id:-hardlinks}.json"
     fi
 }
 
-# setup_environment "$@"
-# "$READER" "$SRC" | search_hardlinks | "$WRITER" > "$DEST"
-SRC="$1"
+
+setup_environment "$@"
 process_input
