@@ -10,6 +10,8 @@ data/
 *.log
 *.man
 
+*.zip
+
 *.avi
 *.mp4
 *.mkv
