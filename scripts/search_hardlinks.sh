@@ -25,7 +25,7 @@ function setup_environment {
 
 function search_hardlinks {
     while read -r destination; do
-        local file="${ROOT}/${destination#/}"
+        local file="${ROOT}${destination#"${ROOT}"}"
         local escape="$(printf '%q' "$file")"
 
         while read -r source; do
@@ -43,7 +43,7 @@ function get_id {
 }
 
 
-function process_input {
+function process_paths {
     if [[ -f "$SRC" ]]; then
         local keys="$(jq -r 'keys[]' "$SRC")"
         local keys_count="$(wc -l <<< "$keys")"
@@ -69,4 +69,4 @@ function process_input {
 
 
 setup_environment "$@"
-process_input
+process_paths
