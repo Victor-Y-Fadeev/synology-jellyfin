@@ -55,7 +55,7 @@ function process_paths {
             while read -r key; do
                 local id="$(get_id "$key")"
 
-                jq --arg key "$key" 'to_entries | map(select(.key == $key)) | from_entries' "$SRC" \
+                jq --arg key "$key" 'with_entries(select(.key == $key))' "$SRC" \
                     | "$READER" | search_hardlinks | "$WRITER" > "${DIR}/${id}.json"
             done <<< "$keys"
         else
