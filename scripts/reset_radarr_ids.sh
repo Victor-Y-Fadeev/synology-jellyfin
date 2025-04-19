@@ -3,7 +3,7 @@
 set -e
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
-DB="$DIR/../config/radarr/radarr.db"
+DB="${DIR}/../config/radarr/radarr.db"
 
 if ! dpkg --status sqlite3 &>/dev/null; then
     sudo apt --yes install sqlite3

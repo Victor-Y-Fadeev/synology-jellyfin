@@ -21,7 +21,7 @@ function build_files_tree {
     local destination="$1"
 
     while read -r line; do
-        local file="$destination/$line"
+        local file="${destination}/${line}"
         local folder="$(dirname "$file")"
 
         mkdir --parents "$folder"
