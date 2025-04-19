@@ -3,7 +3,6 @@
 
 SOURCE="$(realpath "${BASH_SOURCE[0]}")"
 ROOT="$(dirname "${SOURCE}")/../.."
-SCRIPTS="${ROOT}/scripts"
 
 
 input_to_pipe() {
@@ -18,20 +17,20 @@ input_to_pipe() {
 
 
 json_from_paths() {
-    input_to_pipe "$1" | "${SCRIPTS}/json_from_paths.jq"
+    input_to_pipe "$1" | "${ROOT}/scripts/json_from_paths.jq"
 }
 
 
 json_to_paths() {
-    input_to_pipe "$1" | "${SCRIPTS}/json_to_paths.jq"
+    input_to_pipe "$1" | "${ROOT}/scripts/json_to_paths.jq"
 }
 
 
 json_from_kv() {
-    input_to_pipe "$1" | "${SCRIPTS}/json_from_kv.jq"
+    input_to_pipe "$1" | "${ROOT}/scripts/json_from_kv.jq"
 }
 
 
 json_to_kv() {
-    input_to_pipe "$1" | "${SCRIPTS}/json_to_kv.jq"
+    input_to_pipe "$1" | "${ROOT}/scripts/json_to_kv.jq"
 }
