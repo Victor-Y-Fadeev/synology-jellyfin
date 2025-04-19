@@ -2,6 +2,7 @@
 
 
 mock_radarr_movie_added() {
+    mkdir --parents "$radarr_movie_path"
 }
 
 
@@ -14,10 +15,14 @@ mock_radarr_rename() {
 
 
 mock_radarr_movie_file_delete() {
+    rm --force "$radarr_moviefile_path"
 }
 
 
 mock_radarr_movie_delete() {
+    if [[ "$radarr_movie_deletedfiles" == "True" ]]; then
+        rm --force --recursive "$radarr_movie_path"
+    fi
 }
 
 
