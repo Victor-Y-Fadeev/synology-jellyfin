@@ -5,6 +5,10 @@ SOURCE="$(realpath "${BASH_SOURCE[0]}")"
 ROOT="$(dirname "${SOURCE}")/../.."
 
 
+source "${ROOT}/tests/helpers/mock_radarr_event.bash"
+source "${ROOT}/tests/helpers/mock_sonarr_event.bash"
+
+
 unset_environment_variables() {
     local servarr="$(printenv | grep -i "arr_eventtype=" | sed 's/_.*//' | paste -sd '|')"
 
@@ -54,35 +58,6 @@ add_path_prefix() {
 }
 
 
-call_servarr_event() {
-    case "$radarr_eventtype" in
-        "Download")
-            import_extra_files "$radarr_moviefile_sourcepath" "$radarr_moviefile_path"
-            ;;
-        "Rename")
-            rename_extra_files "$radarr_moviefile_previouspaths" "$radarr_moviefile_paths"
-            ;;
-        "MovieFileDelete")
-            remove_extra_files "$radarr_moviefile_path"
-            ;;
-    esac
-
-    case "$sonarr_eventtype" in
-        "Download")
-            if [[ -n "$sonarr_isupgrade" ]]; then
-                import_extra_files "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
-            fi
-            ;;
-        "Rename")
-            rename_extra_files "$sonarr_episodefile_previouspaths" "$sonarr_episodefile_paths"
-            ;;
-        "EpisodeFileDelete")
-            remove_extra_files "$sonarr_episodefile_path"
-            ;;
-    esac
-}
-
-
 mock_servarr_event() {
     local event_environment="$(cat "$1")"
     local target_prefix="$2"
@@ -96,15 +71,7 @@ mock_servarr_event() {
 
     unset_environment_variables
     export_environment_variables "$event_environment"
-    call_servarr_event
+
+    mock_radarr_event
+    mock_sonarr_event
 }
-
-
-
-
-# unset_environment_variables
-# export_environment_variables "$1"
-# mock_servarr_event "../cases/tvdbid-72070/download/events/20250408_204316_743459087_Download.json"
-# mock_servarr_event "../cases/tmdbid-18491/download/events/20250410_015320_350277224_Download.json"
-# mock_servarr_event "../cases/tvdbid-72070/download/events/20250408_204316_743459087_Download.json"
-mock_servarr_event "../cases/tvdbid-72070/rename/events/20250408_204634_513962973_Rename.json"
