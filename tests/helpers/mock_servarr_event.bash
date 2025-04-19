@@ -2,4 +2,4 @@
 
 
 SOURCE="$(realpath "${BASH_SOURCE[0]}")"
-SCRIPTS="$(dirname "${SOURCE}")/../../scripts"
+ROOT="$(dirname "${SOURCE}")/../.."

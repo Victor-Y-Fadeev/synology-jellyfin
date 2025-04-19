@@ -2,8 +2,17 @@
 
 
 SOURCE="$(realpath "${BASH_SOURCE[0]}")"
-HELPERS="$(dirname "${SOURCE}")"
+ROOT="$(dirname "${SOURCE}")/../.."
 
 
-source "${HELPERS}/json_tools.bash"
-source "${HELPERS}/mock_servarr_event.bash"
+source "${ROOT}/tests/helpers/json_tools.bash"
+source "${ROOT}/tests/helpers/mock_servarr_event.bash"
+
+
+common_setup() {
+    load "${ROOT}/tests/bats-support/load"
+    load "${ROOT}/tests/bats-assert/load"
+    load "${ROOT}/tests/bats-file/load"
+
+    PATH="${ROOT}/scripts:${PATH}"
+}

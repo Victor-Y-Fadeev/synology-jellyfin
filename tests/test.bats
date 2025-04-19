@@ -15,9 +15,8 @@ setup_file() {
 }
 
 setup() {
-    load 'helpers/bats-support/load'
-    load 'helpers/bats-assert/load'
-    load 'helpers/bats-file/load'
+    load 'helpers/load'
+    common_setup
 
     JSON="{}"
 

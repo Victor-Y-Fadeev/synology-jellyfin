@@ -2,7 +2,8 @@
 
 
 SOURCE="$(realpath "${BASH_SOURCE[0]}")"
-SCRIPTS="$(dirname "${SOURCE}")/../../scripts"
+ROOT="$(dirname "${SOURCE}")/../.."
+SCRIPTS="${ROOT}/scripts"
 
 
 input_to_pipe() {
