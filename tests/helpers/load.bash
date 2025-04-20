@@ -13,6 +13,4 @@ common_setup() {
     load "${ROOT}/tests/bats-support/load"
     load "${ROOT}/tests/bats-assert/load"
     load "${ROOT}/tests/bats-file/load"
-
-    PATH="${ROOT}/scripts:${PATH}"
 }
