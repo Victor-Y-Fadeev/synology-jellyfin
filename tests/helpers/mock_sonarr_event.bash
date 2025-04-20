@@ -8,11 +8,23 @@ mock_sonarr_series_add() {
 
 mock_sonarr_download() {
     if [[ -n "$sonarr_isupgrade" ]]; then
+        mkdir --parents "$(dirname "$sonarr_episodefile_path")"
+
+        if ! ln --force "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path" &>/dev/null; then
+            cp --force "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
+        fi
     fi
 }
 
 
 mock_sonarr_rename() {
+    local previouspaths, paths, i
+    readarray -d '|' -t previouspaths <<< "$sonarr_episodefile_previouspaths"
+    readarray -d '|' -t paths <<< "$sonarr_episodefile_paths"
+
+    for (( i = 0; i < "${#paths[@]}"; ++i )); do
+        mv --force "${previouspaths[$i]}" "${paths[$i]}"
+    done
 }
 
 

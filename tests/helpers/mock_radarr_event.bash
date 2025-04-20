@@ -7,10 +7,16 @@ mock_radarr_movie_added() {
 
 
 mock_radarr_download() {
+    mkdir --parents "$(dirname "$radarr_moviefile_path")"
+
+    if ! ln --force "$radarr_moviefile_sourcepath" "$radarr_moviefile_path" &>/dev/null; then
+        cp --force "$radarr_moviefile_sourcepath" "$radarr_moviefile_path"
+    fi
 }
 
 
 mock_radarr_rename() {
+    mv --force "$radarr_moviefile_previouspaths" "$radarr_moviefile_paths"
 }
 
 
