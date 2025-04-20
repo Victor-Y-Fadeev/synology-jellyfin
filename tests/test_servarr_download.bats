@@ -1,0 +1,80 @@
+setup_file() {
+    ROOT="$(dirname "${BATS_TEST_FILENAME}")/.."
+    "${ROOT}/scripts/load_file_structure.sh" "${ROOT}/tests/cases/downloads.json" "${BATS_FILE_TMPDIR}"
+}
+
+
+setup() {
+    load 'helpers/load'
+    common_setup
+}
+
+
+test_servarr_download() {
+    local id="$1"
+}
+
+
+@test "Memories (1995) [tmdbid-42994]" {
+    test_servarr_download "tmdbid-42994"
+}
+
+
+@test "Neon Genesis Evangelion - The End of Evangelion (1997) [tmdbid-18491]" {
+    test_servarr_download "tmdbid-18491"
+}
+
+
+@test "Chobits (2002) [tvdbid-72070]" {
+    test_servarr_download "tvdbid-72070"
+}
+
+
+@test "Death Note (2006) [tvdbid-79481]" {
+    test_servarr_download "tvdbid-79481"
+}
+
+
+@test "Elfen Lied (2004) [tvdbid-75941]" {
+    test_servarr_download "tvdbid-75941"
+}
+
+
+@test "Fullmetal Alchemist (2003) [tvdbid-75579]" {
+    test_servarr_download "tvdbid-75579"
+}
+
+
+@test "Monster Musume - Everyday Life with Monster Girls (2015) [tvdbid-293119]" {
+    test_servarr_download "tvdbid-293119"
+}
+
+
+@test "Neon Genesis Evangelion (1995) [tvdbid-70350]" {
+    test_servarr_download "tvdbid-70350"
+}
+
+
+@test "Night Warriors - DarkStalkers' Revenge (1997) [tvdbid-82119]" {
+    test_servarr_download "tvdbid-82119"
+}
+
+
+@test "Record of Lodoss War (1990) [tvdbid-78777]" {
+    test_servarr_download "tvdbid-78777"
+}
+
+
+@test "Slayers (1995) [tvdbid-77681]" {
+    test_servarr_download "tvdbid-77681"
+}
+
+
+@test "Spice and Wolf (2008) [tvdbid-81178]" {
+    test_servarr_download "tvdbid-81178"
+}
+
+
+@test "To LOVE-Ru (2008) [tvdbid-81831]" {
+    test_servarr_download "tvdbid-81831"
+}
