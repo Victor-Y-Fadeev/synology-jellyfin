@@ -26,7 +26,7 @@ export_environment_variables() {
     local keys="$(jq --raw-output 'keys[]' <<< "$input")"
 
     while read -r key; do
-        local value="$(jq --raw-output --arg key "$key" '.$key' <<< "$input")"
+        local value="$(jq --raw-output --arg key "$key" '.[$key]' <<< "$input")"
         export "$key"="$value"
     done <<< "$keys"
 }
@@ -50,7 +50,7 @@ add_path_prefix() {
     local prefix="$3"
 
     if [[ -n "$prefix" && "$origin" != "null" ]]; then
-        local escape="$(printf '%q' "$origin")"
+        local escape="$(sed 's|\W|\\\0|g' <<< "$origin")"
         sed --posix --regexp-extended "s|${escape}|${prefix}/${origin#/}|g" <<< "$input"
     else
         echo "$input"
