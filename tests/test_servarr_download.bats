@@ -31,7 +31,12 @@ test_servarr_download() {
 
         assert_file_exists "$target"
         assert_files_equal "$source" "$target"
+
+        rm --force "$target"
     done <<< "$(json_to_kv "$expected")"
+
+    run find "${BATS_TEST_TMPDIR}" -type f ! -name "movie.nfo" -name "s[0-9][0-9]e[0-9][0-9]-*.nfo"
+    refute_output
 }
 
 
