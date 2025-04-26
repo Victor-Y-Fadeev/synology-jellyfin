@@ -5,7 +5,7 @@ setup_file() {
 
 
 setup() {
-    load 'helpers/load'
+    load "helpers/load"
     common_setup
 }
 
@@ -26,13 +26,13 @@ test_servarr_download() {
         local source="${line%|*}"
         local target="${line#*|}"
 
-        source="${BATS_FILE_TMPDIR}/${source#/}"
-        target="${BATS_TEST_TMPDIR}/${target#/}"
+        local source_path="${BATS_FILE_TMPDIR}/${source#/}"
+        local target_path="${BATS_TEST_TMPDIR}/${target#/}"
 
-        assert_file_exists "$target"
-        assert_files_equal "$source" "$target"
+        assert_file_exists "$target_path"
+        assert_files_equal "$source_path" "$target_path"
 
-        rm --force "$target"
+        rm --force "$target_path"
     done <<< "$(json_to_kv "$expected")"
 
     run find "${BATS_TEST_TMPDIR}" -type f ! -name "movie.nfo" ! -name "s[0-9][0-9]e[0-9][0-9]-*.nfo"

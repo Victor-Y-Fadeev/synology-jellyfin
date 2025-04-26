@@ -18,11 +18,15 @@ mock_sonarr_download() {
 
 
 mock_sonarr_rename() {
-    local previouspaths, paths, i
-    readarray -d '|' -t previouspaths <<< "$sonarr_episodefile_previouspaths"
-    readarray -d '|' -t paths <<< "$sonarr_episodefile_paths"
+    local previouspaths
+    echo -n "$sonarr_episodefile_previouspaths" | readarray -d '|' -t previouspaths
 
+    local paths
+    echo -n "$sonarr_episodefile_paths" | readarray -d '|' -t paths
+
+    local i
     for (( i = 0; i < "${#paths[@]}"; ++i )); do
+        mkdir --parents "$(dirname "${paths[$i]}")"
         mv --force "${previouspaths[$i]}" "${paths[$i]}"
     done
 }
