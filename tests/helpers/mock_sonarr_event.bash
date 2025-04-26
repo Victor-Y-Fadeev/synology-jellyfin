@@ -19,10 +19,12 @@ mock_sonarr_download() {
 
 mock_sonarr_rename() {
     local previouspaths
-    echo -n "$sonarr_episodefile_previouspaths" | readarray -d '|' -t previouspaths
+    readarray -d '|' -t previouspaths <<< "$sonarr_episodefile_previouspaths"
+    previouspaths[-1]="${previouspaths[-1]%$'\n'}"
 
     local paths
-    echo -n "$sonarr_episodefile_paths" | readarray -d '|' -t paths
+    readarray -d '|' -t paths <<< "$sonarr_episodefile_paths"
+    paths[-1]="${paths[-1]%$'\n'}"
 
     local i
     for (( i = 0; i < "${#paths[@]}"; ++i )); do
