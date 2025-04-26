@@ -26,6 +26,10 @@ test_servarr_delete() {
     while read -r line; do
         assert_file_not_exists "${BATS_FILE_TMPDIR}/${line#/}"
     done <<< "$(json_to_paths "$expected")"
+
+    local source="$(jq --raw-output 'keys[]' "$expected")"
+    run find "${BATS_FILE_TMPDIR}/${source#/}" -type f
+    refute_output
 }
 
 
