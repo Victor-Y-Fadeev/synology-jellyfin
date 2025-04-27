@@ -35,6 +35,9 @@ test_servarr_rename() {
 
         run cat "$target_path"
         assert_output "$source"
+
+        run find "$(dirname "$source_path")" -type d -empty
+        refute_output
     done <<< "$(json_to_kv "$expected")"
 }
 
