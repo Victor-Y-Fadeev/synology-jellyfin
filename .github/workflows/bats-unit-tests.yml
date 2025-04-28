@@ -3,6 +3,7 @@ name: BATS Unit Tests
 on:
   push:
     paths:
+      - '.github/workflows/bats-unit-tests.yml'
       - 'scripts/**'
       - 'tests/**'
 
