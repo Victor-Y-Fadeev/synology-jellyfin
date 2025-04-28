@@ -17,6 +17,8 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run Test
+        env:
+          TERM: xterm-256color
         run: tests/bats/bin/bats tests/test_servarr_download.bats --formatter pretty
 
   test_servarr_rename:
@@ -28,6 +30,8 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run Test
+        env:
+          TERM: xterm-256color
         run: tests/bats/bin/bats tests/test_servarr_rename.bats --formatter pretty
 
   test_servarr_delete:
@@ -39,4 +43,6 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run Test
+        env:
+          TERM: xterm-256color
         run: tests/bats/bin/bats tests/test_servarr_delete.bats --formatter pretty
