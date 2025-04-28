@@ -1,5 +1,4 @@
 name: BATS Unit Tests
-# name: Servarr Unit Tests
 
 on:
   push:
@@ -18,7 +17,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run Test
-        run: tests/bats/bin/bats tests/test_servarr_download.bats
+        run: tests/bats/bin/bats tests/test_servarr_download.bats --formatter pretty
 
   test_servarr_rename:
     name: Test Servarr Rename
@@ -29,7 +28,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run Test
-        run: tests/bats/bin/bats tests/test_servarr_rename.bats
+        run: tests/bats/bin/bats tests/test_servarr_rename.bats --formatter pretty
 
   test_servarr_delete:
     name: Test Servarr Delete
@@ -40,4 +39,4 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Run Test
-        run: tests/bats/bin/bats tests/test_servarr_delete.bats
+        run: tests/bats/bin/bats tests/test_servarr_delete.bats --formatter pretty
