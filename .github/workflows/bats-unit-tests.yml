@@ -1,0 +1,19 @@
+name: BATS Unit Tests
+
+on:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+
+jobs:
+  tests:
+    name: Servarr Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: Run Tests
+        run: ./tests/bats/bin/bats ./tests/
