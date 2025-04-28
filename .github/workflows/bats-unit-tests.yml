@@ -1,4 +1,5 @@
 name: BATS Unit Tests
+# name: Servarr Unit Tests
 
 on:
   push:
@@ -8,13 +9,35 @@ on:
       - 'tests/**'
 
 jobs:
-  tests:
-    name: Servarr Unit Tests
+  test_servarr_download:
+    name: Test Servarr Download
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - name: Run Tests
-        run: ./tests/bats/bin/bats ./tests/
+      - name: Run Test
+        run: tests/bats/bin/bats tests/test_servarr_download.bats
+
+  test_servarr_rename:
+    name: Test Servarr Rename
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: Run Test
+        run: tests/bats/bin/bats tests/test_servarr_rename.bats
+
+  test_servarr_delete:
+    name: Test Servarr Delete
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: Run Test
+        run: tests/bats/bin/bats tests/test_servarr_delete.bats
