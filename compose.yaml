@@ -5,54 +5,45 @@ services:
     image: ghcr.io/sagernet/sing-box:latest
     container_name: sing-box
     restart: unless-stopped
-    networks:
-      default:
-        aliases:
-          - qbittorrent
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
     volumes:
       - ./config/sing-box:/etc/sing-box/
     ports:
       - 2080:2080
-      - 2080:2080/udp
-      # - 8080:8080
     command: -D /var/lib/sing-box -C /etc/sing-box/ run
-  flaresolverr:
-    # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    container_name: flaresolverr
-    environment:
-      # - LOG_LEVEL=${LOG_LEVEL:-info}
-      # - LOG_HTML=${LOG_HTML:-false}
-      # - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-      - TZ=${TZ}
-    ports:
-      - 8191:8191
-    restart: unless-stopped
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest #libtorrentv1 #
+    image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      # - WEBUI_PORT=8080
-      # - TORRENTING_PORT=6881
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
     ports:
       - 8080:8080
-      # - 6881:6881
-      # - 6881:6881/udp
+      - 6881:6881
+      - 6881:6881/udp
     depends_on:
       - sing-box
-    # network_mode: service:sing-box
-    # network_mode: host
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - HTTP_PROXY=http://sing-box:2080
+      - HTTPS_PROXY=http://sing-box:2080
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/jellyfin:/config
+      - ./data:/data
+    ports:
+      - 8096:8096
+    depends_on:
+      - sing-box
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -70,6 +61,7 @@ services:
     depends_on:
       - sing-box
       - qbittorrent
+      - jellyfin
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -86,6 +78,7 @@ services:
     depends_on:
       - sing-box
       - qbittorrent
+      - jellyfin
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -100,37 +93,15 @@ services:
       - 9696:9696
     depends_on:
       - sing-box
-      - flaresolverr
       - qbittorrent
       - radarr
       - sonarr
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    restart: unless-stopped
-    environment:
-      - HTTP_PROXY=http://sing-box:2080
-      - HTTPS_PROXY=http://sing-box:2080
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      # - JELLYFIN_PublishedServerUrl=http://jellyfin:8096
-    volumes:
-      - ./config/jellyfin:/config
-      - ./data:/data
-    ports:
-      - 8096:8096
-      # - 8920:8920
-      # - 7359:7359/udp
-      # - 1900:1900/udp
-    depends_on:
-      - sing-box
+
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: unless-stopped
     environment:
-      # - LOG_LEVEL=debug
       - TZ=${TZ}
     ports:
       - 5055:5055
@@ -141,20 +112,26 @@ services:
       - radarr
       - sonarr
       - jellyfin
-  # cloudflared:
-  #   image: cloudflare/cloudflared:latest
-  #   container_name: cloudflared
-  #   restart: unless-stopped
-  #   environment:
-  #     # - NO_AUTOUPDATE
-  #     # - TUNNEL_LOGLEVEL=debug
-  #     # - TUNNEL_TRANSPORT_PROTOCOL=http2
-  #     - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-  #   depends_on:
-  #     - qbittorrent
-  #     - radarr
-  #     - sonarr
-  #     - prowlarr
-  #     - jellyfin
-  #     - jellyseerr
-  #   command: tunnel run
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    extra_hosts:
+      synology.docker.internal: 172.20.0.1
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - qbittorrent
+      - radarr
+      - sonarr
+      - prowlarr
+      - jellyfin
+      - jellyseerr
+    command: tunnel run
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
