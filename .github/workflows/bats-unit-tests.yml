@@ -19,7 +19,7 @@ jobs:
       - name: Run Test
         env:
           TERM: xterm-256color
-        run: tests/bats/bin/bats tests/test_servarr_download.bats --pretty --timing | sed -E 's/^.* sec (✓|✗|-)/ \1/'
+        run: tests/bats/bin/bats tests/test_servarr_download.bats --pretty --timing | col
 
   test_servarr_rename:
     name: Test Servarr Rename
@@ -32,7 +32,7 @@ jobs:
       - name: Run Test
         env:
           TERM: xterm-256color
-        run: tests/bats/bin/bats tests/test_servarr_rename.bats --pretty --timing | sed -E 's/^.* sec (✓|✗|-)/ \1/'
+        run: tests/bats/bin/bats tests/test_servarr_rename.bats --pretty --timing | col
 
   test_servarr_delete:
     name: Test Servarr Delete
@@ -45,4 +45,4 @@ jobs:
       - name: Run Test
         env:
           TERM: xterm-256color
-        run: tests/bats/bin/bats tests/test_servarr_delete.bats --pretty --timing | sed -E 's/^.* sec (✓|✗|-)/ \1/'
+        run: tests/bats/bin/bats tests/test_servarr_delete.bats --pretty --timing | col
