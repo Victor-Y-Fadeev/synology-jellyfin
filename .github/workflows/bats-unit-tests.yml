@@ -18,7 +18,7 @@ jobs:
           submodules: 'recursive'
       - name: Run Test
         env:
-          TERM: plain
+          TERM: linux
         run: tests/bats/bin/bats tests/test_servarr_download.bats --pretty --timing
 
   test_servarr_rename:
@@ -31,7 +31,7 @@ jobs:
           submodules: 'recursive'
       - name: Run Test
         env:
-          TERM: plain
+          TERM: linux
         run: tests/bats/bin/bats tests/test_servarr_rename.bats --pretty --timing
 
   test_servarr_delete:
@@ -44,5 +44,5 @@ jobs:
           submodules: 'recursive'
       - name: Run Test
         env:
-          TERM: plain
+          TERM: linux
         run: tests/bats/bin/bats tests/test_servarr_delete.bats --pretty --timing
