@@ -18,8 +18,8 @@ jobs:
           submodules: 'recursive'
       - name: Run Test
         env:
-          TERM: dumb
-        run: tests/bats/bin/bats tests/test_servarr_download.bats --pretty --timing
+          TERM: xterm-256color
+        run: tests/bats/bin/bats tests/test_servarr_download.bats --pretty --timing | sed -E 's/^.* sec (✓|✗|-)/ \1/'
 
   test_servarr_rename:
     name: Test Servarr Rename
@@ -31,8 +31,8 @@ jobs:
           submodules: 'recursive'
       - name: Run Test
         env:
-          TERM: dumb
-        run: tests/bats/bin/bats tests/test_servarr_rename.bats --pretty --timing
+          TERM: xterm-256color
+        run: tests/bats/bin/bats tests/test_servarr_rename.bats --pretty --timing | sed -E 's/^.* sec (✓|✗|-)/ \1/'
 
   test_servarr_delete:
     name: Test Servarr Delete
@@ -44,5 +44,5 @@ jobs:
           submodules: 'recursive'
       - name: Run Test
         env:
-          TERM: dumb
-        run: tests/bats/bin/bats tests/test_servarr_delete.bats --pretty --timing
+          TERM: xterm-256color
+        run: tests/bats/bin/bats tests/test_servarr_delete.bats --pretty --timing | sed -E 's/^.* sec (✓|✗|-)/ \1/'
