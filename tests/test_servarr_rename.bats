@@ -40,7 +40,8 @@ test_servarr_rename() {
         run cat "$target_path"
         assert_output "$source"
 
-        run find "$(dirname "$source_path")" -type d -empty
+        run bats_pipe find "$(dirname "$source_path")" -type d -empty \
+                    \| sed "s|^${BATS_FILE_TMPDIR}||"
         refute_output
     done <<< "$(json_to_kv "$expected")"
 }

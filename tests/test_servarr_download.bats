@@ -40,7 +40,10 @@ test_servarr_download() {
         rm --force "$target_path"
     done <<< "$(json_to_kv "$expected")"
 
-    run find "${BATS_TEST_TMPDIR}" -type f ! -name "movie.nfo" ! -name "s[0-9][0-9]e[0-9][0-9]-*.nfo"
+    run bats_pipe find "${BATS_TEST_TMPDIR}" -type f \
+                    ! -name "movie.nfo" \
+                    ! -name "s[0-9][0-9]e[0-9][0-9]-*.nfo" \
+                \| sed "s|^${BATS_TEST_TMPDIR}||"
     refute_output
 }
 

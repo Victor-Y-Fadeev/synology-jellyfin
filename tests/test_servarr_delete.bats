@@ -36,7 +36,8 @@ test_servarr_delete() {
     assert_dir_exists "$directory_path"
 
     local escape="$(printf '%q' "$directory_path")"
-    run find "$directory_path" ! -path "$escape"
+    run bats_pipe find "$directory_path" ! -path "$escape" \
+                \| sed "s|^${BATS_FILE_TMPDIR}||"
     refute_output
 }
 
