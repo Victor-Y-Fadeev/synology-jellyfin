@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Deploy Docs
         uses: exuanbo/actions-deploy-gist@v1
         with:
@@ -25,20 +26,15 @@ jobs:
           gist_description: ${{ env.GIST_DESCRIPTION }}
           gist_file_name: 'How to setup Jellyfin.md'
           file_path: docs/How-to-setup-Jellyfin.md
+
       - name: Deploy Questions
         uses: exuanbo/actions-deploy-gist@v1
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: ${{ secrets.GIST_ID }}
-          gist_description: ${{ env.GIST_DESCRIPTION }}
           gist_file_name: 'Questions (FAQ).md'
           file_path: docs/Questions-FAQ.md
-      - name: Deploy Docker Compose
-        uses: exuanbo/actions-deploy-gist@v1
-        with:
-          token: ${{ secrets.TOKEN }}
-          gist_id: ${{ secrets.GIST_ID }}
-          file_path: compose.yaml
+
       - name: Compose Settings Markdown
         run: scripts/compose_settings_markdown.sh
       - name: Deploy Settings
@@ -46,4 +42,20 @@ jobs:
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: ${{ secrets.GIST_ID }}
+          gist_file_name: 'Settings.md'
           file_path: settings/settings.md
+
+      - name: Deploy Docker Compose
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          gist_file_name: '~compose.yaml'
+          file_path: compose.yaml
+
+      - name: Deploy Script
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          file_path: scripts/support_extra_files.sh
