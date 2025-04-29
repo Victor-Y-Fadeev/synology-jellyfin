@@ -7,16 +7,29 @@ on:
       - 'settings/**'
       - 'docs/**'
 
+env:
+  GIST_DESCRIPTION: 'How to setup Jellyfin with Sonarr, Radarr, Prowlarr, Jellyseerr and qBittorrent using Docker'
+
 jobs:
-  deploy_docs:
-    name: Deploy Docs
+  deploy:
+    name: Deploy to Gist
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Deploy
+      - name: Deploy How-to
         uses: exuanbo/actions-deploy-gist@v1
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: ${{ secrets.GIST_ID }}
+          gist_description: ${{ env.GIST_DESCRIPTION }}
+          gist_file_name: 'How to setup Jellyfin.md'
           file_path: docs/How-to-setup-Jellyfin.md
+      - name: Deploy Questions
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          gist_description: ${{ env.GIST_DESCRIPTION }}
+          gist_file_name: 'Questions (FAQ).md'
+          file_path: docs/Questions-FAQ.md
