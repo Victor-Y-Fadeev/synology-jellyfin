@@ -1,0 +1,22 @@
+name: GitHub Gist Deploy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/github-gist-deploy.yml'
+      - 'settings/**'
+      - 'docs/**'
+
+jobs:
+  deploy_docs:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Deploy
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          file_path: docs/How-to-setup-Jellyfin.md
