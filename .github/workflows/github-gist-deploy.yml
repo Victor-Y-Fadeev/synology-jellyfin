@@ -46,4 +46,4 @@ jobs:
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: ${{ secrets.GIST_ID }}
-          file_path: docs/settings.md
+          file_path: settings/settings.md
