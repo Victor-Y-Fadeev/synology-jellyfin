@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Deploy How-to
+      - name: Deploy Docs
         uses: exuanbo/actions-deploy-gist@v1
         with:
           token: ${{ secrets.TOKEN }}
@@ -33,3 +33,17 @@ jobs:
           gist_description: ${{ env.GIST_DESCRIPTION }}
           gist_file_name: 'Questions (FAQ).md'
           file_path: docs/Questions-FAQ.md
+      - name: Deploy Docker Compose
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          file_path: compose.yaml
+      - name: Compose Settings Markdown
+        run: scripts/compose_settings_markdown.sh
+      - name: Deploy Settings
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.TOKEN }}
+          gist_id: ${{ secrets.GIST_ID }}
+          file_path: docs/settings.md
