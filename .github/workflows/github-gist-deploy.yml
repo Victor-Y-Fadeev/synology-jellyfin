@@ -6,6 +6,8 @@ on:
       - master
     paths:
       - '.github/workflows/github-gist-deploy.yml'
+      - 'scripts/support_extra_files.sh'
+      - 'compose.yaml'
       - 'settings/**'
       - 'docs/**'
 
