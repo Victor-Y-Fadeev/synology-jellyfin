@@ -3,6 +3,7 @@
 
 SOURCE="$(realpath "${BASH_SOURCE[0]}")"
 ROOT="$(dirname "${SOURCE}")/../.."
+ROOT="$(realpath "${ROOT}")"
 
 
 source "${ROOT}/tests/helpers/mock_radarr_event.bash"

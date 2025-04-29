@@ -1,5 +1,7 @@
 setup_file() {
     ROOT="$(dirname "${BATS_TEST_FILENAME}")/.."
+    ROOT="$(realpath "${ROOT}")"
+
     "${ROOT}/scripts/load_file_structure.sh" "${ROOT}/tests/cases/movies.json" "${BATS_FILE_TMPDIR}"
     "${ROOT}/scripts/load_file_structure.sh" "${ROOT}/tests/cases/series.json" "${BATS_FILE_TMPDIR}"
 }
@@ -8,6 +10,8 @@ setup_file() {
 setup() {
     load "helpers/load"
     common_setup
+
+    BATSLIB_FILE_PATH_REM="#${BATS_FILE_TMPDIR}"
 }
 
 

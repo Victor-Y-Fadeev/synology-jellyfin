@@ -1,5 +1,7 @@
 setup_file() {
     ROOT="$(dirname "${BATS_TEST_FILENAME}")/.."
+    ROOT="$(realpath "${ROOT}")"
+
     "${ROOT}/scripts/load_file_structure.sh" "${ROOT}/tests/cases/downloads.json" "${BATS_FILE_TMPDIR}"
 }
 
@@ -7,6 +9,9 @@ setup_file() {
 setup() {
     load "helpers/load"
     common_setup
+
+    shopt -s extglob
+    BATSLIB_FILE_PATH_REM="#@(${BATS_TEST_TMPDIR}|${BATS_FILE_TMPDIR})"
 }
 
 

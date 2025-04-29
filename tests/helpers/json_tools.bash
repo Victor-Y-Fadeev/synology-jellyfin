@@ -3,6 +3,7 @@
 
 SOURCE="$(realpath "${BASH_SOURCE[0]}")"
 ROOT="$(dirname "${SOURCE}")/../.."
+ROOT="$(realpath "${ROOT}")"
 
 
 input_to_pipe() {
