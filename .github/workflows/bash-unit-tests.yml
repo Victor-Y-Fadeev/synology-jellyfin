@@ -1,9 +1,9 @@
-name: BATS Unit Tests
+name: Bash Unit Tests
 
 on:
   push:
     paths:
-      - '.github/workflows/bats-unit-tests.yml'
+      - '.github/workflows/bash-unit-tests.yml'
       - 'scripts/**'
       - 'tests/**'
 
