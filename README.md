@@ -3,7 +3,7 @@ git submodule update --init --recursive
 ```
 
 ```shell
-sudo apt --yes install jq file ffmpeg sqlite3 parallel
+sudo apt --yes install jq file ffmpeg sqlite3 parallel shellcheck
 ```
 
 ```shell

@@ -8,6 +8,15 @@ on:
       - 'tests/**'
 
 jobs:
+  shell_style_guide:
+    name: Shell Style Guide
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Run Linter
+        run: scripts/linter.sh
+
   test_servarr_download:
     name: Test Servarr Download
     runs-on: ubuntu-latest
