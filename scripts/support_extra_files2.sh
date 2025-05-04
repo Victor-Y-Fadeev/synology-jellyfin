@@ -27,7 +27,7 @@ function buffer_download_event {
 }
 
 
-function complex_download_event {
+function parted_download_event {
     local buffer="$1"
     local instance="$2"
     local destination="$3"
@@ -49,6 +49,7 @@ function complex_download_event {
         local full="${base}.${extension}"
 
         if [[ "$current" == "$source" && "$full" != "$destination" ]]; then
+            echo "mv --force \"$destination\" \"$full\""
             # mv --force "$destination" "$full"
         fi
 
@@ -57,13 +58,49 @@ function complex_download_event {
 }
 
 
-complex_download_event "$SONARR_BUFFER" \
-    "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]" \
-    "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.mkv" \
-    "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion/25. (The End of Evangelion) 01. AIR (Воздух).mkv"
+# parted_download_event "$SONARR_BUFFER" \
+#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]" \
+#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.mkv" \
+#     "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion/25. (The End of Evangelion) 01. AIR (Воздух).mkv"
 
 
-complex_download_event "$SONARR_BUFFER" \
-    "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]" \
-    "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.mkv" \
-    "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion/26. (The End of Evangelion) 02. My Pure Heart For You (Искренне Ваш...).mkv"
+# parted_download_event "$SONARR_BUFFER" \
+#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]" \
+#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.mkv" \
+#     "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion/26. (The End of Evangelion) 02. My Pure Heart For You (Искренне Ваш...).mkv"
+
+
+
+origin="/mnt/d/Desktop/synology-jellyfin/scripts/data/downloads/series/anime/[Beatrice-Raws] Spice and Wolf [BDRip 1920x1080 x264 FLAC]/[Beatrice-Raws] Spice and Wolf 01 [BDRip 1920x1080 x264 FLAC].mkv"
+# origin="/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.pt1.mkv"
+
+
+function search_extra_files {
+    local dir="$(dirname "${1}")"
+    local name="$(basename "${1%.*}")"
+    # name="${name%.pt[0-9]}"
+
+    local escape_dir="$(printf '%q' "$dir")"
+    local escape_name="$(printf '%q' "$name")"
+    find "$dir" -type f -name "${escape_name}.*" \
+        | jq --arg dir "$escape_dir" --arg name "$escape_name" -R '
+            [
+                inputs
+                | capture("^(?<key>" + $dir
+                        + "/?(?<suffix>.*)/" + $name
+                        + "\\.(?<extension>[^\\.]*))$")
+                | .suffix |= split("/")
+            ]
+            | group_by(.extension)
+            | map(until(map(.suffix[0]) | unique | [length != 1, any(. == null)] | any; map(.suffix |= .[1:])) | .[])
+            | map(.suffix += [.extension] | .suffix |= join("."))
+            # | map(.suffix |= join(".") | .value = .suffix + "." + .extension)'
+            # | from_entries'
+            # | map(map(.suffix[0]) | unique | [length != 1, any(. == null)] | any)'
+            # | map(until(map(.suffix[0] // empty) | unique | length == 1; map(.suffix |= .[1:])))'
+            # | map(map(.suffix[0] // empty))'
+            # | map(map(.suffix[0]))'
+            # | map(map(.suffix |= .[1:]))'
+}
+
+search_extra_files "$origin"
