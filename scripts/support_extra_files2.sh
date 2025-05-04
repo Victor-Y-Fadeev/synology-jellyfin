@@ -3,10 +3,8 @@
 set -e
 
 
-SONARR_BUFFER="/tmp/sonarr_download_event.json"
 RADARR_BUFFER="/tmp/radarr_download_event.json"
-
-# SONARR_BUFFER="test_download_event.json"
+SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 
 function generate_suffix_json {
@@ -33,12 +31,19 @@ function generate_suffix_json {
             | from_entries'
 }
 
+
 function import_file {
     local source="$1"
     local destination="$2"
 
-    echo "import_file '$source' '$destination'"
+    if ln --force "$source" "$destination"; then
+        echo "Hardlink '$source' => '$destination'"
+    else
+        cp --force "$source" "$destination"
+        echo "Copy '$source' => '$destination'"
+    fi
 }
+
 
 function import_extra_files {
     local source="$1"
@@ -95,31 +100,27 @@ function parted_download_event {
         local full="${base}.${extension}"
 
         if [[ "$current" == "$source" && "$full" != "$destination" ]]; then
-            echo "mv --force \"$destination\" \"$full\""
-            # mv --force "$destination" "$full"
+            mv --force "$destination" "$full"
         fi
 
-        # import_extra_files "$current" "$full"
+        import_extra_files "$current" "$full"
     done
 }
 
 
-# parted_download_event "$SONARR_BUFFER" \
-#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]" \
-#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.mkv" \
-#     "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion/25. (The End of Evangelion) 01. AIR (Воздух).mkv"
+case "$radarr_eventtype" in
+    "Download")
+        parted_download_event "$RADARR_BUFFER" "$radarr_movie_path" \
+            "$radarr_moviefile_path" "$radarr_moviefile_sourcepath"
+        ;;
+esac
 
 
-# parted_download_event "$SONARR_BUFFER" \
-#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]" \
-#     "/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.mkv" \
-#     "/data/downloads/series/anime/Neon Genesis Evangelion + The End of Evangelion/26. (The End of Evangelion) 02. My Pure Heart For You (Искренне Ваш...).mkv"
-
-
-
-origin="/mnt/d/Desktop/synology-jellyfin/scripts/data/downloads/series/anime/[Beatrice-Raws] Spice and Wolf [BDRip 1920x1080 x264 FLAC]/[Beatrice-Raws] Spice and Wolf 01 [BDRip 1920x1080 x264 FLAC].mkv"
-# origin="/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.pt1.mkv"
-
-dest="/data/series/anime/Spice and Wolf (2008) [tvdbid-81178]/Season 01/s01e01 Wolf and Best Clothes.mkv"
-
-import_extra_files "$origin" "$dest"
+case "$sonarr_eventtype" in
+    "Download")
+        if [[ -n "$sonarr_isupgrade" ]]; then
+            parted_download_event "$SONARR_BUFFER" "$sonarr_series_path" \
+                "$sonarr_episodefile_path" "$sonarr_episodefile_sourcepath"
+        fi
+        ;;
+esac
