@@ -75,32 +75,28 @@ origin="/mnt/d/Desktop/synology-jellyfin/scripts/data/downloads/series/anime/[Be
 # origin="/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.pt1.mkv"
 
 
-function search_extra_files {
+function generate_suffix_json {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
-    # name="${name%.pt[0-9]}"
 
     local escape_dir="$(printf '%q' "$dir")"
     local escape_name="$(printf '%q' "$name")"
+
     find "$dir" -type f -name "${escape_name}.*" \
         | jq --arg dir "$escape_dir" --arg name "$escape_name" -R '
             [
                 inputs
                 | capture("^(?<key>" + $dir
-                        + "/?(?<suffix>.*)/" + $name
+                        + "/?(?<value>.*)/" + $name
                         + "\\.(?<extension>[^\\.]*))$")
-                | .suffix |= split("/")
+                | .value |= split("/")
             ]
             | group_by(.extension)
-            | map(until(map(.suffix[0]) | unique | [length != 1, any(. == null)] | any; map(.suffix |= .[1:])) | .[])
-            | map(.suffix += [.extension] | .suffix |= join("."))
-            # | map(.suffix |= join(".") | .value = .suffix + "." + .extension)'
-            # | from_entries'
-            # | map(map(.suffix[0]) | unique | [length != 1, any(. == null)] | any)'
-            # | map(until(map(.suffix[0] // empty) | unique | length == 1; map(.suffix |= .[1:])))'
-            # | map(map(.suffix[0] // empty))'
-            # | map(map(.suffix[0]))'
-            # | map(map(.suffix |= .[1:]))'
+            | map(until(map(.value[0]) | unique | [length != 1, any(. == null)] | any;
+                        map(.value |= .[1:])) | .[])
+            | map(.value += [.extension]
+                | .value |= join("."))
+            | from_entries'
 }
 
-search_extra_files "$origin"
+generate_suffix_json "$origin"
