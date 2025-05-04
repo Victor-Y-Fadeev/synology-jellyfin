@@ -45,7 +45,7 @@
 		  - [ ] `On Rename` -> `On`
 		  - [ ] `On Movie File Delete` -> `On`
 		  - [ ] `On Movie File Delete For Upgrade` -> `On`
-		- [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](b4ea1ee58bcb8db43da25125616aeccf/support_extra_files.sh)
+		- [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/scripts/support_extra_files.sh)
   - [ ] `Metadata`
 	- [ ] `Options`
 	  - [ ] `Certification Country` -> `United States`
