@@ -108,6 +108,48 @@ function parted_download_event {
 }
 
 
+function rename_file {
+    local old_base="${1%.*}"
+    old_base="${old_base%.pt[0-9]}"
+    local new_base="${2%.*}"
+
+    local dir="$(dirname "$old_base")"
+    local name="$(basename "$old_base")"
+    local escape="$(sed 's|\W|\\\0|g' <<< "$name")"
+
+    while read -r file; do
+        local extension="${file#"${old_base}"}"
+        mv --force "$file" "${new_base}${extension}"
+        echo "Move '$file' => '${new_base}${extension}'"
+    done <<< "$(find "$dir" -type f -name "${escape}.*")"
+
+    find "$dir" -type d -empty -delete
+}
+
+
+function rename_extra_files {
+    local old_paths
+    readarray -d '|' -t old_paths <<< "$1"
+
+    local new_paths
+    readarray -d '|' -t new_paths <<< "$2"
+
+    local i
+    local length="${#old_paths[@]}"
+
+    for (( i = 0; i < length; ++i )); do
+        local old_base="${old_paths[$i]%.*}"
+        local new_base="${new_paths[$i]%.*}"
+
+        if [[ "$new_base" == "${old_base%.pt[0-9]}" ]]; then
+            mv --force "${new_paths[$i]}" "${old_paths[$i]}"
+        else
+            rename_file "${old_paths[$i]}" "${new_paths[$i]}"
+        fi
+    done
+}
+
+
 function remove_extra_files {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
@@ -127,6 +169,9 @@ case "$radarr_eventtype" in
         parted_download_event "$RADARR_BUFFER" "$radarr_movie_path" \
             "$radarr_moviefile_path" "$radarr_moviefile_sourcepath"
         ;;
+    "Rename")
+        rename_extra_files "$radarr_moviefile_previouspaths" "$radarr_moviefile_paths"
+        ;;
     "MovieFileDelete")
         remove_extra_files "$radarr_moviefile_path"
         rm --force "$(dirname "$radarr_moviefile_path")/movie.nfo"
@@ -140,6 +185,9 @@ case "$sonarr_eventtype" in
             parted_download_event "$SONARR_BUFFER" "$sonarr_series_path" \
                 "$sonarr_episodefile_path" "$sonarr_episodefile_sourcepath"
         fi
+        ;;
+    "Rename")
+        rename_extra_files "$sonarr_episodefile_previouspaths" "$sonarr_episodefile_paths"
         ;;
     "EpisodeFileDelete")
         remove_extra_files "$sonarr_episodefile_path"
