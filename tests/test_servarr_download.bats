@@ -49,6 +49,7 @@ test_servarr_download() {
     run bats_pipe find "${BATS_TEST_TMPDIR}" -type f \
                     ! -name "movie.nfo" \
                     ! -name "s[0-9][0-9]e[0-9][0-9]-*.nfo" \
+                    ! -name "separate-stderr-*" \
                 \| sed "s|^${BATS_TEST_TMPDIR}||"
     refute_output
 }
