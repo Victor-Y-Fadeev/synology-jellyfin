@@ -1,3 +1,7 @@
+#!/usr/bin/env bats
+bats_require_minimum_version 1.5.0
+
+
 setup_file() {
     ROOT="$(dirname "${BATS_TEST_FILENAME}")/.."
     ROOT="$(realpath "${ROOT}")"
@@ -24,7 +28,9 @@ test_servarr_download() {
 
     for event in "${events}"/*; do
         mock_servarr_event "$event" "${BATS_TEST_TMPDIR}" "${BATS_FILE_TMPDIR}"
-        run "$script"
+        run --separate-stderr "$script"
+        refute_stderr
+        assert_success
     done
 
     while read -r line; do
@@ -43,6 +49,7 @@ test_servarr_download() {
     run bats_pipe find "${BATS_TEST_TMPDIR}" -type f \
                     ! -name "movie.nfo" \
                     ! -name "s[0-9][0-9]e[0-9][0-9]-*.nfo" \
+                    ! -name "separate-stderr-*" \
                 \| sed "s|^${BATS_TEST_TMPDIR}||"
     refute_output
 }

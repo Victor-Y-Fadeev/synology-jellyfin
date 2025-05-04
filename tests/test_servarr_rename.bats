@@ -1,3 +1,7 @@
+#!/usr/bin/env bats
+bats_require_minimum_version 1.5.0
+
+
 setup_file() {
     ROOT="$(dirname "${BATS_TEST_FILENAME}")/.."
     ROOT="$(realpath "${ROOT}")"
@@ -24,7 +28,9 @@ test_servarr_rename() {
 
     for event in "${events}"/*; do
         mock_servarr_event "$event" "${BATS_FILE_TMPDIR}" "${BATS_FILE_TMPDIR}"
-        run "$script"
+        run --separate-stderr "$script"
+        refute_stderr
+        assert_success
     done
 
     while read -r line; do
@@ -40,7 +46,12 @@ test_servarr_rename() {
         run cat "$target_path"
         assert_output "$source"
 
-        run bats_pipe find "$(dirname "$source_path")" -type d -empty \
+        local directory="$(dirname "$source_path")"
+        if [[ "$directory" != "$(dirname "$target_path")" ]]; then
+            directory="$(dirname "$directory")"
+        fi
+
+        run bats_pipe find "$directory" -type d -empty \
                     \| sed "s|^${BATS_FILE_TMPDIR}||"
         refute_output
     done <<< "$(json_to_kv "$expected")"

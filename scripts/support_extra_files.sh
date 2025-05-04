@@ -3,147 +3,185 @@
 set -e
 
 
-function search_extra_files {
-    local -n output="$1"
-    local origin="$2"
-    local levels="${3:-10}"
-
-    local folder="$(dirname "$origin")"
-    local file="$(basename "$origin")"
-
-    local file_escape="$(printf '%q' "$file")"
-    local name_escape="${file_escape%.*}"
-
-    readarray -d '' output < <(find "$folder" -maxdepth "$levels" -type f \
-        -name "${name_escape}.*" ! -name "$file_escape" -print0)
-}
+RADARR_BUFFER="/tmp/radarr_download_event.json"
+SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 
-function file_to_dictionary {
-    local -n map="$1"
-    local file="$2"
-    local name="$(basename "$file")"
+function generate_suffix_json {
+    local dir="$(dirname "${1}")"
+    local name="$(basename "${1%.*}")"
 
-    if [[ -n "${map[$name]}" ]]; then
-        map[$name]+=$'\n'"$file"
-    else
-        map[$name]="$file"
-    fi
-}
+    local escape_dir="$(sed 's|\W|\\\0|g' <<< "$dir")"
+    local escape_name="$(sed 's|\W|\\\0|g' <<< "$name")"
 
-
-function dictionary_to_commentary {
-    local -n input="$1"
-    local -n output="$2"
-
-    for key in "${!input[@]}"; do
-        local value="${input[$key]}"
-        local count="$(wc -l <<< "$value")"
-
-        if (( count > 1 )); then
-            local prefix="$(sed -e 'N;s|^\(.*/\).*\n\1.*$|\1\n\1|;D' <<< "$value")"
-            local postfix="$(sed -e 'N;s|^.*\(/.*\)\n.*\1$|\1\n\1|;D' <<< "$value")"
-
-            prefix="${#prefix}"
-            postfix="${#postfix}"
-
-            while read -r line; do
-                if (( prefix + postfix < ${#line} )); then
-                    output[$line]=".${line:prefix:-postfix}"
-                fi
-            done <<< "$value"
-        fi
-    done
+    find "$dir" -type f -name "${escape_name}.*" \
+        | jq --arg dir "$escape_dir" --arg name "$escape_name" --raw-input --null-input '
+            [
+                inputs
+                | capture("^(?<key>" + $dir
+                        + "/?(?<value>.*)/" + $name
+                        + "\\.(?<extension>.*))$")
+                | .value |= split("/")
+            ]
+            | group_by(.extension)
+            | map(until(map(.value[0]) | unique | [length != 1, any(. == null)] | any;
+                        map(.value |= .[1:])) | .[])
+            | map(.value += [.extension]
+                | .value |= join("."))
+            | from_entries'
 }
 
 
 function import_file {
-    local source_path="$1"
-    local destination_path="$2"
+    local source="$1"
+    local destination="$2"
 
-    if ln --force "$source_path" "$destination_path"; then
-        echo "Hardlink '$source_path' => '$destination_path'"
+    if ln --force "$source" "$destination"; then
+        echo "Hardlink '$source' => '$destination'"
     else
-        cp --force "$source_path" "$destination_path"
-        echo "Copy '$source_path' => '$destination_path'"
+        cp --force "$source" "$destination"
+        echo "Copy '$source' => '$destination'"
     fi
 }
 
 
 function import_extra_files {
-    local source_path="$1"
-    local source_name="$(basename "${source_path%.*}")"
-    search_extra_files array "$source_path"
+    local source="$1"
+    local destination="$2"
 
-    local -A dictionary
-    for file in "${array[@]}"; do
-        file_to_dictionary dictionary "$file"
-    done
+    local json="$(generate_suffix_json "$source")"
+    local keys="$(jq --raw-output 'keys[]' <<< "$json")"
+    local base="${destination%.*}"
 
-    local -A commentary
-    dictionary_to_commentary dictionary commentary
+    while read -r key; do
+        local suffix="$(jq --arg key "$key" --raw-output '.[$key]' <<< "$json")"
+        import_file "$key" "${base}.${suffix}"
+    done <<< "$keys"
+}
 
-    local destination_path="$2"
-    local destination_absolute="${destination_path%.*}"
 
-    for file in "${array[@]}"; do
-        local extension="${file##*"$source_name"}"
-        local suffix="${commentary[$file]}"
+function buffer_download_event {
+    local buffer="$1"
+    local instance="$2"
+    local destination="$3"
+    local source="$4"
 
-        import_file "$file" "${destination_absolute}${suffix}${extension}"
+    if [[ ! -f "$buffer" || "$(jq --raw-output '.[0]' "$buffer")" != "$instance" ]]; then
+        echo "[\"$instance\"]" > "$buffer"
+    fi
+
+    local updated="$(jq --arg dest "$destination" --arg src "$source" \
+                        '.[1][$dest] |= (. + [$src] | sort | unique)' "$buffer")"
+    echo "$updated" > "$buffer"
+
+    jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer"
+}
+
+
+function parted_download_event {
+    local buffer="$1"
+    local instance="$2"
+    local destination="$3"
+    local source="$4"
+
+    local all
+    readarray all <<< "$(buffer_download_event "$buffer" "$instance" "$destination" "$source")"
+
+    local i
+    for (( i = 0; i < ${#all[@]}; ++i )); do
+        local current="${all[$i]%$'\n'}"
+        local extension="${current##*.}"
+
+        if (( ${#all[@]} > 1 )); then
+            extension="pt$(( i + 1 )).${extension}"
+        fi
+
+        local base="${destination%.*}"
+        local full="${base}.${extension}"
+
+        if [[ "$current" == "$source" && "$full" != "$destination" ]]; then
+            mv --force "$destination" "$full"
+        fi
+
+        import_extra_files "$current" "$full"
     done
 }
 
 
-function rename_file {
-    local old_path="$1"
-    local old_absolute="${old_path%.*}"
-    search_extra_files array "$old_path" 1
+function rename_file_base {
+    local old_base="$1"
+    local new_base="$2"
 
-    local new_path="$2"
-    local new_absolute="${new_path%.*}"
+    local dir="$(dirname "$old_base")"
+    local name="$(basename "$old_base")"
+    local escape="$(sed 's|\W|\\\0|g' <<< "$name")"
 
-    for file in "${array[@]}"; do
-        local postfix="${file##"$old_absolute"}"
-        local destination="${new_absolute}${postfix}"
+    if [[ -d "$dir" ]]; then
+        while read -r file; do
+            if [[ -f "$file" ]]; then
+                local extension="${file#"${old_base}"}"
+                mv --force "$file" "${new_base}${extension}"
+                echo "Move '$file' => '${new_base}${extension}'"
+            fi
+        done <<< "$(find "$dir" -type f -name "${escape}.*")"
 
-        mv --force "$file" "$destination"
-        echo "Move '$file' => '$destination'"
-    done
+        find "$dir" -type d -empty -delete
+    fi
 }
 
 
 function rename_extra_files {
+    local old_paths
     readarray -d '|' -t old_paths <<< "$1"
+
+    local new_paths
     readarray -d '|' -t new_paths <<< "$2"
 
+    local i
     local length="${#old_paths[@]}"
 
     for (( i = 0; i < length; ++i )); do
-        rename_file "${old_paths[$i]}" "${new_paths[$i]}"
+        local old_base="${old_paths[$i]%.*}"
+        local new_base="${new_paths[$i]%.*}"
+
+        if [[ "$old_base" =~ \.pt[0-9]$ ]]; then
+            old_base="${old_base%.pt[0-9]}"
+            local extension="${old_paths[$i]#"${old_base}"}"
+            mv --force "${new_paths[$i]%$'\n'}" "${new_base}${extension%$'\n'}"
+        fi
+
+        if [[ "$old_base" != "$new_base" ]]; then
+            rename_file_base "$old_base" "$new_base"
+        fi
     done
 }
 
 
 function remove_extra_files {
-    search_extra_files array "$1" 1
+    local dir="$(dirname "${1}")"
+    local name="$(basename "${1%.*}")"
+    local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt[0-9]}")"
 
-    for file in "${array[@]}"; do
-        rm --force "$file"
-        echo "Remove '$file'"
-    done
+    while read -r file; do
+        if [[ "$name" =~ \.pt[0-9]$ || ! "$file" =~ \.pt[0-9]\. ]]; then
+            rm --force "$file"
+            echo "Remove '$file'"
+        fi
+    done <<< "$(find "$dir" -type f -name "${escape}.*")"
 }
 
 
 case "$radarr_eventtype" in
     "Download")
-        import_extra_files "$radarr_moviefile_sourcepath" "$radarr_moviefile_path"
+        parted_download_event "$RADARR_BUFFER" "$radarr_movie_path" \
+            "$radarr_moviefile_path" "$radarr_moviefile_sourcepath"
         ;;
     "Rename")
         rename_extra_files "$radarr_moviefile_previouspaths" "$radarr_moviefile_paths"
         ;;
     "MovieFileDelete")
         remove_extra_files "$radarr_moviefile_path"
+        rm --force "$(dirname "$radarr_moviefile_path")/movie.nfo"
         ;;
 esac
 
@@ -151,7 +189,8 @@ esac
 case "$sonarr_eventtype" in
     "Download")
         if [[ -n "$sonarr_isupgrade" ]]; then
-            import_extra_files "$sonarr_episodefile_sourcepath" "$sonarr_episodefile_path"
+            parted_download_event "$SONARR_BUFFER" "$sonarr_series_path" \
+                "$sonarr_episodefile_path" "$sonarr_episodefile_sourcepath"
         fi
         ;;
     "Rename")
@@ -159,5 +198,6 @@ case "$sonarr_eventtype" in
         ;;
     "EpisodeFileDelete")
         remove_extra_files "$sonarr_episodefile_path"
+        find "$(dirname "$sonarr_episodefile_path")" -type d -empty -delete
         ;;
 esac
