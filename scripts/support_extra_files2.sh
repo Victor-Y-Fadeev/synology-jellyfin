@@ -113,7 +113,7 @@ function remove_extra_files {
     local name="$(basename "${1%.*}")"
     local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt[0-9]}")"
 
-    while read -r key; do
+    while read -r file; do
         rm --force "$file"
         echo "Remove '$file'"
     done <<< "$(find "$dir" -type f -name "${escape}.*")"
