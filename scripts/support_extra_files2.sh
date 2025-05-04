@@ -108,10 +108,9 @@ function parted_download_event {
 }
 
 
-function rename_file {
-    local old_base="${1%.*}"
-    old_base="${old_base%.pt[0-9]}"
-    local new_base="${2%.*}"
+function rename_file_base {
+    local old_base="$1"
+    local new_base="$2"
 
     local dir="$(dirname "$old_base")"
     local name="$(basename "$old_base")"
@@ -141,10 +140,14 @@ function rename_extra_files {
         local old_base="${old_paths[$i]%.*}"
         local new_base="${new_paths[$i]%.*}"
 
-        if [[ "$new_base" == "${old_base%.pt[0-9]}" ]]; then
-            mv --force "${new_paths[$i]}" "${old_paths[$i]}"
-        else
-            rename_file "${old_paths[$i]}" "${new_paths[$i]}"
+        if [[ "$old_base" =~ \.pt[0-9]$ ]]; then
+            old_base="${old_base%.pt[0-9]}"
+            local extension="${old_paths[$i]#"${old_base}"}"
+            mv --force "${new_paths[$i]%$'\n'}" "${new_base}${extension%$'\n'}"
+        fi
+
+        if [[ "$old_base" != "$new_base" ]]; then
+            rename_file_base "$old_base" "$new_base"
         fi
     done
 }
