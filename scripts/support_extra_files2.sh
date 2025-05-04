@@ -108,10 +108,25 @@ function parted_download_event {
 }
 
 
+function remove_extra_files {
+    local dir="$(dirname "${1}")"
+    local name="$(basename "${1%.*}")"
+    local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt[0-9]}")"
+
+    while read -r key; do
+        rm --force "$file"
+        echo "Remove '$file'"
+    done <<< "$(find "$dir" -type f -name "${escape}.*")"
+}
+
+
 case "$radarr_eventtype" in
     "Download")
         parted_download_event "$RADARR_BUFFER" "$radarr_movie_path" \
             "$radarr_moviefile_path" "$radarr_moviefile_sourcepath"
+        ;;
+    "MovieFileDelete")
+        remove_extra_files "$radarr_moviefile_path"
         ;;
 esac
 
@@ -122,5 +137,8 @@ case "$sonarr_eventtype" in
             parted_download_event "$SONARR_BUFFER" "$sonarr_series_path" \
                 "$sonarr_episodefile_path" "$sonarr_episodefile_sourcepath"
         fi
+        ;;
+    "EpisodeFileDelete")
+        remove_extra_files "$sonarr_episodefile_path"
         ;;
 esac

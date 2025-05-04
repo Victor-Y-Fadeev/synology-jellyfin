@@ -20,7 +20,7 @@ test_servarr_delete() {
 
     local events="${ROOT}/tests/cases/${id}/delete/events"
     local expected="${ROOT}/tests/cases/${id}/delete/expected.json"
-    local script="${ROOT}/scripts/support_extra_files.sh"
+    local script="${ROOT}/scripts/support_extra_files2.sh"
 
     for event in "${events}"/*; do
         mock_servarr_event "$event" "${BATS_FILE_TMPDIR}" "${BATS_FILE_TMPDIR}"
