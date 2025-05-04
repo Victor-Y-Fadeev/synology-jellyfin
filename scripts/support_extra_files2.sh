@@ -11,11 +11,11 @@ function generate_suffix_json {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
 
-    local escape_dir="$(printf '%q' "$dir")"
-    local escape_name="$(printf '%q' "$name")"
+    local escape_dir="$(sed 's|\W|\\\0|g' <<< "$dir")"
+    local escape_name="$(sed 's|\W|\\\0|g' <<< "$name")"
 
     find "$dir" -type f -name "${escape_name}.*" \
-        | jq --arg dir "$escape_dir" --arg name "$escape_name" --raw-input '
+        | jq --arg dir "$escape_dir" --arg name "$escape_name" --raw-input --null-input '
             [
                 inputs
                 | capture("^(?<key>" + $dir
