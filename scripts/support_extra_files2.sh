@@ -116,8 +116,6 @@ function remove_extra_files {
     while read -r file; do
         rm --force "$file"
         echo "Remove '$file'"
-
-        "${2:-false}" && find "$dir" -type d -empty -delete
     done <<< "$(find "$dir" -type f -name "${escape}.*")"
 }
 
@@ -129,6 +127,7 @@ case "$radarr_eventtype" in
         ;;
     "MovieFileDelete")
         remove_extra_files "$radarr_moviefile_path"
+        rm --force "$(dirname "$radarr_moviefile_path")/movie.nfo"
         ;;
 esac
 
@@ -141,6 +140,7 @@ case "$sonarr_eventtype" in
         fi
         ;;
     "EpisodeFileDelete")
-        remove_extra_files "$sonarr_episodefile_path" true
+        remove_extra_files "$sonarr_episodefile_path"
+        find "$(dirname "$sonarr_episodefile_path")" -type d -empty -delete
         ;;
 esac
