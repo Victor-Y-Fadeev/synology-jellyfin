@@ -1,3 +1,7 @@
+#!/usr/bin/env bats
+bats_require_minimum_version 1.5.0
+
+
 setup_file() {
     ROOT="$(dirname "${BATS_TEST_FILENAME}")/.."
     ROOT="$(realpath "${ROOT}")"
@@ -24,7 +28,9 @@ test_servarr_delete() {
 
     for event in "${events}"/*; do
         mock_servarr_event "$event" "${BATS_FILE_TMPDIR}" "${BATS_FILE_TMPDIR}"
-        run "$script"
+        run --separate-stderr "$script"
+        refute_stderr
+        assert_success
     done
 
     while read -r line; do
