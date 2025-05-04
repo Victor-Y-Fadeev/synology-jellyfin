@@ -6,7 +6,53 @@ set -e
 SONARR_BUFFER="/tmp/sonarr_download_event.json"
 RADARR_BUFFER="/tmp/radarr_download_event.json"
 
-SONARR_BUFFER="test_download_event.json"
+# SONARR_BUFFER="test_download_event.json"
+
+
+function generate_suffix_json {
+    local dir="$(dirname "${1}")"
+    local name="$(basename "${1%.*}")"
+
+    local escape_dir="$(printf '%q' "$dir")"
+    local escape_name="$(printf '%q' "$name")"
+
+    find "$dir" -type f -name "${escape_name}.*" \
+        | jq --arg dir "$escape_dir" --arg name "$escape_name" --raw-input '
+            [
+                inputs
+                | capture("^(?<key>" + $dir
+                        + "/?(?<value>.*)/" + $name
+                        + "\\.(?<extension>[^\\.]*))$")
+                | .value |= split("/")
+            ]
+            | group_by(.extension)
+            | map(until(map(.value[0]) | unique | [length != 1, any(. == null)] | any;
+                        map(.value |= .[1:])) | .[])
+            | map(.value += [.extension]
+                | .value |= join("."))
+            | from_entries'
+}
+
+function import_file {
+    local source="$1"
+    local destination="$2"
+
+    echo "import_file '$source' '$destination'"
+}
+
+function import_extra_files {
+    local source="$1"
+    local destination="$2"
+
+    local json="$(generate_suffix_json "$source")"
+    local keys="$(jq --raw-output 'keys[]' <<< "$json")"
+    local base="${destination%.*}"
+
+    while read -r key; do
+        local suffix="$(jq --arg key "$key" --raw-output '.[$key]' <<< "$json")"
+        import_file "$key" "${base}.${suffix}"
+    done <<< "$keys"
+}
 
 
 function buffer_download_event {
@@ -23,7 +69,7 @@ function buffer_download_event {
                         '.[1][$dest] |= (. + [$src] | sort | unique)' "$buffer")"
     echo "$updated" > "$buffer"
 
-    jq --raw-output --arg dest "$destination" '.[1][$dest][]' "$buffer"
+    jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer"
 }
 
 
@@ -74,29 +120,6 @@ function parted_download_event {
 origin="/mnt/d/Desktop/synology-jellyfin/scripts/data/downloads/series/anime/[Beatrice-Raws] Spice and Wolf [BDRip 1920x1080 x264 FLAC]/[Beatrice-Raws] Spice and Wolf 01 [BDRip 1920x1080 x264 FLAC].mkv"
 # origin="/data/series/anime/Neon Genesis Evangelion (1995) [tvdbid-70350]/Specials/s00e02 Neon Genesis Evangelion - The End of Evangelion.pt1.mkv"
 
+dest="/data/series/anime/Spice and Wolf (2008) [tvdbid-81178]/Season 01/s01e01 Wolf and Best Clothes.mkv"
 
-function generate_suffix_json {
-    local dir="$(dirname "${1}")"
-    local name="$(basename "${1%.*}")"
-
-    local escape_dir="$(printf '%q' "$dir")"
-    local escape_name="$(printf '%q' "$name")"
-
-    find "$dir" -type f -name "${escape_name}.*" \
-        | jq --arg dir "$escape_dir" --arg name "$escape_name" -R '
-            [
-                inputs
-                | capture("^(?<key>" + $dir
-                        + "/?(?<value>.*)/" + $name
-                        + "\\.(?<extension>[^\\.]*))$")
-                | .value |= split("/")
-            ]
-            | group_by(.extension)
-            | map(until(map(.value[0]) | unique | [length != 1, any(. == null)] | any;
-                        map(.value |= .[1:])) | .[])
-            | map(.value += [.extension]
-                | .value |= join("."))
-            | from_entries'
-}
-
-generate_suffix_json "$origin"
+import_extra_files "$origin" "$dest"
