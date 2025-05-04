@@ -20,7 +20,7 @@ function generate_suffix_json {
                 inputs
                 | capture("^(?<key>" + $dir
                         + "/?(?<value>.*)/" + $name
-                        + "\\.(?<extension>[^\\.]*))$")
+                        + "\\.(?<extension>.*))$")
                 | .value |= split("/")
             ]
             | group_by(.extension)
