@@ -116,13 +116,17 @@ function rename_file_base {
     local name="$(basename "$old_base")"
     local escape="$(sed 's|\W|\\\0|g' <<< "$name")"
 
-    while read -r file; do
-        local extension="${file#"${old_base}"}"
-        mv --force "$file" "${new_base}${extension}"
-        echo "Move '$file' => '${new_base}${extension}'"
-    done <<< "$(find "$dir" -type f -name "${escape}.*")"
+    if [[ -d "$dir" ]]; then
+        while read -r file; do
+            if [[ -f "$file" ]]; then
+                local extension="${file#"${old_base}"}"
+                mv --force "$file" "${new_base}${extension}"
+                echo "Move '$file' => '${new_base}${extension}'"
+            fi
+        done <<< "$(find "$dir" -type f -name "${escape}.*")"
 
-    find "$dir" -type d -empty -delete
+        find "$dir" -type d -empty -delete
+    fi
 }
 
 
