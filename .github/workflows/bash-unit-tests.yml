@@ -9,7 +9,7 @@ on:
 
 jobs:
   shell_style_guide:
-    name: Shell Style Guide
+    name: Check Style Guide
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository

@@ -27,7 +27,7 @@ fi
 #   https://www.shellcheck.net/wiki/SC2001 -- See if you can use ${variable//search/replace} instead.
 
 
-shellcheck --enable=all --exclude=SC2034,SC2154,SC2155,SC2249,SC2311,SC2312,SC2001 \
+shellcheck --color=always --enable=all --exclude=SC2034,SC2154,SC2155,SC2249,SC2311,SC2312,SC2001 \
     "${ROOT}"/scripts/*.sh \
     "${ROOT}"/tests/*.bats \
     "${ROOT}"/tests/helpers/*.bash
