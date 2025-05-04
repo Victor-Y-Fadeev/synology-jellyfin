@@ -4,10 +4,10 @@ set -e
 
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
-DIR="$(realpath "$DIR")"
+ROOT="$(realpath "${DIR}/..")"
 
-DOCKER_COMPOSE="${DIR}/../compose.yaml"
-SETTINGS_DIR="${DIR}/../settings"
+DOCKER_COMPOSE="${ROOT}/compose.yaml"
+SETTINGS_DIR="${ROOT}/settings"
 SETTINGS_FILE="${SETTINGS_DIR}/settings.md"
 
 
