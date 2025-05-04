@@ -114,8 +114,10 @@ function remove_extra_files {
     local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt[0-9]}")"
 
     while read -r file; do
-        rm --force "$file"
-        echo "Remove '$file'"
+        if [[ "$name" =~ \.pt[0-9]$ || ! "$file" =~ \.pt[0-9]\. ]]; then
+            rm --force "$file"
+            echo "Remove '$file'"
+        fi
     done <<< "$(find "$dir" -type f -name "${escape}.*")"
 }
 
