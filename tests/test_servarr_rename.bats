@@ -70,6 +70,18 @@ test_servarr_rename() {
 }
 
 
+# bats test_tags=rename, tmdbid-41365
+@test "Slayers Gorgeous (1998) [tmdbid-41365]" {
+    test_servarr_rename "tmdbid-41365"
+}
+
+
+# bats test_tags=rename, tmdbid-125510
+@test "Slayers Great (1997) [tmdbid-125510]" {
+    test_servarr_rename "tmdbid-125510"
+}
+
+
 # bats test_tags=rename, tvdbid-279396
 @test "Brynhildr in the Darkness (2014) [tvdbid-279396]" {
     test_servarr_rename "tvdbid-279396"
