@@ -112,6 +112,12 @@ test_servarr_rename() {
 }
 
 
+# bats test_tags=rename, tvdbid-118101
+@test "Heaven's Lost Property (2009) [tvdbid-118101]" {
+    test_servarr_rename "tvdbid-118101"
+}
+
+
 # bats test_tags=rename, tvdbid-293119
 @test "Monster Musume - Everyday Life with Monster Girls (2015) [tvdbid-293119]" {
     test_servarr_rename "tvdbid-293119"

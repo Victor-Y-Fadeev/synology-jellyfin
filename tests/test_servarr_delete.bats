@@ -102,6 +102,12 @@ test_servarr_delete() {
 }
 
 
+# bats test_tags=delete, tvdbid-118101
+@test "Heaven's Lost Property (2009) [tvdbid-118101]" {
+    test_servarr_delete "tvdbid-118101"
+}
+
+
 # bats test_tags=delete, tvdbid-293119
 @test "Monster Musume - Everyday Life with Monster Girls (2015) [tvdbid-293119]" {
     test_servarr_delete "tvdbid-293119"
