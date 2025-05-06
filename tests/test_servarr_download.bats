@@ -67,6 +67,12 @@ test_servarr_download() {
 }
 
 
+# bats test_tags=download, tvdbid-279396
+@test "Brynhildr in the Darkness (2014) [tvdbid-279396]" {
+    test_servarr_download "tvdbid-279396"
+}
+
+
 # bats test_tags=download, tvdbid-72070
 @test "Chobits (2002) [tvdbid-72070]" {
     test_servarr_download "tvdbid-72070"

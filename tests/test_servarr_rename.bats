@@ -70,6 +70,12 @@ test_servarr_rename() {
 }
 
 
+# bats test_tags=rename, tvdbid-279396
+@test "Brynhildr in the Darkness (2014) [tvdbid-279396]" {
+    test_servarr_rename "tvdbid-279396"
+}
+
+
 # bats test_tags=rename, tvdbid-72070
 @test "Chobits (2002) [tvdbid-72070]" {
     test_servarr_rename "tvdbid-72070"
