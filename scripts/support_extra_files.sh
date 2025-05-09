@@ -63,7 +63,7 @@ function import_extra_files {
 function buffer_download_event {
     local buffer="$1"
     local instance="$2"
-    local destination="$3"
+    local destination="${3%.*}"
     local source="$4"
 
     if [[ ! -f "$buffer" || "$(jq --raw-output '.[0]' "$buffer")" != "$instance" ]]; then
@@ -172,6 +172,9 @@ function remove_extra_files {
 
 
 case "$radarr_eventtype" in
+    "MovieAdded")
+        rm --force "$RADARR_BUFFER"
+        ;;
     "Download")
         parted_download_event "$RADARR_BUFFER" "$radarr_movie_path" \
             "$radarr_moviefile_path" "$radarr_moviefile_sourcepath"
@@ -183,10 +186,16 @@ case "$radarr_eventtype" in
         remove_extra_files "$radarr_moviefile_path"
         rm --force "$(dirname "$radarr_moviefile_path")/movie.nfo"
         ;;
+    "MovieDelete")
+        rm --force "$RADARR_BUFFER"
+        ;;
 esac
 
 
 case "$sonarr_eventtype" in
+    "SeriesAdd")
+        rm --force "$SONARR_BUFFER"
+        ;;
     "Download")
         if [[ -n "$sonarr_isupgrade" ]]; then
             parted_download_event "$SONARR_BUFFER" "$sonarr_series_path" \
@@ -199,5 +208,8 @@ case "$sonarr_eventtype" in
     "EpisodeFileDelete")
         remove_extra_files "$sonarr_episodefile_path"
         find "$(dirname "$sonarr_episodefile_path")" -type d -empty -delete
+        ;;
+    "SeriesDelete")
+        rm --force "$SONARR_BUFFER"
         ;;
 esac
