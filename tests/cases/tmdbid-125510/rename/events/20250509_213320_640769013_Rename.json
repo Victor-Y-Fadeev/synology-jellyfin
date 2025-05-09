@@ -1,0 +1,21 @@
+{
+  "radarr_applicationurl": "",
+  "radarr_eventtype": "Rename",
+  "radarr_instancename": "Radarr",
+  "radarr_movie_genres": "Animation|Adventure|Comedy|Fantasy",
+  "radarr_movie_id": "4",
+  "radarr_movie_imdbid": "tt0161978",
+  "radarr_movie_in_cinemas_date": "08/02/1997 00:00:00",
+  "radarr_movie_originallanguage": "jpn",
+  "radarr_movie_path": "/data/movies/anime/Slayers Great (1997) [tmdbid-125510]",
+  "radarr_movie_physical_release_date": "03/21/2005 00:00:00",
+  "radarr_movie_tags": "",
+  "radarr_movie_title": "Slayers Great",
+  "radarr_movie_tmdbid": "125510",
+  "radarr_movie_year": "1997",
+  "radarr_moviefile_ids": "3",
+  "radarr_moviefile_paths": "/data/movies/anime/Slayers Great (1997) [tmdbid-125510]/Slayers Great - (1997).mp4",
+  "radarr_moviefile_previouspaths": "/data/movies/anime/Slayers Great (1997) [tmdbid-125510]/Slayers Great (1997).mp4",
+  "radarr_moviefile_previousrelativepaths": "Slayers Great (1997).mp4",
+  "radarr_moviefile_relativepaths": "Slayers Great - (1997).mp4"
+}

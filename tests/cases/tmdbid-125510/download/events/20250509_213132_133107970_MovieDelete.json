@@ -1,0 +1,17 @@
+{
+  "radarr_applicationurl": "",
+  "radarr_eventtype": "MovieDelete",
+  "radarr_instancename": "Radarr",
+  "radarr_movie_deletedfiles": "True",
+  "radarr_movie_folder_size": "1362",
+  "radarr_movie_genres": "Animation|Adventure|Comedy|Fantasy",
+  "radarr_movie_id": "3",
+  "radarr_movie_imdbid": "tt0161978",
+  "radarr_movie_originallanguage": "jpn",
+  "radarr_movie_overview": "All Laia Einburg wants for her golem-making father Galia and her equally ambitious brother Huey is to end a long running feud. But her world gets turned upside down when short-stature Lina Inverse and overly endowed Naga the Serpent save Laia from a rampaging golem.  A grateful, but smitten, Galia asks Lina to be a model for his work. Not to be outdone, Huey makes a similar request to Naga. The results are towering remote-controlled golems in the image of our favorite sorceresses! Huey gets all the proportions right, but Galia's taste is just weird. Adding insult to injury, Galia turns Lina into a magical battery pack!  Officially, Lords Haizen and Granion commissioned these golems for a contest to determine the ruler of the city of Stoner. But the lords are secretly planning to use the golems as prototypes for an army of conquest! Can Lina and Naga save the city from tyranny?",
+  "radarr_movie_path": "/data/movies/anime/Slayers Great (1997) [tmdbid-125510]",
+  "radarr_movie_tags": "",
+  "radarr_movie_title": "Slayers Great",
+  "radarr_movie_tmdbid": "125510",
+  "radarr_movie_year": "1997"
+}
