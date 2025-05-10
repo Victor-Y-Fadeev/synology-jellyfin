@@ -50,7 +50,7 @@ function remove_file_base {
 
 function remove_extra_files {
     local base="${1%.*}"
-    remove_file_base "${name%.pt[0-9]}"
+    remove_file_base "${base%.pt[0-9]}"
 }
 
 
@@ -132,6 +132,8 @@ function import_file {
     local source="$1"
     local destination="$2"
 
+    # echo "Import '$source' => '$destination'" >> /mnt/d/Desktop/synology-jellyfin/scripts/import.log
+
     if ln --force "$source" "$destination"; then
         echo "Hardlink '$source' => '$destination'"
     else
@@ -204,12 +206,16 @@ function buffer_download_event {
         echo "[\"$instance\"]" > "$buffer"
     fi
 
-    untrack_buffered_part "$buffer" "$source"
+    untrack_buffered_part "$buffer" "$source" &> /dev/null
 
     local updated="$(jq --arg dest "$destination" --arg src "$source" \
                         '.[1][$dest] |= (. + [$src] | sort | unique)
                         | .[2][$src] = $dest' "$buffer")"
     echo "$updated" > "$buffer"
+
+    # echo "$destination" >> /mnt/d/Desktop/synology-jellyfin/scripts/destination.log
+    # jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer" >> /mnt/d/Desktop/synology-jellyfin/scripts/destination.log
+    # echo "" >> /mnt/d/Desktop/synology-jellyfin/scripts/destination.log
 
     jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer"
 }
@@ -226,6 +232,7 @@ function parted_download_event {
 
     local i
     for (( i = 0; i < ${#all[@]}; ++i )); do
+        # echo "'${all[$i]}'" >> /mnt/d/Desktop/synology-jellyfin/scripts/event.log
         local current="${all[$i]%$'\n'}"
         local extension="${current##*.}"
 
