@@ -4,12 +4,12 @@
   "radarr_instancename": "Radarr",
   "radarr_movie_addmethod": "Manual",
   "radarr_movie_genres": "Animation|Adventure|Comedy|Fantasy",
-  "radarr_movie_id": "4",
-  "radarr_movie_imdbid": "tt0161978",
+  "radarr_movie_id": "2",
+  "radarr_movie_imdbid": "tt1796619",
   "radarr_movie_originallanguage": "jpn",
-  "radarr_movie_path": "/data/movies/anime/Slayers Great (1997) [tmdbid-125510]",
+  "radarr_movie_path": "/data/movies/anime/Slayers Gorgeous (1998) [tmdbid-41365]",
   "radarr_movie_tags": "",
-  "radarr_movie_title": "Slayers Great",
-  "radarr_movie_tmdbid": "125510",
-  "radarr_movie_year": "1997"
+  "radarr_movie_title": "Slayers Gorgeous",
+  "radarr_movie_tmdbid": "41365",
+  "radarr_movie_year": "1998"
 }
