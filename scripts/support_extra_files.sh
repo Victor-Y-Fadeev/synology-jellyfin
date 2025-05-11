@@ -39,18 +39,25 @@ SONARR_BUFFER="/tmp/sonarr_download_event.json"
 function remove_file_base {
     local dir="$(dirname "$1")"
     local name="$(basename "$1")"
-    local escape="$(sed 's|\W|\\\0|g' <<< "$name")"
+    local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt}")"
 
     while read -r file; do
-        rm --force "$file"
-        echo "Remove '$file'"
+        if [[ "$name" =~ \.pt[0-9]?$ || ! "$file" =~ \.pt[0-9]\. ]]; then
+            rm --force "$file"
+            echo "Remove '$file'"
+        fi
     done <<< "$(find "$dir" -type f -name "${escape}.*")"
 }
 
 
 function remove_extra_files {
     local base="${1%.*}"
-    remove_file_base "${base%.pt[0-9]}"
+
+    if [[ "$base" =~ \.pt[0-9]$ ]]; then
+        base="${base%.pt[0-9]}.pt"
+    fi
+
+    remove_file_base "$base"
 }
 
 
