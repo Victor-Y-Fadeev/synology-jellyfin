@@ -2,35 +2,6 @@
 
 set -e
 
-# rm -rf "/mnt/d/Desktop/synology-jellyfin/scripts/source"
-# mkdir -p "/mnt/d/Desktop/synology-jellyfin/scripts/source"
-# echo "a" > "/mnt/d/Desktop/synology-jellyfin/scripts/source/a.mkv"
-# echo "b" > "/mnt/d/Desktop/synology-jellyfin/scripts/source/b.mp4"
-# echo "c" > "/mnt/d/Desktop/synology-jellyfin/scripts/source/c.avi"
-
-# rm -rf "/mnt/d/Desktop/synology-jellyfin/scripts/destination"
-# mkdir -p "/mnt/d/Desktop/synology-jellyfin/scripts/destination"
-# ln -f "/mnt/d/Desktop/synology-jellyfin/scripts/source/a.mkv" "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target.pt1.mkv"
-# ln -f "/mnt/d/Desktop/synology-jellyfin/scripts/source/b.mp4" "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target.pt2.mp4"
-# ln -f "/mnt/d/Desktop/synology-jellyfin/scripts/source/c.avi" "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target.pt3.avi"
-
-# echo '[
-#     "/mnt/d/Desktop/synology-jellyfin/scripts/destination",
-#     {
-#         "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target": [
-#             "/mnt/d/Desktop/synology-jellyfin/scripts/source/a.mkv",
-#             "/mnt/d/Desktop/synology-jellyfin/scripts/source/b.mp4",
-#             "/mnt/d/Desktop/synology-jellyfin/scripts/source/c.avi"
-#         ]
-#     },
-#     {
-#         "/mnt/d/Desktop/synology-jellyfin/scripts/source/a.mkv": "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target",
-#         "/mnt/d/Desktop/synology-jellyfin/scripts/source/b.mp4": "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target",
-#         "/mnt/d/Desktop/synology-jellyfin/scripts/source/c.avi": "/mnt/d/Desktop/synology-jellyfin/scripts/destination/target"
-#     }
-# ]' > "/mnt/d/Desktop/synology-jellyfin/scripts/buffer.json"
-
-
 
 RADARR_BUFFER="/tmp/radarr_download_event.json"
 SONARR_BUFFER="/tmp/sonarr_download_event.json"
@@ -139,8 +110,6 @@ function import_file {
     local source="$1"
     local destination="$2"
 
-    # echo "Import '$source' => '$destination'" >> /mnt/d/Desktop/synology-jellyfin/scripts/import.log
-
     if ln --force "$source" "$destination"; then
         echo "Hardlink '$source' => '$destination'"
     else
@@ -159,7 +128,7 @@ function import_extra_files {
     local base="${destination%.*}"
 
     while read -r key; do
-        local suffix="$(jq --arg key "$key" --raw-output '.[$key]' <<< "$json")"
+        local suffix="$(jq --raw-output --arg key "$key" '.[$key]' <<< "$json")"
         import_file "$key" "${base}.${suffix}"
     done <<< "$keys"
 }
@@ -213,18 +182,12 @@ function buffer_download_event {
         echo "[\"$instance\"]" > "$buffer"
     fi
 
-    untrack_buffered_part "$buffer" "$source" &> /dev/null
+    untrack_buffered_part "$buffer" "$source"
 
     local updated="$(jq --arg dest "$destination" --arg src "$source" \
                         '.[1][$dest] |= (. + [$src] | sort | unique)
                         | .[2][$src] = $dest' "$buffer")"
     echo "$updated" > "$buffer"
-
-    # echo "$destination" >> /mnt/d/Desktop/synology-jellyfin/scripts/destination.log
-    # jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer" >> /mnt/d/Desktop/synology-jellyfin/scripts/destination.log
-    # echo "" >> /mnt/d/Desktop/synology-jellyfin/scripts/destination.log
-
-    jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer"
 }
 
 
@@ -234,29 +197,28 @@ function parted_download_event {
     local destination="$3"
     local source="$4"
 
-    local all
-    readarray all <<< "$(buffer_download_event "$buffer" "$instance" "$destination" "$source")"
+    local base="${destination%.*}"
+    buffer_download_event "$buffer" "$instance" "$base" "$source"
 
-    local i
-    for (( i = 0; i < ${#all[@]}; ++i )); do
-        # echo "'${all[$i]}'" >> /mnt/d/Desktop/synology-jellyfin/scripts/event.log
-        local current="${all[$i]%$'\n'}"
-        local extension="${current##*.}"
+    local parts="$(jq --raw-output --arg base "$base" '.[1][$base][]' "$buffer")"
+    local length="$(wc --lines <<< "$parts")"
 
-        if (( ${#all[@]} > 1 )); then
-            extension="pt$(( i + 1 )).${extension}"
+    local i=1
+    while read -r part; do
+        local extension="${part##*.}"
+        if (( length > 1 )); then
+            extension="pt${i}.${extension}"
         fi
 
-        local base="${destination%.*}"
         local full="${base}.${extension}"
-
-        if [[ "$current" == "$source" && "$full" != "$destination" ]]; then
+        if [[ "$part" == "$source" && "$full" != "$destination" ]]; then
             rm --force "$full"
             mv --force "$destination" "$full"
         fi
 
-        import_extra_files "$current" "$full"
-    done
+        import_extra_files "$part" "$full"
+        (( ++i ))
+    done <<< "$parts"
 }
 
 
@@ -302,17 +264,3 @@ case "$sonarr_eventtype" in
         rm --force "$SONARR_BUFFER"
         ;;
 esac
-
-
-# echo '[["a", "b", "c"]]' | jq 'if .[1]["t"] == null then . else . - ["b"] end'
-
-# echo '[["a", "b", "c"], {"t": ["s"]}]' | jq 'if .[1]["t"] == null then . else . - ["b"] end'
-
-# echo '[["a", "b", "c"], {"t": ["s", "b"]}]' | jq 'if .[1]["t"] then .[1]["t"] -= ["b"] else . end'
-# echo '[["a", "b", "c"], {"t": ["s"]}]' | jq 'if .[1]["t"] then .[1]["t"] -= ["b"] else . end'
-
-# echo '[["a", "b", "c"]]' | jq 'if .[1]["t"] then .[1]["t"] -= ["b"] else . end'
-
-# echo '[["a", "b", "c"],{"t":["s"]}]' | jq '.[1][null] | length'
-
-# untrack_buffered_part "/mnt/d/Desktop/synology-jellyfin/scripts/buffer.json" "/mnt/d/Desktop/synology-jellyfin/scripts/source/b.mp4"
