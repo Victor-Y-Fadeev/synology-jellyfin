@@ -138,27 +138,27 @@ function untrack_buffered_part {
     local buffer="$1"
     local source="$2"
 
-    local destination="$(jq --raw-output --arg src "$source" '.[2][$src]' "$buffer")"
-    if [[ "$destination" != "null" ]]; then
-        local length="$(jq --raw-output --arg dest "$destination" '.[1][$dest] | length' "$buffer")"
+    local base="$(jq --raw-output --arg src "$source" '.[2][$src]' "$buffer")"
+    if [[ "$base" != "null" ]]; then
+        local length="$(jq --raw-output --arg base "$base" '.[1][$base] | length' "$buffer")"
 
         if (( length == 0 )); then
             return
         elif (( length == 1 )); then
-            remove_file_base "${destination}"
+            remove_file_base "$base"
         else
             local i=1
             local j=1
 
-            local parts="$(jq --raw-output --arg dest "$destination" '.[1][$dest][]' "$buffer")"
+            local parts="$(jq --raw-output --arg base "$base" '.[1][$base][]' "$buffer")"
             while read -r part; do
                 if [[ "$part" == "$source" ]]; then
-                    remove_file_base "${destination}.pt${i}"
+                    remove_file_base "${base}.pt${i}"
                 else
                     if (( length == 2 )); then
-                        rename_file_base "${destination}.pt${i}" "${destination}"
+                        rename_file_base "${base}.pt${i}" "$base"
                     elif (( i != j )); then
-                        rename_file_base "${destination}.pt${i}" "${destination}.pt${j}"
+                        rename_file_base "${base}.pt${i}" "${base}.pt${j}"
                     fi
                     (( ++j ))
                 fi
@@ -166,7 +166,7 @@ function untrack_buffered_part {
             done <<< "$parts"
         fi
 
-        local updated="$(jq --arg dest "$destination" --arg src "$source" '.[1][$dest] -= [$src]' "$buffer")"
+        local updated="$(jq --arg base "$base" --arg src "$source" '.[1][$base] -= [$src]' "$buffer")"
         echo "$updated" > "$buffer"
     fi
 }
@@ -175,7 +175,7 @@ function untrack_buffered_part {
 function buffer_download_event {
     local buffer="$1"
     local instance="$2"
-    local destination="${3%.*}"
+    local base="$3"
     local source="$4"
 
     if [[ ! -f "$buffer" || "$(jq --raw-output '.[0]' "$buffer")" != "$instance" ]]; then
@@ -184,9 +184,9 @@ function buffer_download_event {
 
     untrack_buffered_part "$buffer" "$source"
 
-    local updated="$(jq --arg dest "$destination" --arg src "$source" \
-                        '.[1][$dest] |= (. + [$src] | sort | unique)
-                        | .[2][$src] = $dest' "$buffer")"
+    local updated="$(jq --arg base "$base" --arg src "$source" \
+                        '.[1][$base] |= (. + [$src] | sort | unique)
+                        | .[2][$src] = $base' "$buffer")"
     echo "$updated" > "$buffer"
 }
 
