@@ -7,6 +7,16 @@ RADARR_BUFFER="/tmp/radarr_download_event.json"
 SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 
+#######################################
+# Removes files with the same basename but different extensions.
+# Special handling for .pt files - only removes files that aren't part files
+# (.pt1, .pt2, etc.) unless the input is a part file itself.
+#
+# Arguments:
+#   $1 - File path to use as base for removal
+# Outputs:
+#   Logs each removed file
+#######################################
 function remove_file_base {
     local dir="$(dirname "$1")"
     local name="$(basename "$1")"
@@ -21,6 +31,21 @@ function remove_file_base {
 }
 
 
+#######################################
+# Common function endpoint for handling MovieFileDelete/EpisodeFileDelete events of Radarr/Sonarr.
+# Removes all extra files associated with a given path.
+# Associated files are files with the same base name but different extensions.
+#
+# Special handling for non-parted files, without .pt1, .pt2, etc. suffixes.
+# If specified file have no part suffix, then all linked part-files will be ignored.
+# This is required to escape deletion of newly imported part-files,
+# because of generated *FileDelete event on the end of importing.
+#
+# Arguments:
+#   $1 - Absolute path to the file
+# Outputs:
+#   Logs each removed file
+#######################################
 function remove_extra_files {
     local base="${1%.*}"
 
@@ -32,6 +57,18 @@ function remove_extra_files {
 }
 
 
+#######################################
+# Renames files with the same basename but different extensions.
+# Finds all files matching old_base.* and renames them to new_base.*
+# while preserving their extensions.
+#
+# Arguments:
+#   $1 - Old file path base
+#   $2 - New file path base
+# Outputs:
+#   Logs each moved file
+#   Removes empty directories
+#######################################
 function rename_file_base {
     local old_base="$1"
     local new_base="$2"
@@ -54,6 +91,17 @@ function rename_file_base {
 }
 
 
+#######################################
+# Renames multiple files and their associated extra files.
+# Processes lists of old paths and new paths, handling special
+# cases for .pt[0-9] part files.
+#
+# Arguments:
+#   $1 - Pipe-delimited string of old file paths
+#   $2 - Pipe-delimited string of new file paths
+# Outputs:
+#   Logs from rename_file_base
+#######################################
 function rename_extra_files {
     local old_paths
     readarray -d '|' -t old_paths <<< "$1"
@@ -81,6 +129,16 @@ function rename_extra_files {
 }
 
 
+#######################################
+# Generates JSON mapping of file extensions to their suffixes.
+# Finds all files with the same base name and creates a structured
+# JSON representation using jq.
+#
+# Arguments:
+#   $1 - File path to use as base
+# Outputs:
+#   JSON string describing related files and their suffixes
+#######################################
 function generate_suffix_json {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
@@ -106,6 +164,16 @@ function generate_suffix_json {
 }
 
 
+#######################################
+# Creates a hard link or copies a file to a destination.
+# Tries to create a hard link first, falls back to copy if linking fails.
+#
+# Arguments:
+#   $1 - Source file path
+#   $2 - Destination file path
+# Outputs:
+#   Log message indicating operation performed
+#######################################
 function import_file {
     local source="$1"
     local destination="$2"
@@ -119,6 +187,17 @@ function import_file {
 }
 
 
+#######################################
+# Imports all extra files associated with a given file.
+# Uses generate_suffix_json to find related files and imports them
+# to the destination with appropriate suffixes.
+#
+# Arguments:
+#   $1 - Source file path
+#   $2 - Destination file path
+# Outputs:
+#   Logs from import_file
+#######################################
 function import_extra_files {
     local source="$1"
     local destination="$2"
@@ -134,6 +213,17 @@ function import_extra_files {
 }
 
 
+#######################################
+# Removes or renames part files tracked in a buffer file.
+# Handles special logic for multi-part files (.pt1, .pt2, etc).
+#
+# Arguments:
+#   $1 - Buffer file path
+#   $2 - Source file path to untrack
+# Outputs:
+#   Updates buffer file
+#   Logs from remove_file_base and rename_file_base
+#######################################
 function untrack_buffered_part {
     local buffer="$1"
     local source="$2"
@@ -172,6 +262,19 @@ function untrack_buffered_part {
 }
 
 
+#######################################
+# Records download event information in a buffer file.
+# Creates or updates buffer with instance, base, and source information.
+#
+# Arguments:
+#   $1 - Buffer file path
+#   $2 - Instance identifier
+#   $3 - Base file path
+#   $4 - Source file path
+# Outputs:
+#   Updates buffer file
+#   Logs from untrack_buffered_part
+#######################################
 function buffer_download_event {
     local buffer="$1"
     local instance="$2"
@@ -191,6 +294,19 @@ function buffer_download_event {
 }
 
 
+#######################################
+# Processes a download event for multi-part files.
+# Updates buffer, renames files as needed, and imports associated files.
+#
+# Arguments:
+#   $1 - Buffer file path
+#   $2 - Instance identifier
+#   $3 - Destination file path
+#   $4 - Source file path
+# Outputs:
+#   Updates buffer file
+#   Logs from import_extra_files
+#######################################
 function parted_download_event {
     local buffer="$1"
     local instance="$2"
