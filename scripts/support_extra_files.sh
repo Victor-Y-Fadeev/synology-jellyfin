@@ -7,13 +7,13 @@ RADARR_BUFFER="/tmp/radarr_download_event.json"
 SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 
-#######################################
+###############################################################################
 # Removes files with the same basename but different extensions.
 #
 # Handles parted and non-parted files with the following rules:
-#   * Without part suffix - Only removes non-parted files, ignores all part files
-#   * With specific part suffix (.pt1, .pt2, etc.) - Removes only files with that exact suffix
-#   * With reserved .pt suffix - Removes ALL files with the same basename (both parted and non-parted)
+#   * Without part suffix - Only removes non-parted files, ignores all part files.
+#   * With specific part suffix (.pt1, .pt2, etc.) - Removes only files with that exact suffix.
+#   * With reserved .pt suffix - Removes ALL files with the same basename (both parted and non-parted).
 #
 # Example with the following file structure:
 #   - "/path/to/file.mkv"
@@ -33,7 +33,7 @@ SONARR_BUFFER="/tmp/sonarr_download_event.json"
 #   $1 - File path without extension to use as base for removal
 # Outputs:
 #   Logs each removed file
-#######################################
+###############################################################################
 function remove_file_base {
     local dir="$(dirname "$1")"
     local name="$(basename "$1")"
@@ -48,7 +48,7 @@ function remove_file_base {
 }
 
 
-#######################################
+###############################################################################
 # Removes all associated extra files for Radarr/Sonarr delete events.
 #
 # This function handles MovieFileDelete/EpisodeFileDelete events from
@@ -64,8 +64,8 @@ function remove_file_base {
 # Arguments:
 #   $1 - Absolute path to the file
 # Outputs:
-#   Logs each removed file
-#######################################
+#   Logs from remove_file_base
+###############################################################################
 function remove_extra_files {
     local base="${1%.*}"
 
@@ -87,7 +87,6 @@ function remove_extra_files {
 #   $2 - New file path base
 # Outputs:
 #   Logs each moved file
-#   Removes empty directories
 #######################################
 function rename_file_base {
     local old_base="$1"
@@ -111,17 +110,29 @@ function rename_file_base {
 }
 
 
-#######################################
+###############################################################################
 # Renames multiple files and their associated extra files.
-# Processes lists of old paths and new paths, handling special
-# cases for .pt[0-9] part files.
+#
+# This function handles Rename events from Radarr/Sonarr
+# by processing lists of old and new paths.
+#
+# Features:
+#   * Preserves .pt[0-9] suffixes during file renaming.
+#   * Reverts incorrect Radarr/Sonarr renaming of parted files.
+#   * Deletes empty directories after renaming. This setting should be disabled
+#     in Sonarr to prevent external file deletion during directory renames,
+#     like "Season 01" -> "Season 1".
+#
+# Note:
+#   * Each element of BASH array has a trailing newline that must be
+#     removed before passing to the mv command.
 #
 # Arguments:
-#   $1 - Pipe-delimited string of old file paths
-#   $2 - Pipe-delimited string of new file paths
+#   $1 - Old file paths '|' delimited string
+#   $2 - New file paths '|' delimited string
 # Outputs:
 #   Logs from rename_file_base
-#######################################
+###############################################################################
 function rename_extra_files {
     local old_paths
     readarray -d '|' -t old_paths <<< "$1"
