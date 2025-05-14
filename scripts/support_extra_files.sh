@@ -64,7 +64,7 @@ function remove_file_base {
 # Arguments:
 #   $1 - Absolute path to the file
 # Outputs:
-#   Logs from remove_file_base
+#   Logs each removed file from remove_file_base
 ###############################################################################
 function remove_extra_files {
     local base="${1%.*}"
@@ -77,17 +77,27 @@ function remove_extra_files {
 }
 
 
-#######################################
+###############################################################################
 # Renames files with the same basename but different extensions.
+#
 # Finds all files matching old_base.* and renames them to new_base.*
 # while preserving their extensions.
+# All destination directories should be already created by Radarr/Sonarr.
+# Also removes empty directories after renaming.
+#
+# Note:
+#   * File existence check required to handle cases with no extra files renaming,
+#     when only one file was renamed by Radarr/Sonarr and function should do nothing.
+#   * Directory existence check required to prevent errors with find command call,
+#     when directory was deleted on previous call of this function. For example,
+#     when there are no extra files and ALL regular files already renamed by Radarr/Sonarr.
 #
 # Arguments:
-#   $1 - Old file path base
-#   $2 - New file path base
+#   $1 - Old absolute basename path
+#   $2 - New absolute basename path
 # Outputs:
 #   Logs each moved file
-#######################################
+###############################################################################
 function rename_file_base {
     local old_base="$1"
     local new_base="$2"
@@ -131,7 +141,7 @@ function rename_file_base {
 #   $1 - Old file paths '|' delimited string
 #   $2 - New file paths '|' delimited string
 # Outputs:
-#   Logs from rename_file_base
+#   Logs each moved file from rename_file_base
 ###############################################################################
 function rename_extra_files {
     local old_paths
