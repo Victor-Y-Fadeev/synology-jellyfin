@@ -9,11 +9,28 @@ SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 #######################################
 # Removes files with the same basename but different extensions.
-# Special handling for .pt files - only removes files that aren't part files
-# (.pt1, .pt2, etc.) unless the input is a part file itself.
+#
+# Handles parted and non-parted files with the following rules:
+#   * Without part suffix - Only removes non-parted files, ignores all part files
+#   * With specific part suffix (.pt1, .pt2, etc.) - Removes only files with that exact suffix
+#   * With reserved .pt suffix - Removes ALL files with the same basename (both parted and non-parted)
+#
+# Example with the following file structure:
+#   - "/path/to/file.mkv"
+#   - "/path/to/file.mka"
+#   - "/path/to/file.pt1.mkv"
+#   - "/path/to/file.pt1.mka"
+#   - "/path/to/file.pt2.mkv"
+#   - "/path/to/file.pt2.mka"
+#
+# Behavior with different inputs:
+#   - "/path/to/file" -> Removes "file.mkv" and "file.mka" only
+#   - "/path/to/file.pt1" -> Removes "file.pt1.mkv" and "file.pt1.mka" only
+#   - "/path/to/file.pt2" -> Removes "file.pt2.mkv" and "file.pt2.mka" only
+#   - "/path/to/file.pt" -> Removes ALL files (both regular and part files)
 #
 # Arguments:
-#   $1 - File path to use as base for removal
+#   $1 - File path without extension to use as base for removal
 # Outputs:
 #   Logs each removed file
 #######################################
@@ -32,14 +49,17 @@ function remove_file_base {
 
 
 #######################################
-# Common function endpoint for handling MovieFileDelete/EpisodeFileDelete events of Radarr/Sonarr.
-# Removes all extra files associated with a given path.
-# Associated files are files with the same base name but different extensions.
+# Removes all associated extra files for Radarr/Sonarr delete events.
 #
-# Special handling for non-parted files, without .pt1, .pt2, etc. suffixes.
-# If specified file have no part suffix, then all linked part-files will be ignored.
-# This is required to escape deletion of newly imported part-files,
-# because of generated *FileDelete event on the end of importing.
+# This function handles MovieFileDelete/EpisodeFileDelete events from
+# Radarr/Sonarr by removing all files with the same basename but
+# different extensions.
+#
+# Special handling is provided for part files:
+#   * If the specified file has no part suffix (.pt1, .pt2, etc.),
+#     all linked part-files will be ignored during deletion.
+#   * This prevents accidental deletion of newly imported part-files
+#     during the *FileDelete event generated at the end of importing.
 #
 # Arguments:
 #   $1 - Absolute path to the file
