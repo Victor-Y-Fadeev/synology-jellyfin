@@ -170,16 +170,49 @@ function rename_extra_files {
 }
 
 
-#######################################
-# Generates JSON mapping of file extensions to their suffixes.
-# Finds all files with the same base name and creates a structured
-# JSON representation using jq.
+###############################################################################
+# Generates JSON mapping of found files to their computed extensions.
+#
+# This function searches for files with the same basename in all subdirectories
+# starting from the given file's directory. It:
+#   * Splits paths into segments and groups files by extension
+#   * Uses path segments starting from the original file directory
+#   * Uses all extensions after the original basename
+#   * Removes common subdirectories for files with the same extension
+#   * For single-file extension groups, removes additional extensions
+#     except the original one
+#
+# The output is a JSON dictionary where:
+#   * Keys are absolute paths of found files
+#   * Values are computed extensions for import
+#
+# Example filesystem structure:
+#   - "/path/to/file.mkv"
+#   - "/path/to/sound/first/file.mka"
+#   - "/path/to/sound/second/file.mka"
+#   - "/path/to/sound/third/file.language.mka"
+#   - "/path/to/subtitles/first/file.ass"
+#   - "/path/to/subtitles/first/spelling/file.ass"
+#   - "/path/to/subtitles/second/file.ass"
+#   - "/path/to/subtitles/third/file.language.mks"
+#
+# This generates the following JSON:
+#   {
+#     "/path/to/file.mkv": "mkv",
+#     "/path/to/sound/first/file.mka": "first.mka",
+#     "/path/to/sound/second/file.mka": "second.mka",
+#     "/path/to/sound/third/file.language.mka": "language.mka",
+#     "/path/to/subtitles/first/file.ass": "first.ass",
+#     "/path/to/subtitles/first/spelling/file.ass": "first.spelling.ass",
+#     "/path/to/subtitles/second/file.ass": "second.ass",
+#     "/path/to/subtitles/third/file.language.mks": "language.mks"
+#   }
 #
 # Arguments:
-#   $1 - File path to use as base
+#   $1 - Absolute file path to use as base for depth search
 # Outputs:
-#   JSON string describing related files and their suffixes
-#######################################
+#   JSON string mapping found files to their computed extensions
+###############################################################################
 function generate_suffix_json {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
