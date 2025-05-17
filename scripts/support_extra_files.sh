@@ -300,17 +300,44 @@ function import_extra_files {
 }
 
 
-#######################################
-# Removes or renames part files tracked in a buffer file.
-# Handles special logic for multi-part files (.pt1, .pt2, etc).
+###############################################################################
+# Removes already buffered part file and renames others for consistency.
+#
+# This function corrects user mistakes during import events by:
+#   * Fixing wrong part files for non-parted files.
+#   * Handling cases when users reimport the same files to fix incorrectly numbering.
+#   * Maintaining proper sequence of parted files on each call.
+#
+# Operation logic:
+#   * Uses the third buffer array item containing back references.
+#   * Reads the backref of the source file to check if it exists in buffered lists.
+#   * If not found in buffer, does nothing.
+#   * If list contains only one item, simply removes the file.
+#   * If two files exist, removes one and renames the other by removing the .pt[0-9] suffix.
+#   * If more files exist, skips files until the specified one, removes it, and renames remaining files.
+#
+# Note:
+#   * Also renames/removes all external files associated with buffered ones
+#     through rename_file_base/remove_file_base functions.
+#   * Removed file disappears from the buffer JSON lists, but backref remains.
+#
+# Example with the following links:
+#   - "/old/path/to/file_1.mkv" -> "/new/path/to/file.pt1.mkv"
+#   - "/old/path/to/file_2.mkv" -> "/new/path/to/file.pt2.mkv"
+#   - "/old/path/to/file_3.mkv" -> "/new/path/to/file.pt3.mkv"
+#
+# Changes when untracking "/old/path/to/file_2.mkv":
+#   - "/new/path/to/file.pt1.mkv" -> Unchanged
+#   - "/new/path/to/file.pt2.mkv" -> Removed
+#   - "/new/path/to/file.pt3.mkv" -> Renamed to "/new/path/to/file.pt2.mkv"
 #
 # Arguments:
-#   $1 - Buffer file path
-#   $2 - Source file path to untrack
+#   $1 - JSON buffer file path
+#   $2 - Absolute source path to untrack
 # Outputs:
-#   Updates buffer file
-#   Logs from remove_file_base and rename_file_base
-#######################################
+#   Logs each renamed file from rename_file_base
+#   Logs each removed file from remove_file_base
+###############################################################################
 function untrack_buffered_part {
     local buffer="$1"
     local source="$2"
