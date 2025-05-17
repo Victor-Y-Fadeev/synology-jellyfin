@@ -175,26 +175,26 @@ function rename_extra_files {
 #
 # This function searches for files with the same basename in all subdirectories
 # starting from the given file's directory. It:
-#   * Splits paths into segments and groups files by extension
-#   * Uses path segments starting from the original file directory
-#   * Uses all extensions after the original basename
-#   * Removes common subdirectories for files with the same extension
+#   * Splits paths into segments and groups files by extension.
+#   * Uses path segments starting from the original file directory.
+#   * Uses all extensions after the original basename.
+#   * Removes common subdirectories for files with the same extension.
 #   * For single-file extension groups, removes additional extensions
-#     except the original one
+#     except the original one.
 #
 # The output is a JSON dictionary where:
-#   * Keys are absolute paths of found files
-#   * Values are computed extensions for import
+#   * Keys are absolute paths of found files.
+#   * Values are computed extensions for import.
 #
 # Example filesystem structure:
 #   - "/path/to/file.mkv"
 #   - "/path/to/sound/first/file.mka"
 #   - "/path/to/sound/second/file.mka"
 #   - "/path/to/sound/third/file.language.mka"
-#   - "/path/to/subtitles/first/file.ass"
-#   - "/path/to/subtitles/first/spelling/file.ass"
-#   - "/path/to/subtitles/second/file.ass"
-#   - "/path/to/subtitles/third/file.language.mks"
+#   - "/path/to/subtitles/first/file.mks"
+#   - "/path/to/subtitles/first/spelling/file.mks"
+#   - "/path/to/subtitles/second/file.mks"
+#   - "/path/to/subtitles/third/file.language.srt"
 #
 # This generates the following JSON:
 #   {
@@ -202,10 +202,10 @@ function rename_extra_files {
 #     "/path/to/sound/first/file.mka": "first.mka",
 #     "/path/to/sound/second/file.mka": "second.mka",
 #     "/path/to/sound/third/file.language.mka": "language.mka",
-#     "/path/to/subtitles/first/file.ass": "first.ass",
-#     "/path/to/subtitles/first/spelling/file.ass": "first.spelling.ass",
-#     "/path/to/subtitles/second/file.ass": "second.ass",
-#     "/path/to/subtitles/third/file.language.mks": "language.mks"
+#     "/path/to/subtitles/first/file.mks": "first.mks",
+#     "/path/to/subtitles/first/spelling/file.mks": "first.spelling.mks",
+#     "/path/to/subtitles/second/file.mks": "second.mks",
+#     "/path/to/subtitles/third/file.language.srt": "language.srt"
 #   }
 #
 # Arguments:
@@ -242,9 +242,9 @@ function generate_suffix_json {
 # Creates a hard link or copies a file to a destination.
 #
 # Operation flow:
-#   * Attempts to create a hard link from source to destination
-#   * Falls back to copying if hard linking fails
-#   * Preserves error messages from failed hard link operations
+#   * Attempts to create a hard link from source to destination.
+#   * Falls back to copying if hard linking fails.
+#   * Preserves error messages from failed hard link operations.
 #
 # Arguments:
 #   $1 - Source file path
@@ -265,17 +265,26 @@ function import_file {
 }
 
 
-#######################################
-# Imports all extra files associated with a given file.
-# Uses generate_suffix_json to find related files and imports them
-# to the destination with appropriate suffixes.
+###############################################################################
+# Imports all associated extra files for Radarr/Sonarr download events.
+#
+# This function:
+#   * Searches for files with the same basename across all subdirectories.
+#   * Imports them to the destination with computed extensions.
+#   * Handles multiple external audio and subtitle streams.
+#   * Uses a naming scheme compatible with Jellyfin server format.
+#   * Stores additional information using dots in the extension for different streams.
+#
+# Note:
+#   * This function can be used directly to handle events if you don't need
+#     the buffer feature.
 #
 # Arguments:
 #   $1 - Source file path
 #   $2 - Destination file path
 # Outputs:
-#   Logs from import_file
-#######################################
+#   Logs each imported file from import_file
+###############################################################################
 function import_extra_files {
     local source="$1"
     local destination="$2"
