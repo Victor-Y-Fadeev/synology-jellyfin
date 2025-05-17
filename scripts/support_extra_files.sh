@@ -238,16 +238,20 @@ function generate_suffix_json {
 }
 
 
-#######################################
+###############################################################################
 # Creates a hard link or copies a file to a destination.
-# Tries to create a hard link first, falls back to copy if linking fails.
+#
+# Operation flow:
+#   * Attempts to create a hard link from source to destination
+#   * Falls back to copying if hard linking fails
+#   * Preserves error messages from failed hard link operations
 #
 # Arguments:
 #   $1 - Source file path
 #   $2 - Destination file path
 # Outputs:
-#   Log message indicating operation performed
-#######################################
+#   Logs the operation performed, hardlink or copy
+###############################################################################
 function import_file {
     local source="$1"
     local destination="$2"
