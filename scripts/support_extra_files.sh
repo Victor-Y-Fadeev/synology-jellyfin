@@ -376,19 +376,59 @@ function untrack_buffered_part {
 }
 
 
-#######################################
-# Records download event information in a buffer file.
-# Creates or updates buffer with instance, base, and source information.
+###############################################################################
+# Buffers imported files between script runs.
+#
+# This function:
+#   * Maintains a buffer for parted files importing support.
+#   * Creates and updates the buffer during download events for a movie or series.
+#   * Invalidates the buffer when processing a different movie or series.
+#   * Uses the movie or series base directory as an identifier for current buffer content.
+#   * Stores all source paths used for each destination between script calls.
+#   * Maintains back references for source files to prevent duplicate imports
+#     and incorrect part file generation.
+#
+# Note:
+#   * Uses the base of destination file path instead of the full path to support
+#     cases where parts have different extensions.
+#
+# Example download events:
+#   - "/path/to/downloads/s01e01.mkv" -> "/path/to/series/s01e01.mkv"
+#   - "/path/to/downloads/s01e02.mkv" -> "/path/to/series/s01e02.mkv"
+#   - "/path/to/downloads/s00e01.mkv" -> "/path/to/series/s00e01.mkv"
+#   - "/path/to/downloads/s00e02.mp4" -> "/path/to/series/s00e01.mp4"
+#
+# Generated JSON buffer structure:
+#   [
+#     "/path/to/series",
+#     {
+#       "/path/to/series/s01e01": [
+#         "/path/to/downloads/s01e01.mkv"
+#       ],
+#       "/path/to/series/s01e02": [
+#         "/path/to/downloads/s01e02.mkv"
+#       ],
+#       "/path/to/series/s00e01": [
+#         "/path/to/downloads/s00e01.mkv",
+#         "/path/to/downloads/s00e02.mp4"
+#       ]
+#     },
+#     {
+#       "/path/to/downloads/s01e01.mkv": "/path/to/series/s01e01",
+#       "/path/to/downloads/s01e02.mkv": "/path/to/series/s01e02",
+#       "/path/to/downloads/s00e01.mkv": "/path/to/series/s00e01",
+#       "/path/to/downloads/s00e02.mp4": "/path/to/series/s00e01"
+#     }
+#   ]
 #
 # Arguments:
-#   $1 - Buffer file path
-#   $2 - Instance identifier
-#   $3 - Base file path
+#   $1 - JSON buffer file path
+#   $2 - Movie or series base folder of Radarr/Sonarr
+#   $3 - Destination file path without extension
 #   $4 - Source file path
 # Outputs:
-#   Updates buffer file
-#   Logs from untrack_buffered_part
-#######################################
+#   Logs each renamed and removed file from untrack_buffered_part
+###############################################################################
 function buffer_download_event {
     local buffer="$1"
     local instance="$2"
