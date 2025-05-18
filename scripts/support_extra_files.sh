@@ -449,17 +449,40 @@ function buffer_download_event {
 
 
 #######################################
-# Processes a download event for multi-part files.
-# Updates buffer, renames files as needed, and imports associated files.
+# Imports all associated extra files for Radarr/Sonarr download events with parted files support.
+#
+# Creates or updates buffer on each function call between scripts run
+# to maintain more then one source file, because Radarr/Sonarr does not support it.
+# Buffer contain information only about current importing sequence.
+# Buffer eraises on movie or series switch.
+#
+# After buffer updates, read the all linked files for current destination
+# and if them more then one, then use parted files naming and importing logic.
+# Also for parted import add to the specified source file .pt[0-9] suffix.
+# After replacing the destination filename to computed one, call regular import_extra_files function.
+#
+# Note:
+#   * Radarr/Sonarr does not support multiple source files for one destination,
+#     and generates *FileDelete events immediately after importing.
+#   * To use benefits from logic of this function you need
+#     to specify multilpe files for one destination into manual import GUI of Radarr/Sonarr,
+#     all of them shoud be marked in checkbox.
+#   * Option of deleting empty folders should be disabled in Radarr/Sonarr settings,
+#     beacause it conflicts with the logic of this function and lead to broken importing.
+#   * Usage of this function also imposes restrictions on you misstakes. If you want to reimport
+#     the same movie or series immediatly with the completely different sources, you need to clear the buffer.
+#     You can do it by applying import action to another movie/series or by addition/deletion of any movie/series.
+#     I recommend to use the second option on your working movie/series, completely delete it and add again.
+#     The last option is just restart your container and this clear the buffer automatically.
 #
 # Arguments:
-#   $1 - Buffer file path
-#   $2 - Instance identifier
+#   $1 - JSON buffer file path
+#   $2 - Movie or series base folder of Radarr/Sonarr
 #   $3 - Destination file path
 #   $4 - Source file path
 # Outputs:
-#   Updates buffer file
-#   Logs from import_extra_files
+#   Logs each hardlinked and copied file from import_file
+#   Logs each renamed and removed file from buffer_download_event
 #######################################
 function parted_download_event {
     local buffer="$1"
