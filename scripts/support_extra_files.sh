@@ -250,7 +250,7 @@ function generate_suffix_json {
 #   $1 - Source file path
 #   $2 - Destination file path
 # Outputs:
-#   Logs the operation performed, hardlink or copy
+#   Logs the operation performed (hardlink or copy)
 ###############################################################################
 function import_file {
     local source="$1"
