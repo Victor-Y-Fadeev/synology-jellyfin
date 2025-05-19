@@ -1,9 +1,19 @@
 {
+  "/data/downloads/movies/anime/Slayers Gorgeous - Movie 4 [Persona99.GSG] [BDRip 1280x720 x264 AAC].rus.jpn": {
+    ".": [
+      "Slayers Gorgeous - Movie 4 [Persona99.GSG] [BDRip 1280x720 x264 AAC].rus.jpn.mkv"
+    ]
+  },
+  "/data/downloads/movies/anime/[MiraiDuB] Slayers Great": {
+    ".": [
+      "[MiraiDuB] Великие Рубаки - Slayers Great (MVO).mp4"
+    ]
+  },
   "/data/downloads/movies/anime/Воспоминания о будущем [BDRip 1080]": {
     ".": [
       "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv",
-      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv",
-      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.mkv"
+      "02.Memorizu.Saishu-Heiki.1995.1080p.BluRay.Rus.Jap.HDCLUB.mp4",
+      "03.Memorizu.Taiho.no.Machi.1995.1080p.BluRay.Rus.Jap.HDCLUB.avi"
     ],
     "nfo": [
       "01.Memorizu.Kanojo.no.Omoide.1995.1080p.BluRay.Rus.Jap.HDCLUB.nfo",
@@ -100,6 +110,24 @@
       "Chobits S01E22 Chi Wears And Takes Off[Virus123][Bluray][1080p][Dual Audio].mka",
       "Chobits S01E23 Chi Decides[Virus123][Bluray][1080p][Dual Audio].mka",
       "Chobits S01E24 The Person Only For Chi[Virus123][Bluray][1080p][Dual Audio].mka"
+    ]
+  },
+  "/data/downloads/series/anime/Gokukoku no Brynhildr": {
+    ".": [
+      "Gokukoku no Brynhildr - 01 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 02 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 03 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 04 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 05 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 06 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 07 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 08 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 09 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 10 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 11 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 11.5 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 12 [Anything Group].mp4",
+      "Gokukoku no Brynhildr - 13 [Anything Group].mp4"
     ]
   },
   "/data/downloads/series/anime/Lodoss-tou Senki [BD] [720p]": {
@@ -443,6 +471,53 @@
       "Slayers Try - 24 [DVDRip 768x576 x264 AC3].ass",
       "Slayers Try - 25 [DVDRip 768x576 x264 AC3].ass",
       "Slayers Try - 26 [DVDRip 768x576 x264 AC3].ass"
+    ]
+  },
+  "/data/downloads/series/anime/[AniDub]_Sora_no_Otoshimono_[BDRip720p_h264_Flac][Cuba77]": {
+    ".": [
+      "[AniDub]_Sora_no_Otoshimono_[01]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[02]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[03]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[04]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[05]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[06]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[07]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[08]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[09]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[10]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[11]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[12]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[13]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[13_Director's_cut]_[BDRip720p_h264_Flac][Cuba77].mkv",
+      "[AniDub]_Sora_no_Otoshimono_[14_OVA]_[BDRip720p_h264_Flac][Cuba77].mkv"
+    ],
+    "Bonus": [
+      "Sora no Otoshimono (CM 1) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (CM 2) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 01) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 02) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 03) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 04) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 05) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 06) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 07) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 08) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 09) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 10) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 11) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 12) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 13) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless ED ep 14) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless OP 1) [BDrip 1920x1080 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless OP 2) [BDrip 1920x1080 x264 FLAC].mkv",
+      "Sora no Otoshimono (Creditless OP 3) [BDrip 1920x1080 x264 FLAC].mkv",
+      "Sora no Otoshimono (DVD PV) [BDrip 1024x576 x264 FLAC].mkv",
+      "Sora no Otoshimono (Episode 10 live scene) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Episode 10 unused cuts) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (PV 1) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (PV 2) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Sponsorship post-episode backdrops) [BDrip 1280x720 x264 FLAC].mkv",
+      "Sora no Otoshimono (Sponsorship pre-episode illustrations) [BDrip 1280x720 x264 FLAC].mkv"
     ]
   },
   "/data/downloads/series/anime/[AniDub]_To_Love-Ru_TV_[DVDRip_1024x576_h264_aac]_[Cuba77_HQR]": {

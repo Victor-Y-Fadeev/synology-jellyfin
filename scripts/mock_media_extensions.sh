@@ -14,7 +14,7 @@ fi
 
 TARGET="$(realpath "$1")"
 ESCAPE="$(printf '%q' "$EXTENSIONS")"
-FILES="$(find "$TARGET" -type f -iregex ".*\.${ESCAPE}$")"
+FILES="$(find "$TARGET" -type f -iregex ".*\.\(${ESCAPE}\)$")"
 
 MOCK="$TARGET/tmp.mkv"
 ffmpeg -y -lavfi "color=c=black:size=2x2:d=0.1" "$MOCK" &>/dev/null

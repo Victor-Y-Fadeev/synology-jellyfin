@@ -4,10 +4,10 @@
       "Memories (1995).pt1.mkv",
       "Memories (1995).pt1.nfo",
       "Memories (1995).pt1.srt",
-      "Memories (1995).pt2.mkv",
+      "Memories (1995).pt2.mp4",
       "Memories (1995).pt2.nfo",
       "Memories (1995).pt2.srt",
-      "Memories (1995).pt3.mkv",
+      "Memories (1995).pt3.avi",
       "Memories (1995).pt3.nfo",
       "Memories (1995).pt3.srt",
       "movie.nfo"
@@ -20,6 +20,16 @@
       "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.mkv",
       "Neon Genesis Evangelion - The End of Evangelion (1997).pt2.nfo",
       "movie.nfo"
+    ]
+  },
+  "/data/movies/anime/Slayers Gorgeous (1998) [tmdbid-41365]": {
+    ".": [
+      "Slayers Gorgeous (1998).mkv"
+    ]
+  },
+  "/data/movies/anime/Slayers Great (1997) [tmdbid-125510]": {
+    ".": [
+      "Slayers Great (1997).mp4"
     ]
   }
 }

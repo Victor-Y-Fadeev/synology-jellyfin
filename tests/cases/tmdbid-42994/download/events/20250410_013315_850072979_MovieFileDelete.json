@@ -14,10 +14,10 @@
   "radarr_movie_year": "1995",
   "radarr_moviefile_deletereason": "MissingFromDisk",
   "radarr_moviefile_id": "3",
-  "radarr_moviefile_path": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories (1995).mkv",
+  "radarr_moviefile_path": "/data/movies/anime/Memories (1995) [tmdbid-42994]/Memories (1995).avi",
   "radarr_moviefile_quality": "Bluray-1080p",
   "radarr_moviefile_qualityversion": "1",
-  "radarr_moviefile_relativepath": "Memories (1995).mkv",
+  "radarr_moviefile_relativepath": "Memories (1995).avi",
   "radarr_moviefile_releasegroup": "",
   "radarr_moviefile_scenename": "",
   "radarr_moviefile_size": "1362"

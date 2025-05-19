@@ -1,0 +1,16 @@
+{
+  "radarr_applicationurl": "",
+  "radarr_eventtype": "MovieDelete",
+  "radarr_instancename": "Radarr",
+  "radarr_movie_deletedfiles": "True",
+  "radarr_movie_genres": "Animation|Adventure|Comedy|Fantasy",
+  "radarr_movie_id": "2",
+  "radarr_movie_imdbid": "tt1796619",
+  "radarr_movie_originallanguage": "jpn",
+  "radarr_movie_overview": "Lina Inverse and her sidekick Naga the Serpent are happily enjoying lunch when the entire town ducks under cover before an invasion of Marlene Culvert and her legion of bloodthirsty dragons. The cause of the invasion? Marlene is in a feud with her father, the king, over her allowance.  Lina leaps into action to defend the village against Marlene, her tetrad knights and her dragons, but her dependable Dragon Slave spell fails her.  Right when she thinks she has won, the real battle has just begun.",
+  "radarr_movie_path": "/data/movies/anime/Slayers Gorgeous (1998) [tmdbid-41365]",
+  "radarr_movie_tags": "",
+  "radarr_movie_title": "Slayers Gorgeous",
+  "radarr_movie_tmdbid": "41365",
+  "radarr_movie_year": "1998"
+}

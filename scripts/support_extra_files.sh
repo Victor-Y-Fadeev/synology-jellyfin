@@ -7,104 +7,28 @@ RADARR_BUFFER="/tmp/radarr_download_event.json"
 SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 
-function generate_suffix_json {
-    local dir="$(dirname "${1}")"
-    local name="$(basename "${1%.*}")"
+function remove_file_base {
+    local dir="$(dirname "$1")"
+    local name="$(basename "$1")"
+    local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt}")"
 
-    local escape_dir="$(sed 's|\W|\\\0|g' <<< "$dir")"
-    local escape_name="$(sed 's|\W|\\\0|g' <<< "$name")"
-
-    find "$dir" -type f -name "${escape_name}.*" \
-        | jq --arg dir "$escape_dir" --arg name "$escape_name" --raw-input --null-input '
-            [
-                inputs
-                | capture("^(?<key>" + $dir
-                        + "/?(?<value>.*)/" + $name
-                        + "\\.(?<extension>.*))$")
-                | .value |= split("/")
-            ]
-            | group_by(.extension)
-            | map(until(map(.value[0]) | unique | [length != 1, any(. == null)] | any;
-                        map(.value |= .[1:])) | .[])
-            | map(.value += [.extension]
-                | .value |= join("."))
-            | from_entries'
+    while read -r file; do
+        if [[ "$name" =~ \.pt[0-9]?$ || ! "$file" =~ \.pt[0-9]\. ]]; then
+            rm --force "$file"
+            echo "Remove '$file'"
+        fi
+    done <<< "$(find "$dir" -type f -name "${escape}.*")"
 }
 
 
-function import_file {
-    local source="$1"
-    local destination="$2"
+function remove_extra_files {
+    local base="${1%.*}"
 
-    if ln --force "$source" "$destination"; then
-        echo "Hardlink '$source' => '$destination'"
-    else
-        cp --force "$source" "$destination"
-        echo "Copy '$source' => '$destination'"
-    fi
-}
-
-
-function import_extra_files {
-    local source="$1"
-    local destination="$2"
-
-    local json="$(generate_suffix_json "$source")"
-    local keys="$(jq --raw-output 'keys[]' <<< "$json")"
-    local base="${destination%.*}"
-
-    while read -r key; do
-        local suffix="$(jq --arg key "$key" --raw-output '.[$key]' <<< "$json")"
-        import_file "$key" "${base}.${suffix}"
-    done <<< "$keys"
-}
-
-
-function buffer_download_event {
-    local buffer="$1"
-    local instance="$2"
-    local destination="$3"
-    local source="$4"
-
-    if [[ ! -f "$buffer" || "$(jq --raw-output '.[0]' "$buffer")" != "$instance" ]]; then
-        echo "[\"$instance\"]" > "$buffer"
+    if [[ "$base" =~ \.pt[0-9]$ ]]; then
+        base="${base%.pt[0-9]}.pt"
     fi
 
-    local updated="$(jq --arg dest "$destination" --arg src "$source" \
-                        '.[1][$dest] |= (. + [$src] | sort | unique)' "$buffer")"
-    echo "$updated" > "$buffer"
-
-    jq --arg dest "$destination" --raw-output '.[1][$dest][]' "$buffer"
-}
-
-
-function parted_download_event {
-    local buffer="$1"
-    local instance="$2"
-    local destination="$3"
-    local source="$4"
-
-    local all
-    readarray all <<< "$(buffer_download_event "$buffer" "$instance" "$destination" "$source")"
-
-    local i
-    for (( i = 0; i < ${#all[@]}; ++i )); do
-        local current="${all[$i]%$'\n'}"
-        local extension="${current##*.}"
-
-        if (( ${#all[@]} > 1 )); then
-            extension="pt$(( i + 1 )).${extension}"
-        fi
-
-        local base="${destination%.*}"
-        local full="${base}.${extension}"
-
-        if [[ "$current" == "$source" && "$full" != "$destination" ]]; then
-            mv --force "$destination" "$full"
-        fi
-
-        import_extra_files "$current" "$full"
-    done
+    remove_file_base "$base"
 }
 
 
@@ -157,21 +81,151 @@ function rename_extra_files {
 }
 
 
-function remove_extra_files {
+function generate_suffix_json {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
-    local escape="$(sed 's|\W|\\\0|g' <<< "${name%.pt[0-9]}")"
 
-    while read -r file; do
-        if [[ "$name" =~ \.pt[0-9]$ || ! "$file" =~ \.pt[0-9]\. ]]; then
-            rm --force "$file"
-            echo "Remove '$file'"
+    local escape_dir="$(sed 's|\W|\\\0|g' <<< "$dir")"
+    local escape_name="$(sed 's|\W|\\\0|g' <<< "$name")"
+
+    find "$dir" -type f -name "${escape_name}.*" \
+        | jq --arg dir "$escape_dir" --arg name "$escape_name" --raw-input --null-input '
+            [
+                inputs
+                | capture("^(?<key>" + $dir
+                        + "/?(?<value>.*)/" + $name
+                        + "\\.(?<extension>.*))$")
+                | .value |= split("/")
+            ]
+            | group_by(.extension)
+            | map(until(map(.value[0]) | unique | [length != 1, any(. == null)] | any;
+                        map(.value |= .[1:])) | .[])
+            | map(.value += [.extension]
+                | .value |= join("."))
+            | from_entries'
+}
+
+
+function import_file {
+    local source="$1"
+    local destination="$2"
+
+    if ln --force "$source" "$destination"; then
+        echo "Hardlink '$source' => '$destination'"
+    else
+        cp --force "$source" "$destination"
+        echo "Copy '$source' => '$destination'"
+    fi
+}
+
+
+function import_extra_files {
+    local source="$1"
+    local destination="$2"
+
+    local json="$(generate_suffix_json "$source")"
+    local keys="$(jq --raw-output 'keys[]' <<< "$json")"
+    local base="${destination%.*}"
+
+    while read -r key; do
+        local suffix="$(jq --raw-output --arg key "$key" '.[$key]' <<< "$json")"
+        import_file "$key" "${base}.${suffix}"
+    done <<< "$keys"
+}
+
+
+function untrack_buffered_part {
+    local buffer="$1"
+    local source="$2"
+
+    local base="$(jq --raw-output --arg src "$source" '.[2][$src]' "$buffer")"
+    if [[ "$base" != "null" ]]; then
+        local length="$(jq --raw-output --arg base "$base" '.[1][$base] | length' "$buffer")"
+
+        if (( length == 0 )); then
+            return
+        elif (( length == 1 )); then
+            remove_file_base "$base"
+        else
+            local i=1
+            local j=1
+
+            local parts="$(jq --raw-output --arg base "$base" '.[1][$base][]' "$buffer")"
+            while read -r part; do
+                if [[ "$part" == "$source" ]]; then
+                    remove_file_base "${base}.pt${i}"
+                else
+                    if (( length == 2 )); then
+                        rename_file_base "${base}.pt${i}" "$base"
+                    elif (( i != j )); then
+                        rename_file_base "${base}.pt${i}" "${base}.pt${j}"
+                    fi
+                    (( ++j ))
+                fi
+                (( ++i ))
+            done <<< "$parts"
         fi
-    done <<< "$(find "$dir" -type f -name "${escape}.*")"
+
+        local updated="$(jq --arg base "$base" --arg src "$source" '.[1][$base] -= [$src]' "$buffer")"
+        echo "$updated" > "$buffer"
+    fi
+}
+
+
+function buffer_download_event {
+    local buffer="$1"
+    local instance="$2"
+    local base="$3"
+    local source="$4"
+
+    if [[ ! -f "$buffer" || "$(jq --raw-output '.[0]' "$buffer")" != "$instance" ]]; then
+        echo "[\"$instance\"]" > "$buffer"
+    fi
+
+    untrack_buffered_part "$buffer" "$source"
+
+    local updated="$(jq --arg base "$base" --arg src "$source" \
+                        '.[1][$base] |= (. + [$src] | sort | unique)
+                        | .[2][$src] = $base' "$buffer")"
+    echo "$updated" > "$buffer"
+}
+
+
+function parted_download_event {
+    local buffer="$1"
+    local instance="$2"
+    local destination="$3"
+    local source="$4"
+
+    local base="${destination%.*}"
+    buffer_download_event "$buffer" "$instance" "$base" "$source"
+
+    local parts="$(jq --raw-output --arg base "$base" '.[1][$base][]' "$buffer")"
+    local length="$(wc --lines <<< "$parts")"
+
+    local i=1
+    while read -r part; do
+        local extension="${part##*.}"
+        if (( length > 1 )); then
+            extension="pt${i}.${extension}"
+        fi
+
+        local full="${base}.${extension}"
+        if [[ "$part" == "$source" && "$full" != "$destination" ]]; then
+            rm --force "$full"
+            mv --force "$destination" "$full"
+        fi
+
+        import_extra_files "$part" "$full"
+        (( ++i ))
+    done <<< "$parts"
 }
 
 
 case "$radarr_eventtype" in
+    "MovieAdded")
+        rm --force "$RADARR_BUFFER"
+        ;;
     "Download")
         parted_download_event "$RADARR_BUFFER" "$radarr_movie_path" \
             "$radarr_moviefile_path" "$radarr_moviefile_sourcepath"
@@ -183,10 +237,16 @@ case "$radarr_eventtype" in
         remove_extra_files "$radarr_moviefile_path"
         rm --force "$(dirname "$radarr_moviefile_path")/movie.nfo"
         ;;
+    "MovieDelete")
+        rm --force "$RADARR_BUFFER"
+        ;;
 esac
 
 
 case "$sonarr_eventtype" in
+    "SeriesAdd")
+        rm --force "$SONARR_BUFFER"
+        ;;
     "Download")
         if [[ -n "$sonarr_isupgrade" ]]; then
             parted_download_event "$SONARR_BUFFER" "$sonarr_series_path" \
@@ -199,5 +259,8 @@ case "$sonarr_eventtype" in
     "EpisodeFileDelete")
         remove_extra_files "$sonarr_episodefile_path"
         find "$(dirname "$sonarr_episodefile_path")" -type d -empty -delete
+        ;;
+    "SeriesDelete")
+        rm --force "$SONARR_BUFFER"
         ;;
 esac

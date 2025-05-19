@@ -67,6 +67,24 @@ test_servarr_download() {
 }
 
 
+# bats test_tags=download, tmdbid-41365
+@test "Slayers Gorgeous (1998) [tmdbid-41365]" {
+    test_servarr_download "tmdbid-41365"
+}
+
+
+# bats test_tags=download, tmdbid-125510
+@test "Slayers Great (1997) [tmdbid-125510]" {
+    test_servarr_download "tmdbid-125510"
+}
+
+
+# bats test_tags=download, tvdbid-279396
+@test "Brynhildr in the Darkness (2014) [tvdbid-279396]" {
+    test_servarr_download "tvdbid-279396"
+}
+
+
 # bats test_tags=download, tvdbid-72070
 @test "Chobits (2002) [tvdbid-72070]" {
     test_servarr_download "tvdbid-72070"
@@ -88,6 +106,12 @@ test_servarr_download() {
 # bats test_tags=download, tvdbid-75579
 @test "Fullmetal Alchemist (2003) [tvdbid-75579]" {
     test_servarr_download "tvdbid-75579"
+}
+
+
+# bats test_tags=download, tvdbid-118101
+@test "Heaven's Lost Property (2009) [tvdbid-118101]" {
+    test_servarr_download "tvdbid-118101"
 }
 
 

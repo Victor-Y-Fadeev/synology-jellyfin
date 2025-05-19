@@ -1,0 +1,19 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesDelete",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_deletedfiles": "False",
+  "sonarr_series_genres": "Action|Animation|Anime|Drama|Fantasy|Mystery|Romance|Science Fiction|Thriller",
+  "sonarr_series_id": "1",
+  "sonarr_series_imdbid": "tt3563898",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Brynhildr in the Darkness (2014) [tvdbid-279396]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Brynhildr in the Darkness",
+  "sonarr_series_titleslug": "brynhildr-in-the-darkness",
+  "sonarr_series_tmdbid": "60805",
+  "sonarr_series_tvdbid": "279396",
+  "sonarr_series_tvmazeid": "8279",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2014"
+}

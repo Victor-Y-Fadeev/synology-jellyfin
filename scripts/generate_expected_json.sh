@@ -39,6 +39,7 @@ for test in "${TESTS}"/*/; do
         --expression 's/^([^\|]*)\|(.*)$/\2|\1/' \
         --expression '/^([^\|]*)\|\1$/d')"
 
+    mkdir --parents "${test}"/{delete,rename}
     "$FROM_PATHS" <<< "$list" > "${test}/delete/expected.json"
     "$FROM_KV" <<< "$dict" > "${test}/rename/expected.json"
 done

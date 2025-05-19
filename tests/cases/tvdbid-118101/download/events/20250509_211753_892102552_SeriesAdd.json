@@ -1,0 +1,18 @@
+{
+  "sonarr_applicationurl": "",
+  "sonarr_eventtype": "SeriesAdd",
+  "sonarr_instancename": "Sonarr",
+  "sonarr_series_genres": "Action|Animation|Comedy|Drama|Fantasy|Romance|Science Fiction",
+  "sonarr_series_id": "2",
+  "sonarr_series_imdbid": "tt1528567",
+  "sonarr_series_originallanguage": "jpn",
+  "sonarr_series_path": "/data/series/anime/Heaven's Lost Property (2009) [tvdbid-118101]",
+  "sonarr_series_tags": "",
+  "sonarr_series_title": "Heaven's Lost Property",
+  "sonarr_series_titleslug": "heavens-lost-property",
+  "sonarr_series_tmdbid": "37437",
+  "sonarr_series_tvdbid": "118101",
+  "sonarr_series_tvmazeid": "5302",
+  "sonarr_series_type": "Standard",
+  "sonarr_series_year": "2009"
+}
