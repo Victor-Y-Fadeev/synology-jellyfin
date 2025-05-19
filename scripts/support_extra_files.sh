@@ -448,32 +448,29 @@ function buffer_download_event {
 }
 
 
-#######################################
-# Imports all associated extra files for Radarr/Sonarr download events with parted files support.
+###############################################################################
+# Processes download events with multi-part file support for Radarr/Sonarr.
 #
-# Creates or updates buffer on each function call between scripts run
-# to maintain more then one source file, because Radarr/Sonarr does not support it.
-# Buffer contain information only about current importing sequence.
-# Buffer eraises on movie or series switch.
+# This function:
+#   * Creates and updates a buffer between script runs to track multiple source files.
+#   * Maintains import state since Radarr/Sonarr does not natively support multi-part files.
+#   * Tracks files only for the current import sequence (clears on movie/series change).
+#   * Processes all associated extra files for the current destination.
 #
-# After buffer updates, read the all linked files for current destination
-# and if them more then one, then use parted files naming and importing logic.
-# Also for parted import add to the specified source file .pt[0-9] suffix.
-# After replacing the destination filename to computed one, call regular import_extra_files function.
+# Technical operation:
+#   * Buffer stores information about source-destination relationships.
+#   * When multiple sources are found for one destination,
+#     Jellyfin compatible .pt[0-9] suffixes are applied.
+#   * Each file is processed through import_extra_files after renaming.
 #
-# Note:
-#   * Radarr/Sonarr does not support multiple source files for one destination,
-#     and generates *FileDelete events immediately after importing.
-#   * To use benefits from logic of this function you need
-#     to specify multilpe files for one destination into manual import GUI of Radarr/Sonarr,
-#     all of them shoud be marked in checkbox.
-#   * Option of deleting empty folders should be disabled in Radarr/Sonarr settings,
-#     beacause it conflicts with the logic of this function and lead to broken importing.
-#   * Usage of this function also imposes restrictions on you misstakes. If you want to reimport
-#     the same movie or series immediatly with the completely different sources, you need to clear the buffer.
-#     You can do it by applying import action to another movie/series or by addition/deletion of any movie/series.
-#     I recommend to use the second option on your working movie/series, completely delete it and add again.
-#     The last option is just restart your container and this clear the buffer automatically.
+# Usage guide:
+#   * In Radarr/Sonarr manual import GUI, select multiple files for one destination.
+#   * Ensure all desired files are checked in the interface.
+#   * Disable "Delete Empty Folders" in Radarr/Sonarr settings to prevent conflicts.
+#   * To reimport with different sources, clear the buffer first by:
+#     - Importing a different movie/series.
+#     - Deleting and re-adding the current movie/series.
+#     - Restarting the container (automatically clears buffer).
 #
 # Arguments:
 #   $1 - JSON buffer file path
@@ -483,7 +480,7 @@ function buffer_download_event {
 # Outputs:
 #   Logs each hardlinked and copied file from import_file
 #   Logs each renamed and removed file from buffer_download_event
-#######################################
+###############################################################################
 function parted_download_event {
     local buffer="$1"
     local instance="$2"
