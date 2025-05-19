@@ -48,6 +48,8 @@
 		  - [ ] `On File Import` -> `On`
 		  - [ ] `On File Upgrade` -> `On`
 		  - [ ] `On Rename` -> `On`
+		  - [ ] `On Series Add` -> `On`
+		  - [ ] `On Series Delete` -> `On`
 		  - [ ] `On Episode File Delete` -> `On`
 		  - [ ] `On Episode File Delete For Upgrade` -> `On`
 		- [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/scripts/support_extra_files.sh)

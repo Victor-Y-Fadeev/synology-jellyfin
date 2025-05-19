@@ -49,10 +49,10 @@ function remove_file_base {
 
 
 ###############################################################################
-# Removes all associated extra files for Radarr/Sonarr delete events.
+# Removes all associated extra files for Servarr delete events.
 #
 # This function handles MovieFileDelete/EpisodeFileDelete events from
-# Radarr/Sonarr by removing all files with the same basename but
+# Servarr by removing all files with the same basename but
 # different extensions.
 #
 # Special handling is provided for part files:
@@ -82,15 +82,15 @@ function remove_extra_files {
 #
 # Finds all files matching old_base.* and renames them to new_base.*
 # while preserving their extensions.
-# All destination directories should be already created by Radarr/Sonarr.
+# All destination directories should be already created by Servarr.
 # Also removes empty directories after renaming.
 #
 # Note:
 #   * File existence check required to handle cases with no extra files renaming,
-#     when only one file was renamed by Radarr/Sonarr and function should do nothing.
+#     when only one file was renamed by Servarr and function should do nothing.
 #   * Directory existence check required to prevent errors with find command call,
 #     when directory was deleted on previous call of this function. For example,
-#     when there are no extra files and ALL regular files already renamed by Radarr/Sonarr.
+#     when there are no extra files and ALL regular files already renamed by Servarr.
 #
 # Arguments:
 #   $1 - Old absolute basename path
@@ -123,14 +123,14 @@ function rename_file_base {
 ###############################################################################
 # Renames multiple files and their associated extra files.
 #
-# This function handles Rename events from Radarr/Sonarr
+# This function handles Rename events from Servarr
 # by processing lists of old and new paths.
 #
 # Features:
 #   * Preserves .pt[0-9] suffixes during file renaming.
-#   * Reverts incorrect Radarr/Sonarr renaming of parted files.
+#   * Reverts incorrect Servarr renaming of parted files.
 #   * Deletes empty directories after renaming. This setting should be disabled
-#     in Sonarr to prevent external file deletion during directory renames,
+#     in Servarr to prevent external file deletion during directory renames,
 #     like "Season 01" -> "Season 1".
 #
 # Note:
@@ -266,7 +266,7 @@ function import_file {
 
 
 ###############################################################################
-# Imports all associated extra files for Radarr/Sonarr download events.
+# Imports all associated extra files for Servarr download events.
 #
 # This function:
 #   * Searches for files with the same basename across all subdirectories.
@@ -423,7 +423,7 @@ function untrack_buffered_part {
 #
 # Arguments:
 #   $1 - JSON buffer file path
-#   $2 - Movie or series base folder of Radarr/Sonarr
+#   $2 - Movie or series base folder of Servarr
 #   $3 - Destination file path without extension
 #   $4 - Source file path
 # Outputs:
@@ -449,11 +449,11 @@ function buffer_download_event {
 
 
 ###############################################################################
-# Processes download events with multi-part file support for Radarr/Sonarr.
+# Processes download events with multi-part file support for Servarr.
 #
 # This function:
 #   * Creates and updates a buffer between script runs to track multiple source files.
-#   * Maintains import state since Radarr/Sonarr does not natively support multi-part files.
+#   * Maintains import state since Servarr does not natively support multi-part files.
 #   * Tracks files only for the current import sequence (clears on movie/series change).
 #   * Processes all associated extra files for the current destination.
 #
@@ -464,9 +464,9 @@ function buffer_download_event {
 #   * Each file is processed through import_extra_files after renaming.
 #
 # Usage guide:
-#   * In Radarr/Sonarr manual import GUI, select multiple files for one destination.
+#   * In Servarr manual import GUI, select multiple files for one destination.
 #   * Ensure all desired files are checked in the interface.
-#   * Disable "Delete Empty Folders" in Radarr/Sonarr settings to prevent conflicts.
+#   * Disable "Delete Empty Folders" in Servarr settings to prevent conflicts.
 #   * To reimport with different sources, clear the buffer first by:
 #     - Importing a different movie/series.
 #     - Deleting and re-adding the current movie/series.
@@ -474,7 +474,7 @@ function buffer_download_event {
 #
 # Arguments:
 #   $1 - JSON buffer file path
-#   $2 - Movie or series base folder of Radarr/Sonarr
+#   $2 - Movie or series base folder of Servarr
 #   $3 - Destination file path
 #   $4 - Source file path
 # Outputs:
