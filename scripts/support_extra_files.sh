@@ -7,6 +7,33 @@ RADARR_BUFFER="/tmp/radarr_download_event.json"
 SONARR_BUFFER="/tmp/sonarr_download_event.json"
 
 
+###############################################################################
+# Removes files with the same basename but different extensions.
+#
+# Handles parted and non-parted files with the following rules:
+#   * Without part suffix - Only removes non-parted files, ignores all part files.
+#   * With specific part suffix (.pt1, .pt2, etc.) - Removes only files with that exact suffix.
+#   * With reserved .pt suffix - Removes ALL files with the same basename (both parted and non-parted).
+#
+# Example with the following file structure:
+#   - "/path/to/file.mkv"
+#   - "/path/to/file.mka"
+#   - "/path/to/file.pt1.mkv"
+#   - "/path/to/file.pt1.mka"
+#   - "/path/to/file.pt2.mkv"
+#   - "/path/to/file.pt2.mka"
+#
+# Behavior with different inputs:
+#   - "/path/to/file" -> Removes "file.mkv" and "file.mka" only
+#   - "/path/to/file.pt1" -> Removes "file.pt1.mkv" and "file.pt1.mka" only
+#   - "/path/to/file.pt2" -> Removes "file.pt2.mkv" and "file.pt2.mka" only
+#   - "/path/to/file.pt" -> Removes ALL files (both regular and part files)
+#
+# Arguments:
+#   $1 - File path without extension to use as base for removal
+# Outputs:
+#   Logs each removed file
+###############################################################################
 function remove_file_base {
     local dir="$(dirname "$1")"
     local name="$(basename "$1")"
@@ -21,6 +48,24 @@ function remove_file_base {
 }
 
 
+###############################################################################
+# Removes all associated extra files for Radarr/Sonarr delete events.
+#
+# This function handles MovieFileDelete/EpisodeFileDelete events from
+# Radarr/Sonarr by removing all files with the same basename but
+# different extensions.
+#
+# Special handling is provided for part files:
+#   * If the specified file has no part suffix (.pt1, .pt2, etc.),
+#     all linked part-files will be ignored during deletion.
+#   * This prevents accidental deletion of newly imported part-files
+#     during the *FileDelete event generated at the end of importing.
+#
+# Arguments:
+#   $1 - Absolute path to the file
+# Outputs:
+#   Logs each removed file from remove_file_base
+###############################################################################
 function remove_extra_files {
     local base="${1%.*}"
 
@@ -32,6 +77,27 @@ function remove_extra_files {
 }
 
 
+###############################################################################
+# Renames files with the same basename but different extensions.
+#
+# Finds all files matching old_base.* and renames them to new_base.*
+# while preserving their extensions.
+# All destination directories should be already created by Radarr/Sonarr.
+# Also removes empty directories after renaming.
+#
+# Note:
+#   * File existence check required to handle cases with no extra files renaming,
+#     when only one file was renamed by Radarr/Sonarr and function should do nothing.
+#   * Directory existence check required to prevent errors with find command call,
+#     when directory was deleted on previous call of this function. For example,
+#     when there are no extra files and ALL regular files already renamed by Radarr/Sonarr.
+#
+# Arguments:
+#   $1 - Old absolute basename path
+#   $2 - New absolute basename path
+# Outputs:
+#   Logs each moved file
+###############################################################################
 function rename_file_base {
     local old_base="$1"
     local new_base="$2"
@@ -54,6 +120,29 @@ function rename_file_base {
 }
 
 
+###############################################################################
+# Renames multiple files and their associated extra files.
+#
+# This function handles Rename events from Radarr/Sonarr
+# by processing lists of old and new paths.
+#
+# Features:
+#   * Preserves .pt[0-9] suffixes during file renaming.
+#   * Reverts incorrect Radarr/Sonarr renaming of parted files.
+#   * Deletes empty directories after renaming. This setting should be disabled
+#     in Sonarr to prevent external file deletion during directory renames,
+#     like "Season 01" -> "Season 1".
+#
+# Note:
+#   * Each element of BASH array has a trailing newline that must be
+#     removed before passing to the mv command.
+#
+# Arguments:
+#   $1 - Old file paths '|' delimited string
+#   $2 - New file paths '|' delimited string
+# Outputs:
+#   Logs each moved file from rename_file_base
+###############################################################################
 function rename_extra_files {
     local old_paths
     readarray -d '|' -t old_paths <<< "$1"
@@ -81,6 +170,49 @@ function rename_extra_files {
 }
 
 
+###############################################################################
+# Generates JSON mapping of found files to their computed extensions.
+#
+# This function searches for files with the same basename in all subdirectories
+# starting from the given file's directory. It:
+#   * Splits paths into segments and groups files by extension.
+#   * Uses path segments starting from the original file directory.
+#   * Uses all extensions after the original basename.
+#   * Removes common subdirectories for files with the same extension.
+#   * For single-file extension groups, removes additional extensions
+#     except the original one.
+#
+# The output is a JSON dictionary where:
+#   * Keys are absolute paths of found files.
+#   * Values are computed extensions for import.
+#
+# Example filesystem structure:
+#   - "/path/to/file.mkv"
+#   - "/path/to/sound/first/file.mka"
+#   - "/path/to/sound/second/file.mka"
+#   - "/path/to/sound/third/file.language.mka"
+#   - "/path/to/subtitles/first/file.mks"
+#   - "/path/to/subtitles/first/spelling/file.mks"
+#   - "/path/to/subtitles/second/file.mks"
+#   - "/path/to/subtitles/third/file.language.srt"
+#
+# This generates the following JSON:
+#   {
+#     "/path/to/file.mkv": "mkv",
+#     "/path/to/sound/first/file.mka": "first.mka",
+#     "/path/to/sound/second/file.mka": "second.mka",
+#     "/path/to/sound/third/file.language.mka": "language.mka",
+#     "/path/to/subtitles/first/file.mks": "first.mks",
+#     "/path/to/subtitles/first/spelling/file.mks": "first.spelling.mks",
+#     "/path/to/subtitles/second/file.mks": "second.mks",
+#     "/path/to/subtitles/third/file.language.srt": "language.srt"
+#   }
+#
+# Arguments:
+#   $1 - Absolute file path to use as base for depth search
+# Outputs:
+#   JSON string mapping found files to their computed extensions
+###############################################################################
 function generate_suffix_json {
     local dir="$(dirname "${1}")"
     local name="$(basename "${1%.*}")"
@@ -106,6 +238,20 @@ function generate_suffix_json {
 }
 
 
+###############################################################################
+# Creates a hard link or copies a file to a destination.
+#
+# Operation flow:
+#   * Attempts to create a hard link from source to destination.
+#   * Falls back to copying if hard linking fails.
+#   * Preserves error messages from failed hard link operations.
+#
+# Arguments:
+#   $1 - Source file path
+#   $2 - Destination file path
+# Outputs:
+#   Logs the operation performed (hardlink or copy)
+###############################################################################
 function import_file {
     local source="$1"
     local destination="$2"
@@ -119,6 +265,26 @@ function import_file {
 }
 
 
+###############################################################################
+# Imports all associated extra files for Radarr/Sonarr download events.
+#
+# This function:
+#   * Searches for files with the same basename across all subdirectories.
+#   * Imports them to the destination with computed extensions.
+#   * Handles multiple external audio and subtitle streams.
+#   * Uses a naming scheme compatible with Jellyfin server format.
+#   * Stores additional information using dots in the extension for different streams.
+#
+# Note:
+#   * This function can be used directly to handle events if you don't need
+#     the buffer feature.
+#
+# Arguments:
+#   $1 - Source file path
+#   $2 - Destination file path
+# Outputs:
+#   Logs each imported file from import_file
+###############################################################################
 function import_extra_files {
     local source="$1"
     local destination="$2"
@@ -134,6 +300,44 @@ function import_extra_files {
 }
 
 
+###############################################################################
+# Removes already buffered part file and renames others for consistency.
+#
+# This function corrects user mistakes during import events by:
+#   * Fixing wrong part files for non-parted files.
+#   * Handling cases when users reimport the same files to fix incorrectly numbering.
+#   * Maintaining proper sequence of parted files on each call.
+#
+# Operation logic:
+#   * Uses the third buffer array item containing back references.
+#   * Reads the backref of the source file to check if it exists in buffered lists.
+#   * If not found in buffer, does nothing.
+#   * If list contains only one item, simply removes the file.
+#   * If two files exist, removes one and renames the other by removing the .pt[0-9] suffix.
+#   * If more files exist, skips files until the specified one, removes it, and renames remaining files.
+#
+# Note:
+#   * Also renames/removes all external files associated with buffered ones
+#     through rename_file_base/remove_file_base functions.
+#   * Removed file disappears from the buffer JSON lists, but backref remains.
+#
+# Example with the following links:
+#   - "/old/path/to/file_1.mkv" -> "/new/path/to/file.pt1.mkv"
+#   - "/old/path/to/file_2.mkv" -> "/new/path/to/file.pt2.mkv"
+#   - "/old/path/to/file_3.mkv" -> "/new/path/to/file.pt3.mkv"
+#
+# Changes when untracking "/old/path/to/file_2.mkv":
+#   - "/new/path/to/file.pt1.mkv" -> Unchanged
+#   - "/new/path/to/file.pt2.mkv" -> Removed
+#   - "/new/path/to/file.pt3.mkv" -> Renamed to "/new/path/to/file.pt2.mkv"
+#
+# Arguments:
+#   $1 - JSON buffer file path
+#   $2 - Absolute source path to untrack
+# Outputs:
+#   Logs each renamed file from rename_file_base
+#   Logs each removed file from remove_file_base
+###############################################################################
 function untrack_buffered_part {
     local buffer="$1"
     local source="$2"
@@ -172,6 +376,59 @@ function untrack_buffered_part {
 }
 
 
+###############################################################################
+# Buffers imported files between script runs.
+#
+# This function:
+#   * Maintains a buffer for parted files importing support.
+#   * Creates and updates the buffer during download events for a movie or series.
+#   * Invalidates the buffer when processing a different movie or series.
+#   * Uses the movie or series base directory as an identifier for current buffer content.
+#   * Stores all source paths used for each destination between script calls.
+#   * Maintains back references for source files to prevent duplicate imports
+#     and incorrect part file generation.
+#
+# Note:
+#   * Uses the base of destination file path instead of the full path to support
+#     cases where parts have different extensions.
+#
+# Example download events:
+#   - "/path/to/downloads/s01e01.mkv" -> "/path/to/series/s01e01.mkv"
+#   - "/path/to/downloads/s01e02.mkv" -> "/path/to/series/s01e02.mkv"
+#   - "/path/to/downloads/s00e01.mkv" -> "/path/to/series/s00e01.mkv"
+#   - "/path/to/downloads/s00e02.mp4" -> "/path/to/series/s00e01.mp4"
+#
+# Generated JSON buffer structure:
+#   [
+#     "/path/to/series",
+#     {
+#       "/path/to/series/s01e01": [
+#         "/path/to/downloads/s01e01.mkv"
+#       ],
+#       "/path/to/series/s01e02": [
+#         "/path/to/downloads/s01e02.mkv"
+#       ],
+#       "/path/to/series/s00e01": [
+#         "/path/to/downloads/s00e01.mkv",
+#         "/path/to/downloads/s00e02.mp4"
+#       ]
+#     },
+#     {
+#       "/path/to/downloads/s01e01.mkv": "/path/to/series/s01e01",
+#       "/path/to/downloads/s01e02.mkv": "/path/to/series/s01e02",
+#       "/path/to/downloads/s00e01.mkv": "/path/to/series/s00e01",
+#       "/path/to/downloads/s00e02.mp4": "/path/to/series/s00e01"
+#     }
+#   ]
+#
+# Arguments:
+#   $1 - JSON buffer file path
+#   $2 - Movie or series base folder of Radarr/Sonarr
+#   $3 - Destination file path without extension
+#   $4 - Source file path
+# Outputs:
+#   Logs each renamed and removed file from untrack_buffered_part
+###############################################################################
 function buffer_download_event {
     local buffer="$1"
     local instance="$2"
@@ -191,6 +448,39 @@ function buffer_download_event {
 }
 
 
+###############################################################################
+# Processes download events with multi-part file support for Radarr/Sonarr.
+#
+# This function:
+#   * Creates and updates a buffer between script runs to track multiple source files.
+#   * Maintains import state since Radarr/Sonarr does not natively support multi-part files.
+#   * Tracks files only for the current import sequence (clears on movie/series change).
+#   * Processes all associated extra files for the current destination.
+#
+# Technical operation:
+#   * Buffer stores information about source-destination relationships.
+#   * When multiple sources are found for one destination,
+#     Jellyfin compatible .pt[0-9] suffixes are applied.
+#   * Each file is processed through import_extra_files after renaming.
+#
+# Usage guide:
+#   * In Radarr/Sonarr manual import GUI, select multiple files for one destination.
+#   * Ensure all desired files are checked in the interface.
+#   * Disable "Delete Empty Folders" in Radarr/Sonarr settings to prevent conflicts.
+#   * To reimport with different sources, clear the buffer first by:
+#     - Importing a different movie/series.
+#     - Deleting and re-adding the current movie/series.
+#     - Restarting the container (automatically clears buffer).
+#
+# Arguments:
+#   $1 - JSON buffer file path
+#   $2 - Movie or series base folder of Radarr/Sonarr
+#   $3 - Destination file path
+#   $4 - Source file path
+# Outputs:
+#   Logs each hardlinked and copied file from import_file
+#   Logs each renamed and removed file from buffer_download_event
+###############################################################################
 function parted_download_event {
     local buffer="$1"
     local instance="$2"
