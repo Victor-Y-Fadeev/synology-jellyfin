@@ -23,6 +23,14 @@
 +victor.y.fadeev:x:1026:100::/var/services/homes/victor:/bin/sh
 ```
 
+```diff
+--- /etc/group
++++ /etc/group
+@@ -2 +2 @@
+-administrators:x:101:admin,victor
++administrators:x:101:admin,victor,victor.y.fadeev
+```
+
 ```shell
 $ chmod 755 ~/.ssh/authorized_keys
 $ sudo vim /etc/ssh/ca.pub
