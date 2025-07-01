@@ -37,7 +37,7 @@
       - [ ] `Apply rate limit to peers on LAN` -> `Off`
   - [ ] `BitTorrent`
     - [ ] `Max active checking torrents:` -> `-1`
-    - [ ] `Torrent Queueing` - > `Off`
+    - [ ] `Torrent Queueing` -> `Off`
   - [ ] `WebUI`
     - [ ] `Authentication`
       - [ ] `Username:` -> `admin`

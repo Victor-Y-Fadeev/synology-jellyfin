@@ -9,12 +9,12 @@
 	  - [ ] `Standard Movie Format` -> `{Movie Title} ({Release Year})`
 	  - [ ] `Movie Folder Format` -> `{Movie Title} ({Release Year}) [tmdbid-{TmdbId}]`
 	- [ ] `Folders`
-	  - [ ] `Create empty movie folders` - > `Off`
-	  - [ ] `Delete empty Folders` - > `Off`
+	  - [ ] `Create empty movie folders` -> `Off`
+	  - [ ] `Delete empty Folders` -> `Off`
 	- [ ] `Importing`
-	  - [ ] `Use Hardlinks instead of Copy` - > `On`
+	  - [ ] `Use Hardlinks instead of Copy` -> `On`
 	- [ ] `File Management`
-	  - [ ] `Unmonitor Deleted Movies` - > `On`
+	  - [ ] `Unmonitor Deleted Movies` -> `On`
 	  - [ ] `Propers and Repacks` -> `Do not Prefer`
 	- [ ] `Root Folders`
 	  - [ ] `/data/movies/anime`

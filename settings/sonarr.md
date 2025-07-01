@@ -14,12 +14,12 @@
 	  - [ ] `Specials Folder Format` -> `Specials`
 	  - [ ] `Multi Episode Style` -> `Range`
 	- [ ] `Folders`
-	  - [ ] `Create Empty Series Folders` - > `Off`
-	  - [ ] `Delete Empty Folders` - > `Off`
+	  - [ ] `Create Empty Series Folders` -> `Off`
+	  - [ ] `Delete Empty Folders` -> `Off`
 	- [ ] `Importing`
-	  - [ ] `Use Hardlinks instead of Copy` - > `On`
+	  - [ ] `Use Hardlinks instead of Copy` -> `On`
 	- [ ] `File Management`
-	  - [ ] `Unmonitor Deleted Episodes` - > `On`
+	  - [ ] `Unmonitor Deleted Episodes` -> `On`
 	  - [ ] `Propers and Repacks` -> `Do not Prefer`
 	- [ ] `Root Folders`
 	  - [ ] `/data/series/anime`
