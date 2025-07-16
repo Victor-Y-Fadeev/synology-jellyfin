@@ -103,3 +103,26 @@ services:
       - radarr
       - sonarr
       - jellyfin
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    extra_hosts:
+      synology.docker.internal: 172.20.0.1
+    env_file:
+      - ./.env
+    depends_on:
+      - qbittorrent
+      - radarr
+      - sonarr
+      - prowlarr
+      - jellyfin
+      - jellyseerr
+    command: tunnel run
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1

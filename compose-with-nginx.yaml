@@ -103,3 +103,30 @@ services:
       - radarr
       - sonarr
       - jellyfin
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    extra_hosts:
+      synology.docker.internal: 172.20.0.1
+    ports:
+      - 80:80
+      - 443:443
+      - 81:81
+    volumes:
+      - ./config/nginx-proxy-manager:/data
+      - ./config/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - qbittorrent
+      - radarr
+      - sonarr
+      - prowlarr
+      - jellyfin
+      - jellyseerr
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
