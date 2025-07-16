@@ -4,8 +4,6 @@
 config/
 data/
 
-.env
-
 settings/settings.md
 
 *.txt
