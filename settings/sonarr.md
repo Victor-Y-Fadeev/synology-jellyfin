@@ -61,7 +61,7 @@
 	  - [ ] `Password` -> `adminadmin`
 	- [ ] `Proxy`
 	  - [ ] `Use Proxy` -> `On`
-	  - [ ] `Proxy Type` -> `HTTP(S)`
+	  - [ ] `Proxy Type` -> `Socks5 (Support TOR)`
 	  - [ ] `Hostname` -> `sing-box`
 	  - [ ] `Port` -> `2080`
 	  - [ ] `Bypass Proxy for Local Addresses` -> `On`

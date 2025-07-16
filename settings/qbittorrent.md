@@ -24,6 +24,15 @@
       - [ ] `Maximum number of connections per torrent:` -> `Off`
       - [ ] `Global maximum number of upload slots:` -> `Off`
       - [ ] `Maximum number of upload slots per torrent:` -> `Off`
+    - [ ] `Proxy Server`
+      - [ ] `Type:` -> `SOCKS5`
+      - [ ] `Host:` -> `sing-box`
+      - [ ] `Port:` -> `2080`
+      - [ ] `Perform hostname lookup via proxy` -> `On`
+      - [ ] `Use proxy for BitTorrent purposes` -> `On`
+        - [ ] `Use proxy for peer connections` -> `Off`
+      - [ ] `Use proxy for RSS purposes` -> `On`
+      - [ ] `Use proxy for general purposes` -> `On`
   - [ ] `Speed`
     - [ ] `Global Rate Limits`
       - [ ] `Upload:` -> `0`
