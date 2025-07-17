@@ -1,1 +1,74 @@
 # <img src="https://fileres.synology.com/images/common/favicon/syno/icon-180x180.png" width="32"/> Synology
+
+- [ ] `Control Panel`
+  - [ ] `File Sharing`
+    - [ ] `File Services` -> `FTP` -> `SFTP`
+      - [ ] `Enable SFTP service` -> `On`
+      - [ ] `Port number:` -> `22`
+  - [ ] `Connectivity`
+    - [ ] `External Access`
+      - [ ] `QuickConnect` -> `General`
+        - [ ] `Enable QuickConnect` -> `On`
+        - [ ] `QuickConnect ID` -> `*`
+      - [ ] `DDNS` -> `Add`
+        - [ ] `Service Provider:` -> `Synology`
+        - [ ] `Hostname:` -> `*.synology.me`
+      - [ ] `Advanced`
+        - [ ] `Hostname or static IP:` -> `*.synology.me`
+        - [ ] `DSM (HTTP):` -> `80`
+        - [ ] `DSM (HTTPS):` -> `443`
+    - [ ] `Network` -> `General`
+      - [ ] `Server name:` -> `SYNOLOGY-DS723`
+      - [ ] `Manually configure DNS server` -> `On`
+          - [ ] `Preferred DNS server:` -> `8.8.8.8`
+          - [ ] `Alternative DNS server:` -> `8.8.4.4`
+    - [ ] `Security` -> `Certificate`
+      - [ ] `Add` -> `Add a new certificate` -> `Get a certificate from Let's Encrypt`
+        - [ ] `Description:` -> `Synology DDNS Certificate`
+        - [ ] `Set as default certificate` -> `On`
+        - [ ] `Domain name:` -> `*.synology.me`
+        - [ ] `Subject Alternative Name:` -> `*.*.synology.me`
+      - [ ] `Settings` -> `Configure`
+        - [ ] `Certificate` -> `*.synology.me`
+    - [ ] `Terminal & SNMP` -> `Terminal`
+      - [ ] `Enable SSH service` -> `On`
+      - [ ] `Port:` -> `22`
+  - [ ] `System`
+    - [ ] `Login Portal`
+      - [ ] `DSM`
+        - [ ] `Web Services`
+          - [ ] `DSM port (HTTP):` -> `5000`
+          - [ ] `DSM port (HTTPS):` -> `5001`
+          - [ ] `Automatically redirect HTTP connection to HTTPS for DSM desktop` -> `Off`
+        - [ ] `Domain`
+          - [ ] `Customized domain:` -> `*.synology.me`
+          - [ ] `Enabling HSTS forces browsers to use secured connections.` -> `On`
+      - [ ] `Applications`
+        - [ ] `File Station` -> `Edit`
+          - [ ] `Web Services`
+            - [ ] `Customized port (HTTP):` -> `7000`
+            - [ ] `Customized port (HTTPS):` -> `7001`
+          - [ ] `Domain`
+            - [ ] `Customized domain:` -> `file.*.synology.me`
+            - [ ] `Enabling HSTS forces browsers to use secured connections.` -> `On`
+        - [ ] `Synology Drive` -> `Edit`
+          - [ ] `Web Services`
+            - [ ] `Customized port (HTTP):` -> `10002`
+            - [ ] `Customized port (HTTPS):` -> `10003`
+          - [ ] `Domain`
+            - [ ] `Customized domain:` -> `drive.*.synology.me`
+            - [ ] `Enabling HSTS forces browsers to use secured connections.` -> `On`
+      - [ ] `Advanced`
+        - [ ] `Reverse Proxy` -> `Create`
+          - [ ] `Reverse Proxy Name:` -> `synology` / `file` / `drive`
+          - [ ] `Source`
+            - [ ] `Protocol:` -> `HTTPS`
+            - [ ] `Hostname:` -> `*` / `file.*` / `drive.*`
+            - [ ] `Port:` -> `443`
+            - [ ] `Enable HSTS` -> `On`
+          - [ ] `Destination`
+            - [ ] `Protocol:` -> `HTTP`
+            - [ ] `Hostname:` -> `localhost`
+            - [ ] `Port:` -> `5000` / `7000` / `10002`
+    - [ ] `Regional Options` -> `Language`
+      - [ ] `Display language:` -> `Russian`
