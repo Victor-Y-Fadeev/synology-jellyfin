@@ -14,12 +14,12 @@
 	  - [ ] `Specials Folder Format` -> `Specials`
 	  - [ ] `Multi Episode Style` -> `Range`
 	- [ ] `Folders`
-	  - [ ] `Create Empty Series Folders` - > `Off`
-	  - [ ] `Delete Empty Folders` - > `Off`
+	  - [ ] `Create Empty Series Folders` -> `Off`
+	  - [ ] `Delete Empty Folders` -> `Off`
 	- [ ] `Importing`
-	  - [ ] `Use Hardlinks instead of Copy` - > `On`
+	  - [ ] `Use Hardlinks instead of Copy` -> `On`
 	- [ ] `File Management`
-	  - [ ] `Unmonitor Deleted Episodes` - > `On`
+	  - [ ] `Unmonitor Deleted Episodes` -> `On`
 	  - [ ] `Propers and Repacks` -> `Do not Prefer`
 	- [ ] `Root Folders`
 	  - [ ] `/data/series/anime`
@@ -48,6 +48,8 @@
 		  - [ ] `On File Import` -> `On`
 		  - [ ] `On File Upgrade` -> `On`
 		  - [ ] `On Rename` -> `On`
+		  - [ ] `On Series Add` -> `On`
+		  - [ ] `On Series Delete` -> `On`
 		  - [ ] `On Episode File Delete` -> `On`
 		  - [ ] `On Episode File Delete For Upgrade` -> `On`
 		- [ ] `Path` -> [`/data/scripts/support_extra_files.sh`](https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/scripts/support_extra_files.sh)
@@ -59,7 +61,7 @@
 	  - [ ] `Password` -> `adminadmin`
 	- [ ] `Proxy`
 	  - [ ] `Use Proxy` -> `On`
-	  - [ ] `Proxy Type` -> `HTTP(S)`
+	  - [ ] `Proxy Type` -> `Socks5 (Support TOR)`
 	  - [ ] `Hostname` -> `sing-box`
 	  - [ ] `Port` -> `2080`
 	  - [ ] `Bypass Proxy for Local Addresses` -> `On`
