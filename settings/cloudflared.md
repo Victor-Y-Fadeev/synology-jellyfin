@@ -7,10 +7,13 @@
 -#PubkeyAuthentication yes
 +PubkeyAuthentication yes
 +TrustedUserCAKeys /etc/ssh/ca.pub
+@@ -57 +58 @@
+-PasswordAuthentication yes
++PasswordAuthentication no
 @@ -82 +83 @@ ChallengeResponseAuthentication no
 -UsePAM yes
 +UsePAM no
-@@ -86 +86 @@ UsePAM no
+@@ -85 +86 @@ UsePAM yes
 -AllowTcpForwarding no
 +AllowTcpForwarding yes
 @@ -124,0 +126,3 @@ Match User anonymous
@@ -35,6 +38,7 @@
 ```
 
 ```shell
+$ ln -s ~ ~/../victor.y.fadeev
 $ chmod 755 ~/.ssh/authorized_keys
 $ sudo vim /etc/ssh/ca.pub
 $ sudo chmod 600 /etc/ssh/ca.pub
