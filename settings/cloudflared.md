@@ -38,6 +38,7 @@
 ```
 
 ```shell
+$ ln -s ~ ~/../victor.y.fadeev
 $ chmod 755 ~/.ssh/authorized_keys
 $ sudo vim /etc/ssh/ca.pub
 $ sudo chmod 600 /etc/ssh/ca.pub
