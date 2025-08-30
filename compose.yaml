@@ -6,7 +6,6 @@ services:
     container_name: sing-box
     restart: unless-stopped
     volumes:
-      - /var/run/dbus:/var/run/dbus
       - ./config/sing-box:/etc/sing-box/
     ports:
       - 2080:2080
@@ -95,8 +94,6 @@ services:
     restart: unless-stopped
     env_file:
       - ./.env
-    dns:
-      - sing-box
     ports:
       - 5055:5055
     volumes:
