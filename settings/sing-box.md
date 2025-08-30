@@ -2,6 +2,35 @@
 
 ```json
 {
+  "dns": {
+    "servers": [
+      {
+        "type": "local",
+        "tag": "local"
+      },
+      {
+        "type": "udp",
+        "tag": "dns",
+        "server": "1.1.1.1",
+        "server_port": 53,
+        "detour": "proxy"
+      }
+    ],
+    "rules": [
+      {
+        "inbound": "proxy",
+        "server": "dns"
+      }
+    ]
+  },
+  "services": [
+    {
+      "type": "resolved",
+      "tag": "resolved",
+      "listen": "::",
+      "listen_port": 53
+    }
+  ],
   "inbounds": [
     {
       "type": "mixed",
