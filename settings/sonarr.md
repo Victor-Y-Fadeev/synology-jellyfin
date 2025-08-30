@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/Sonarr/Sonarr/refs/heads/develop/Logo/Sonarr.svg" width="32"/> [Sonarr](http://localhost:8989/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/sonarr.svg" width="32"/> [Sonarr](http://localhost:8989/)
 
 - [ ] `Settings` -> `Show Advanced`
   - [ ] `Media Management`

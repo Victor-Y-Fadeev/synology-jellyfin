@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/Prowlarr/Prowlarr/refs/heads/develop/Logo/Prowlarr.svg" width="32"/> [Prowlarr](http://localhost:9696/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/prowlarr.svg" width="32"/> [Prowlarr](http://localhost:9696/)
 
 - [ ] `Settings` -> `Show Advanced`
   - [ ] `Apps`

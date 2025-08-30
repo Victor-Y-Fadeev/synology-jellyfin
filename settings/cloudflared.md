@@ -1,4 +1,4 @@
-# <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png" width="32"/> [Cloudflare](https://one.dash.cloudflare.com/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/cloudflare.png" width="32"/> [Cloudflare](https://one.dash.cloudflare.com/)
 
 ```diff
 --- /etc/ssh/sshd_config

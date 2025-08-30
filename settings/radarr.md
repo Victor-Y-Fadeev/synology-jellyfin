@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/Radarr/Radarr/refs/heads/develop/Logo/Radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/radarr.svg" width="32"/> [Radarr](http://localhost:7878/)
 
 - [ ] `Settings` -> `Show Advanced`
   - [ ] `Media Management`
