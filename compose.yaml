@@ -88,28 +88,12 @@ services:
       - radarr
       - sonarr
 
-  coredns:
-    image: coredns/coredns:latest
-    container_name: coredns
-    restart: unless-stopped
-    environment:
-      - HTTP_PROXY=http://sing-box:2080
-      - HTTPS_PROXY=http://sing-box:2080
-    ports:
-      - 53:53
-      - 53:53/udp
-    volumes:
-      - ./config/coredns/Corefile:/Corefile
-    depends_on:
-      - sing-box
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: unless-stopped
     env_file:
       - ./.env
-    dns:
-      - coredns
     ports:
       - 5055:5055
     volumes:
