@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/SVG/icon-transparent.svg" width="32"/> [Jellyfin](http://localhost:8096/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/jellyfin.svg" width="32"/> [Jellyfin](http://localhost:8096/)
 
 - [ ] `Administration` -> `Dashboard`
   - [ ] `Plugins`

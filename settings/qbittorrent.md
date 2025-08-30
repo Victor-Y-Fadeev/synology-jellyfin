@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent-tray.svg" width="32"/> [qBittorrent](http://localhost:8080/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/qbittorrent.svg" width="32"/> [qBittorrent](http://localhost:8080/)
 
 - [ ] `Tools` -> `Options...`
   - [ ] `Behavior`

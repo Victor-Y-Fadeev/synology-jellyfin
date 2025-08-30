@@ -1,4 +1,4 @@
-# <img src="https://fileres.synology.com/images/common/favicon/syno/icon-180x180.png" width="32"/> Synology
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/synology.png" width="32"/> Synology
 
 - [ ] `Control Panel`
   - [ ] `File Sharing`
