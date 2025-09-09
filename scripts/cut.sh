@@ -65,9 +65,22 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 # prev_key_frame "$INPUT" "$FROM"
 
 
-# ffmpeg -y -hide_banner -i "$INPUT" -ss "$FROM" -to "$NEXT" -map 0 -c:v libx264 -qp 0 -g 1 -c:a copy -c:s copy "[${FROM}, ${NEXT}).mkv"
-# ffmpeg -y -hide_banner -i "$INPUT" -ss "$NEXT" -to "$PREV" -map 0 -c copy "[${NEXT}, ${PREV}).mkv"
-# ffmpeg -y -hide_banner -i "$INPUT" -ss "$PREV" -to "$TO"   -map 0 -c:v libx264 -qp 0 -g 1 -c:a copy -c:s copy "[${PREV}, ${TO}).mkv"
+# ffmpeg -y -hide_banner -i "$INPUT" -ss "$FROM" -to "$NEXT" -map 0:v -c:v libx264 -crf 1 -g 1 -x264-params repeat-headers=1 -bsf:v h264_mp4toannexb -f mpegts "A.ts"
+# ffmpeg -y -hide_banner -i "$INPUT" -ss "$NEXT" -to "$PREV" -map 0:v -c:v copy -fflags +genpts -avoid_negative_ts make_zero -bsf:v h264_mp4toannexb -f mpegts "B.ts"
+# ffmpeg -y -hide_banner -i "$INPUT" -ss "$PREV" -to "$TO"   -map 0:v -c:v libx264 -crf 1 -g 1 -x264-params repeat-headers=1 -bsf:v h264_mp4toannexb -f mpegts "C.ts"
+
+# cat A.ts B.ts C.ts > V.ts
+
+# ffmpeg -y -hide_banner -i V.ts -map 0:v -c:v copy V.mkv
+
+cat > center.txt <<EOF
+file '$INPUT'
+inpoint $NEXT
+outpoint $PREV
+EOF
+
+ffmpeg -y -hide_banner -f concat -safe 0 -i center.txt -map 0:v -c:v copy -f mpegts B.ts
+
 
 # echo "file '[${FROM}, ${NEXT}).mkv'" > list.txt
 # echo "file '[${NEXT}, ${PREV}).mkv'" >> list.txt
@@ -151,19 +164,19 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 # --------------------------------------------------------------------
 
 # A -> TS
-ffmpeg -y -hide_banner -i A.mkv \
-  -map 0:v -map 0:a? -c:v copy -c:a copy \
-  -bsf:v h264_mp4toannexb -f mpegts A.ts
+# ffmpeg -y -hide_banner -i A.mkv \
+#   -map 0:v -map 0:a? -c:v copy -c:a copy \
+#   -bsf:v h264_mp4toannexb -f mpegts A.ts
 
-# B -> TS
-ffmpeg -y -hide_banner -i B.mkv \
-  -map 0:v -map 0:a? -c:v copy -c:a copy \
-  -bsf:v h264_mp4toannexb -f mpegts B.ts
+# # B -> TS
+# ffmpeg -y -hide_banner -i B.mkv \
+#   -map 0:v -map 0:a? -c:v copy -c:a copy \
+#   -bsf:v h264_mp4toannexb -f mpegts B.ts
 
-# байтовая склейка
-cat A.ts B.ts > AB.ts
+# # байтовая склейка
+# cat A.ts B.ts > AB.ts
 
-# ремультиплекс обратно в MKV
-ffmpeg -y -hide_banner -i AB.ts \
-  -c copy -bsf:v h264_metadata=aud=insert -fflags +genpts -avoid_negative_ts make_zero \
-  "A_B.mkv"
+# # ремультиплекс обратно в MKV
+# ffmpeg -y -hide_banner -i AB.ts \
+#   -c copy -bsf:v h264_metadata=aud=insert -fflags +genpts -avoid_negative_ts make_zero \
+#   "A_B.mkv"
