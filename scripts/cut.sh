@@ -56,11 +56,14 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 # info "$INPUT"
+BEFORE="$(prev_key_frame "$INPUT" "$FROM")"
 NEXT="$(next_key_frame "$INPUT" "$FROM")"
 PREV="$(prev_key_frame "$INPUT" "$TO")"
+AFTER="$(next_key_frame "$INPUT" "$TO")"
 
-echo "[${FROM}, ${NEXT}) - All-I recoding"
-echo "[${NEXT}, ${TO}) - Copy"
+echo "[${BEFORE}, ${NEXT}) - All-I recoding"
+echo "[${FROM}, ${NEXT}) - Cut"
+echo "[${NEXT}, ${PREV}) - Copy"
 echo "[${PREV}, ${TO}) - All-I recoding"
 # prev_key_frame "$INPUT" "$FROM"
 
@@ -73,14 +76,101 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 
 # ffmpeg -y -hide_banner -i V.ts -map 0:v -c:v copy V.mkv
 
+# cat > center.txt <<EOF
+# file '$INPUT'
+# inpoint $NEXT
+# outpoint $PREV
+# EOF
+
+# ffmpeg -y -hide_banner -f concat -safe 0 -i center.txt -map 0:v -c:v copy -f mpegts B.ts
+
+# --------------------------------------------------------------------
+
+
+cat > left.txt <<EOF
+file '$INPUT'
+inpoint $BEFORE
+outpoint $NEXT
+EOF
+
+# ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i left.txt -map 0:v -c:v libx264 -crf 1 -g 1 -f mpegts A.ts
+
+FPS="$(ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate -of csv=p=0 "$INPUT")"
+echo "FPS: ${FPS}"
+
+
+START_REL="0$(bc <<< "$FROM - $BEFORE")"
+END_REL="0$(bc <<< "$NEXT - $BEFORE")"
+echo "START_REL: ${START_REL}"
+echo "END_REL: ${END_REL}"
+echo "EXPECTED DURATION: 0$(bc <<< "$NEXT - $FROM")"
+
+ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i left.txt \
+  -map 0:v \
+  -vf "setpts=PTS-STARTPTS,trim=start=${START_REL}:end=${END_REL},setpts=PTS-STARTPTS" \
+  -c:v libx264 -crf 1 -g 1 -f mpegts A.ts
+
+# exit 0
+
+P_NEXT="00:01:40.141"
+P_NEXT="$(date --date "1970-01-01T${P_NEXT}Z" +%s.%N)"
+
+
 cat > center.txt <<EOF
 file '$INPUT'
 inpoint $NEXT
-outpoint $PREV
+outpoint $P_NEXT
 EOF
 
-ffmpeg -y -hide_banner -f concat -safe 0 -i center.txt -map 0:v -c:v copy -f mpegts B.ts
+echo "EXPECTED DURATION: 0$(bc <<< "$P_NEXT - $NEXT")"
+ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i center.txt -map 0:v -c:v copy \
+ -f mpegts B.ts
 
+cat > right.txt <<EOF
+file '$INPUT'
+inpoint $PREV
+outpoint $AFTER
+EOF
+
+START_REL="0$(bc <<< "$P_NEXT - $PREV")"
+END_REL="0$(bc <<< "$TO - $PREV")"
+echo "START_REL: ${START_REL}"
+echo "END_REL: ${END_REL}"
+
+
+ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i right.txt \
+  -map 0:v \
+  -vf "setpts=PTS-STARTPTS,trim=start=${START_REL}:end=${END_REL},setpts=PTS-STARTPTS" \
+  -c:v libx264 -crf 1 -g 1 -f mpegts C.ts
+
+
+echo "FULL DURATION: 0$(bc <<< "$TO - $FROM")"
+
+cat > merge.txt <<EOF
+file A.ts
+file B.ts
+file C.ts
+EOF
+
+ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i merge.txt -map 0:v -c:v copy V.mkv
+
+
+
+ffprobe -v error -select_streams v:0 -show_entries frame=pts_time,pict_type -of csv=p=0 V.mkv \
+  | awk 'NR>1{d=$1-p; if(d>0.06) printf "GAP %.3f at %s -> %s\n", d, p, $1; } {p=$1}'
+
+
+# ffmpeg -y -hide_banner -i "concat:A.ts|B.ts" \
+#   -map 0:v:0 -c:v copy \
+#   -bsf:v h264_metadata=aud=insert \
+#   -fflags +genpts -avoid_negative_ts make_zero \
+#   V.mkv
+
+
+
+
+
+# --------------------------------------------------------------------
 
 # echo "file '[${FROM}, ${NEXT}).mkv'" > list.txt
 # echo "file '[${NEXT}, ${PREV}).mkv'" >> list.txt
