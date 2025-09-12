@@ -95,11 +95,27 @@ function prev_predicted_frame {
 
 
 function cut_video_recoding {
-    echo
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local config="${WORKDIR}/${from}-${to}.txt"
+    local output="${WORKDIR}/${from}-${to}.ts"
+
+
+    echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
 
 function cut_video_copy {
-    echo
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local config="${WORKDIR}/${from}-${to}.txt"
+    local output="${WORKDIR}/${from}-${to}.ts"
+
+
+    echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
 
 function cut_video {
@@ -107,18 +123,23 @@ function cut_video {
     local from="$2"
     local to="$3"
 
-    local begin="$(next_intra_frame "${input}" "${from}")"
-    if [[ -z "${begin}" ]] || (( $(bc <<< "${to} <= ${begin}") )); then
+    local start="$(next_intra_frame "${input}" "${from}")"
+    if [[ -z "${start}" ]] || [[ -n "${to}" ]] && (( $(bc <<< "${to} <= ${start}") )); then
         cut_video_recoding "${input}" "${from}" "${to}"
         return
-    elif (( $(bc <<< "${from} < ${begin}") )); then
-        cut_video_recoding "${input}" "${from}" "${begin}"
+    elif (( $(bc <<< "${from} < ${start}") )); then
+        cut_video_recoding "${input}" "${from}" "${start}"
+    fi
+
+    if [[ -z "${to}" ]]; then
+        cut_video_copy "${input}" "${start}"
+        return
     fi
 
     local prev="$(prev_predicted_frame "${input}" "${to}")"
     local end="$(next_frame "${input}" "${prev}")"
-    if (( $(bc <<< "${begin} < ${prev}") )); then
-        cut_video_copy "${input}" "${begin}" "${end}"
+    if (( $(bc <<< "${start} < ${prev}") )); then
+        cut_video_copy "${input}" "${start}" "${end}"
     fi
 
     if (( $(bc <<< "${end} < ${to}") )); then
@@ -158,18 +179,29 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 TEST="00:23:28.073"
 TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
 
-echo "TEST: ${TEST}"
-echo "NEXT: $(next_intra_frame "$INPUT" "$TEST")"
-echo "PREV: $(prev_intra_frame "$INPUT" "$TEST")"
+# echo "TEST: ${TEST}"
+# echo "NEXT: $(next_intra_frame "$INPUT" "$TEST")"
+# echo "PREV: $(prev_intra_frame "$INPUT" "$TEST")"
 
-R="100500"
-if [[ -z "$R" ]] || (( $(bc <<< "${TEST} > ${R}") )); then
-    echo "R="recoding""
-    echo "$(bc <<< "${TEST} < ${R}")"
+# prev_predicted_frame "$INPUT" ""
+
+# R="100500"
+# L="x"
+# if [[ -z "$R" || -n "$L" ]] && (( $(bc <<< "${TEST} < ${R}") )); then
+#     echo "R="recoding""
+#     echo "$(bc <<< "${TEST} < ${R}")"
+# fi
+
+# next_intra_frame "$INPUT" "0.0"
+
+A="A"
+B=""
+
+if [[ -z "${A}" ]] || [[ -n "${B}" ]] && (( 1 )); then
+    echo "true"
+else
+    echo "false"
 fi
-
-next_intra_frame "$INPUT" "0.0"
-
 
 exit 0
 
