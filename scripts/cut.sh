@@ -3,6 +3,8 @@
 set -e
 
 DELTA="30"
+EPSILON="0.000001"
+GAP="0.001"
 
 # INPUT="$(realpath "$1")"
 
@@ -10,7 +12,38 @@ DELTA="30"
 # TO="$(date --date "1970-01-01T${3}Z" +%s.%N)"
 
 
-function next_key_frame {
+function info {
+    ffprobe -loglevel quiet -select_streams v:0 -show_streams -print_format json "$1"
+}
+
+function check_gap {
+    local input="$1"
+    local gap="${2:-$GAP}"
+
+    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -print_format json "${input}" \
+        | jq --arg gap "${gap}" '
+            def step($prev; $next):
+                { prev: $prev, next: $next, diff: (if $prev | type == "object" then
+                    ($next.diff - $prev.diff) * 1000 | round / 1000
+                else
+                    ($next - $prev) * 1000 | round / 1000
+                end )};
+
+            def diff:
+                reduce .[1:][] as $item ({ prev: .[0], out: [] };
+                    .out += [step(.prev; $item)]
+                    | .prev = $item
+                ) | .out;
+
+            .frames | map(.pts_time | tonumber) | diff | diff
+                    | map(select(.diff > ($gap | tonumber)) | if .prev.diff > 0 then
+                            { time: .next.prev, duration: .next.diff, gap: .diff }
+                        else
+                            { time: .prev.prev, duration: .prev.diff, gap: .diff }
+                        end)'
+}
+
+function next_intra_frame {
     local input="$1"
     local time="$2"
 
@@ -20,27 +53,48 @@ function next_key_frame {
             first(inputs[1] | select(type == "string" and tonumber >= ($time | tonumber)))'
 }
 
-function prev_key_frame {
+function next_frame {
+    local input="$1"
+    local time="$2"
+
+    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -print_format json \
+            -read_intervals "${time}%" "${input}" \
+        | jq --null-input --raw-output --stream --arg time "${time}" '
+            first(inputs[1] | select(type == "string" and tonumber > ($time | tonumber)))'
+}
+
+function prev_intra_frame {
     local input="$1"
     local time="$2"
 
     local delta="${3:-$DELTA}"
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
+    time="0$(bc <<< "${time} + ${EPSILON}")"
 
     ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
         | jq --raw-output --arg time "${time}" '.frames | map(.pts_time | tonumber) | max'
 }
 
-function info {
-    ffprobe -loglevel quiet -select_streams v:0 -show_streams -print_format json "$1"
+function prev_predicted_frame {
+    local input="$1"
+    local time="$2"
+
+    local delta="${3:-$DELTA}"
+    local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
+    time="0$(bc <<< "${time} + ${EPSILON}")"
+
+    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time,pict_type -print_format json \
+            -read_intervals "${start}%${time}" "${input}" \
+        | jq --raw-output --arg time "${time}" '
+            .frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max'
 }
 
 
 # TIME="10.600"
 
-# next_key_frame "$INPUT" "$TIME"
-# prev_key_frame "$INPUT" "$TIME"
+# next_intra_frame "$INPUT" "$TIME"
+# prev_intra_frame "$INPUT" "$TIME"
 
 # --------------------------------------------------------------------
 
@@ -56,16 +110,27 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 # info "$INPUT"
-BEFORE="$(prev_key_frame "$INPUT" "$FROM")"
-NEXT="$(next_key_frame "$INPUT" "$FROM")"
-PREV="$(prev_key_frame "$INPUT" "$TO")"
-AFTER="$(next_key_frame "$INPUT" "$TO")"
+BEFORE="$(prev_intra_frame "$INPUT" "$FROM")"
+NEXT="$(next_intra_frame "$INPUT" "$FROM")"
+PREV="$(prev_intra_frame "$INPUT" "$TO")"
+AFTER="$(next_intra_frame "$INPUT" "$TO")"
 
 echo "[${BEFORE}, ${NEXT}) - All-I recoding"
 echo "[${FROM}, ${NEXT}) - Cut"
 echo "[${NEXT}, ${PREV}) - Copy"
 echo "[${PREV}, ${TO}) - All-I recoding"
-# prev_key_frame "$INPUT" "$FROM"
+
+# P="$(prev_predicted_frame "$INPUT" "$TO")"
+# echo "P: ${P}"
+prev_predicted_frame "$INPUT" "101.184"
+next_intra_frame "$INPUT" "$NEXT"
+
+
+P_NEXT="00:01:40.141"
+P_NEXT="$(date --date "1970-01-01T${P_NEXT}Z" +%s.%N)"
+echo "P_NEXT: ${P_NEXT}"
+next_frame "$INPUT" "$PREV"
+# prev_intra_frame "$INPUT" "$FROM"
 
 
 # ffmpeg -y -hide_banner -i "$INPUT" -ss "$FROM" -to "$NEXT" -map 0:v -c:v libx264 -crf 1 -g 1 -x264-params repeat-headers=1 -bsf:v h264_mp4toannexb -f mpegts "A.ts"
@@ -76,6 +141,8 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 
 # ffmpeg -y -hide_banner -i V.ts -map 0:v -c:v copy V.mkv
 
+# check_gap "V.mkv"
+
 # cat > center.txt <<EOF
 # file '$INPUT'
 # inpoint $NEXT
@@ -84,6 +151,8 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 
 # ffmpeg -y -hide_banner -f concat -safe 0 -i center.txt -map 0:v -c:v copy -f mpegts B.ts
 
+# --------------------------------------------------------------------
+exit 0
 # --------------------------------------------------------------------
 
 
@@ -107,10 +176,10 @@ echo "EXPECTED DURATION: 0$(bc <<< "$NEXT - $FROM")"
 
 ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i left.txt \
   -map 0:v \
-  -vf "setpts=PTS-STARTPTS,trim=start=${START_REL}:end=${END_REL},setpts=PTS-STARTPTS" \
+  -vf "trim=start=${START_REL}:end=${END_REL},setpts=PTS-STARTPTS" \
   -c:v libx264 -crf 1 -g 1 -f mpegts A.ts
 
-# exit 0
+exit 0
 
 P_NEXT="00:01:40.141"
 P_NEXT="$(date --date "1970-01-01T${P_NEXT}Z" +%s.%N)"
@@ -140,7 +209,7 @@ echo "END_REL: ${END_REL}"
 
 ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i right.txt \
   -map 0:v \
-  -vf "setpts=PTS-STARTPTS,trim=start=${START_REL}:end=${END_REL},setpts=PTS-STARTPTS" \
+  -vf "trim=start=${START_REL}:end=${END_REL}" \
   -c:v libx264 -crf 1 -g 1 -f mpegts C.ts
 
 
@@ -154,10 +223,35 @@ EOF
 
 ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i merge.txt -map 0:v -c:v copy V.mkv
 
+check_gap "V.mkv"
 
 
-ffprobe -v error -select_streams v:0 -show_entries frame=pts_time,pict_type -of csv=p=0 V.mkv \
-  | awk 'NR>1{d=$1-p; if(d>0.06) printf "GAP %.3f at %s -> %s\n", d, p, $1; } {p=$1}'
+# ffprobe -v error -select_streams v:0 -show_entries frame=pts_time,pict_type -of csv=p=0 V.mkv \
+#   | awk 'NR>1{d=$1-p; if(d>0.06) printf "GAP %.3f at %s -> %s\n", d, p, $1; } {p=$1}'
+
+
+# echo '[89.172000, 89.213000, 89.256000, 89.298000]' |  jq --exit-status '
+#     def step($prev; $next):
+#         { prev: $prev, next: $next, diff: (if $prev | type == "object" then
+#             ($next.diff - $prev.diff) * 1000 | round / 1000
+#         else
+#             ($next - $prev) * 1000 | round / 1000
+#         end )};
+
+#     def diff:
+#         reduce .[1:][] as $item ({ prev: .[0], out: [] };
+#             .out += [step(.prev; $item)]
+#             | .prev = $item
+#         ) | .out;
+
+# diff | diff | map(select(.diff > 0.0015) | { time: .next.prev, duration: .next.diff, gap: .diff })'
+
+# echo "'$?'"
+
+# check_gap "V.mkv"
+
+# echo "'$?'"
+
 
 
 # ffmpeg -y -hide_banner -i "concat:A.ts|B.ts" \
