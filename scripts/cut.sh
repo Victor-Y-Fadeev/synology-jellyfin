@@ -2,6 +2,7 @@
 
 set -e
 
+
 DELTA="30"
 EPSILON="0.000001"
 GAP="0.001"
@@ -45,6 +46,7 @@ function check_gap {
                             { time: .prev.prev, duration: .prev.diff, gap: .diff }
                         end)'
 }
+
 
 function next_frame {
     local input="$1"
@@ -129,8 +131,16 @@ function cut_video_copy {
     local to="$3"
 
     local config="${WORKDIR}/video-${from}-${to}.txt"
-    local output="${WORKDIR}/video-${from}-${to}.ts"
+    echo "file '${input}'" > "${config}"
 
+    echo "inpoint ${from}" >> "${config}"
+    if [[ -n "${to}" ]]; then
+        echo "outpoint ${to}" >> "${config}"
+    fi
+
+    local output="${WORKDIR}/video-${from}-${to}.ts"
+    ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "${config}" \
+        -map 0:v -c:v copy -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -192,6 +202,16 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 
+cut_video "$INPUT" "$FROM" "$TO"
+merge_video
+echo "$WORKDIR"
+check_gap "${WORKDIR}/video.mkv"
+
+exit 0
+
+
+
+
 
 TEST="00:23:28.073"
 TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
@@ -229,8 +249,6 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 cut_video_recoding "$INPUT" "$FROM" "$TO"
 echo "$WORKDIR"
 
-
-exit 0
 
 
 
