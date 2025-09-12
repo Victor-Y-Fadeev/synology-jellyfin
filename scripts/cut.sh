@@ -6,6 +6,9 @@ DELTA="30"
 EPSILON="0.000001"
 GAP="0.001"
 
+WORKDIR="$(mktemp --directory)"
+VIDEO_CONCAT="${WORKDIR}/video.txt"
+
 # INPUT="$(realpath "$1")"
 
 # FROM="$(date --date "1970-01-01T${2}Z" +%s.%N)"
@@ -43,16 +46,6 @@ function check_gap {
                         end)'
 }
 
-function next_intra_frame {
-    local input="$1"
-    local time="$2"
-
-    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -skip_frame nokey -print_format json \
-            -read_intervals "${time}%" "${input}" \
-        | jq --null-input --raw-output --stream --arg time "${time}" '
-            first(inputs[1] | select(type == "string" and tonumber >= ($time | tonumber)))'
-}
-
 function next_frame {
     local input="$1"
     local time="$2"
@@ -63,13 +56,23 @@ function next_frame {
             first(inputs[1] | select(type == "string" and tonumber > ($time | tonumber)))'
 }
 
+function next_intra_frame {
+    local input="$1"
+    local time="$2"
+
+    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -skip_frame nokey -print_format json \
+            -read_intervals "${time}%" "${input}" \
+        | jq --null-input --raw-output --stream --arg time "${time}" '
+            first(inputs[1] | select(type == "string" and tonumber >= ($time | tonumber)))'
+}
+
 function prev_intra_frame {
     local input="$1"
     local time="$2"
 
     local delta="${3:-$DELTA}"
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
-    time="0$(bc <<< "${time} + ${EPSILON}")"
+    # time="0$(bc <<< "${time} + ${EPSILON}")"
 
     ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
@@ -82,13 +85,54 @@ function prev_predicted_frame {
 
     local delta="${3:-$DELTA}"
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
-    time="0$(bc <<< "${time} + ${EPSILON}")"
+    # time="0$(bc <<< "${time} + ${EPSILON}")"
 
     ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time,pict_type -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
         | jq --raw-output --arg time "${time}" '
             .frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max'
 }
+
+
+function cut_video_recoding {
+    echo
+}
+
+function cut_video_copy {
+    echo
+}
+
+function cut_video {
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local begin="$(next_intra_frame "${input}" "${from}")"
+    if [[ -z "${begin}" ]] || (( $(bc <<< "${to} <= ${begin}") )); then
+        cut_video_recoding "${input}" "${from}" "${to}"
+        return
+    elif (( $(bc <<< "${from} < ${begin}") )); then
+        cut_video_recoding "${input}" "${from}" "${begin}"
+    fi
+
+    local prev="$(prev_predicted_frame "${input}" "${to}")"
+    local end="$(next_frame "${input}" "${prev}")"
+    if (( $(bc <<< "${begin} < ${prev}") )); then
+        cut_video_copy "${input}" "${begin}" "${end}"
+    fi
+
+    if (( $(bc <<< "${end} < ${to}") )); then
+        cut_video_recoding "${input}" "${end}" "${to}"
+    fi
+}
+
+function merge_video {
+    local video_output="${WORKDIR}/video.mkv"
+    ffmpeg -y -hide_banner -loglevel warning -stats \
+        -f concat -safe 0 -i "${VIDEO_CONCAT}" -map 0:v -c:v copy "${video_output}"
+}
+
+
 
 
 # TIME="10.600"
@@ -109,6 +153,27 @@ TO="00:01:41.309"
 FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
+
+
+TEST="00:23:28.073"
+TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
+
+echo "TEST: ${TEST}"
+echo "NEXT: $(next_intra_frame "$INPUT" "$TEST")"
+echo "PREV: $(prev_intra_frame "$INPUT" "$TEST")"
+
+R="100500"
+if [[ -z "$R" ]] || (( $(bc <<< "${TEST} > ${R}") )); then
+    echo "R="recoding""
+    echo "$(bc <<< "${TEST} < ${R}")"
+fi
+
+next_intra_frame "$INPUT" "0.0"
+
+
+exit 0
+
+
 # info "$INPUT"
 BEFORE="$(prev_intra_frame "$INPUT" "$FROM")"
 NEXT="$(next_intra_frame "$INPUT" "$FROM")"
@@ -122,7 +187,7 @@ echo "[${PREV}, ${TO}) - All-I recoding"
 
 # P="$(prev_predicted_frame "$INPUT" "$TO")"
 # echo "P: ${P}"
-prev_predicted_frame "$INPUT" "101.184"
+prev_predicted_frame "$INPUT" "$TO"
 next_intra_frame "$INPUT" "$NEXT"
 
 
