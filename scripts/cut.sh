@@ -99,9 +99,26 @@ function cut_video_recoding {
     local from="$2"
     local to="$3"
 
-    local config="${WORKDIR}/${from}-${to}.txt"
-    local output="${WORKDIR}/${from}-${to}.ts"
+    local config="${WORKDIR}/video-${from}-${to}.txt"
+    echo "file '${input}'" > "${config}"
 
+    local prev="$(prev_intra_frame "${input}" "${from}")"
+    echo "inpoint ${prev}" >> "${config}"
+
+    local next="$(next_intra_frame "${input}" "${from}")"
+    if [[ -n "${next}" ]]; then
+        echo "outpoint ${next}" >> "${config}"
+    fi
+
+    local filter="trim=start=0$(bc <<< "$from - $prev")"
+    if [[ -n "${to}" ]]; then
+        filter="${filter}:end=0$(bc <<< "$to - $prev")"
+    fi
+
+    local output="${WORKDIR}/video-${from}-${to}.ts"
+    ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "${config}" \
+        -map 0:v -vf "${filter},setpts=PTS-STARTPTS" \
+        -c:v libx264 -crf 1 -g 1 -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -111,8 +128,8 @@ function cut_video_copy {
     local from="$2"
     local to="$3"
 
-    local config="${WORKDIR}/${from}-${to}.txt"
-    local output="${WORKDIR}/${from}-${to}.ts"
+    local config="${WORKDIR}/video-${from}-${to}.txt"
+    local output="${WORKDIR}/video-${from}-${to}.ts"
 
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
@@ -194,16 +211,6 @@ TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
 
 # next_intra_frame "$INPUT" "0.0"
 
-A="A"
-B=""
-
-if [[ -z "${A}" ]] || [[ -n "${B}" ]] && (( 1 )); then
-    echo "true"
-else
-    echo "false"
-fi
-
-exit 0
 
 
 # info "$INPUT"
@@ -216,6 +223,16 @@ echo "[${BEFORE}, ${NEXT}) - All-I recoding"
 echo "[${FROM}, ${NEXT}) - Cut"
 echo "[${NEXT}, ${PREV}) - Copy"
 echo "[${PREV}, ${TO}) - All-I recoding"
+
+
+
+cut_video_recoding "$INPUT" "$FROM" "$TO"
+echo "$WORKDIR"
+
+
+exit 0
+
+
 
 # P="$(prev_predicted_frame "$INPUT" "$TO")"
 # echo "P: ${P}"
