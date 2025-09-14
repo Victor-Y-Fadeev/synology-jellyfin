@@ -5,9 +5,10 @@ set -e
 
 DELTA="30"
 EPSILON="0.000001"
-GAP="0.001"
+GAP="0.002"
 
-WORKDIR="$(mktemp --directory)"
+# WORKDIR="$(mktemp --directory)"
+WORKDIR="$(realpath .)"
 VIDEO_CONCAT="${WORKDIR}/video.txt"
 
 # INPUT="$(realpath "$1")"
@@ -24,7 +25,7 @@ function check_gap {
     local input="$1"
     local gap="${2:-$GAP}"
 
-    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -print_format json "${input}" \
+    ffprobe -loglevel quiet -select_streams a:0 -show_entries frame=pts_time -print_format json "${input}" \
         | jq --arg gap "${gap}" '
             def step($prev; $next):
                 { prev: $prev, next: $next, diff: (if $prev | type == "object" then
@@ -202,12 +203,114 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 
-cut_video "$INPUT" "$FROM" "$TO"
-merge_video
-echo "$WORKDIR"
-check_gap "${WORKDIR}/video.mkv"
+# rm "$VIDEO_CONCAT"
+# cut_video "$INPUT" "$FROM" "$TO"
+# merge_video
+# echo "$WORKDIR"
+# check_gap "${WORKDIR}/video.mkv"
+
+
+# ffmpeg -y -hide_banner -loglevel warning -stats \
+#   -i "$INPUT" -map 0:a? -map 0:s? -c copy "source.mkv"
+
+# echo "file 'source.mkv'" > "audio.txt"
+# echo "inpoint $FROM" >> "audio.txt"
+# echo "outpoint $TO" >> "audio.txt"
+
+
+# ffmpeg -y -hide_banner -loglevel warning -stats \
+#     -f concat -safe 0 -i "audio.txt" -map 0 -c copy "audio.mkv"
+
+
+ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name -print_format json "$INPUT" \
+    | jq --raw-output '.streams[] | .codec_name'
+exit 0
+
+# --------------------------------------------------------------------
+
+ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  10.969 -to  15.015 -map 0:a:0 -c copy -f adts a0_1.aac
+ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  15.015 -to 101.226 -map 0:a:0 -c copy -f adts a0_2.aac
+ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss 101.226 -to 101.309 -map 0:a:0 -c copy -f adts a0_3.aac
+
+cat a0_1.aac a0_2.aac a0_3.aac > a0_cat.aac
+ffmpeg -y -hide_banner -loglevel warning -stats -i a0_cat.aac -c copy a0.mka
+
+# echo "file 'a0_1.aac'" > "a0.txt"
+# echo "file 'a0_2.aac'" >> "a0.txt"
+# echo "file 'a0_3.aac'" >> "a0.txt"
+
+# ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "a0.txt" -map 0:a -c:a copy "a0.mka"
+# ffmpeg -y -hide_banner -loglevel warning -stats -i "concat:a0_1.aac|a0_2.aac|a0_3.aac" -c copy a0.mka
+
+check_gap a0.mka
 
 exit 0
+
+
+# --------------------------------------------------------------------
+
+check_gap audio-file-*.mkv
+check_gap audio-concat-*.mkv
+check_gap audio-cut-*.mkv
+
+exit 0
+
+# --------------------------------------------------------------------
+
+ffmpeg -y -hide_banner -loglevel warning -stats \
+    -i "$INPUT" -ss "10.969" -to "15.015" -map 0:a? -map 0:s? -c copy "audio-10.969-15.015.mkv"
+
+ffmpeg -y -hide_banner -loglevel warning -stats \
+    -i "$INPUT" -ss "15.015" -to "101.226" -map 0:a? -map 0:s? -c copy "audio-15.015-101.226.mkv"
+
+ffmpeg -y -hide_banner -loglevel warning -stats \
+    -i "$INPUT" -ss "101.226" -to "101.309" -map 0:a? -map 0:s? -c copy "audio-101.226-101.309.mkv"
+
+echo "file 'audio-10.969-15.015.mkv'" > "audio.txt"
+echo "file 'audio-15.015-101.226.mkv'" >> "audio.txt"
+echo "file 'audio-101.226-101.309.mkv'" >> "audio.txt"
+
+ffmpeg -y -hide_banner -loglevel warning -stats \
+    -f concat -safe 0 -i "audio.txt" -map 0 -c copy "audio-file-10.969-15.015-101.226-101.309.mkv"
+
+ffmpeg -y -hide_banner -loglevel warning -stats \
+    -i "concat:audio-10.969-15.015.mkv|audio-15.015-101.226.mkv|audio-101.226-101.309.mkv" \
+    -map 0 -c copy "audio-concat-10.969-15.015-101.226-101.309.mkv"
+
+ffmpeg -y -hide_banner -loglevel warning -stats \
+    -i "$INPUT" -ss "10.969" -to "101.309" -map 0:a? -map 0:s? -c copy "audio-cut-10.969-101.309.mkv"
+
+exit 0
+
+# --------------------------------------------------------------------
+
+# cat > audio_subs.txt <<EOF
+# file '$INPUT'
+# inpoint 10.969000000
+# outpoint 15.015000
+# file '$INPUT'
+# inpoint 15.015000
+# outpoint 101.226000
+# file '$INPUT'
+# inpoint 101.226000
+# outpoint 101.309000000
+# EOF
+
+# ffmpeg -y -hide_banner -loglevel warning -stats \
+#   -f concat -safe 0 -i audio_subs.txt \
+#   -map 0 -map -0:v -map -0:t -dn \
+#   -c copy \
+#   -fflags +genpts -avoid_negative_ts make_zero -muxpreload 0 -muxdelay 0 \
+#   audio_subs.mkv
+
+# ffmpeg -y -hide_banner -loglevel warning -stats \
+#     -i "$INPUT" -ss "$FROM" -to "$TO" -map 0:a? -map 0:s? -c copy "audio.mkv"
+
+
+# ffmpeg -y -hide_banner -loglevel warning -stats \
+#   -i "video.mkv" -i "audio.mkv" \
+#   -map 0:v -map 1:a? -map 1:s? -c copy "final.mkv"
+
 
 
 
