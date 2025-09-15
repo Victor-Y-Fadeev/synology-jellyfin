@@ -3,6 +3,8 @@
 set -e
 
 
+COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
+
 DELTA="30"
 EPSILON="0.000001"
 GAP="0.002"
@@ -18,7 +20,7 @@ VIDEO_CONCAT="${WORKDIR}/video.txt"
 
 
 function info {
-    ffprobe -loglevel quiet -select_streams v:0 -show_streams -print_format json "$1"
+    ffprobe -loglevel quiet -select_streams v -show_streams -print_format json "$1"
 }
 
 function check_gap {
@@ -53,7 +55,7 @@ function next_frame {
     local input="$1"
     local time="$2"
 
-    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -print_format json \
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -print_format json \
             -read_intervals "${time}%" "${input}" \
         | jq --null-input --raw-output --stream --arg time "${time}" '
             first(inputs[1] | select(type == "string" and tonumber > ($time | tonumber)))'
@@ -63,7 +65,7 @@ function next_intra_frame {
     local input="$1"
     local time="$2"
 
-    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -skip_frame nokey -print_format json \
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${time}%" "${input}" \
         | jq --null-input --raw-output --stream --arg time "${time}" '
             first(inputs[1] | select(type == "string" and tonumber >= ($time | tonumber)))'
@@ -77,7 +79,7 @@ function prev_intra_frame {
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
     # time="0$(bc <<< "${time} + ${EPSILON}")"
 
-    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time -skip_frame nokey -print_format json \
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
         | jq --raw-output --arg time "${time}" '.frames | map(.pts_time | tonumber) | max'
 }
@@ -90,7 +92,7 @@ function prev_predicted_frame {
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
     # time="0$(bc <<< "${time} + ${EPSILON}")"
 
-    ffprobe -loglevel quiet -select_streams v:0 -show_entries frame=pts_time,pict_type -print_format json \
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
         | jq --raw-output --arg time "${time}" '
             .frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max'
@@ -113,15 +115,15 @@ function cut_video_recoding {
         echo "outpoint ${next}" >> "${config}"
     fi
 
-    local filter="trim=start=0$(bc <<< "$from - $prev")"
+    local filter="trim=start=0$(bc <<< "${from} - ${prev}")"
     if [[ -n "${to}" ]]; then
-        filter="${filter}:end=0$(bc <<< "$to - $prev")"
+        filter="${filter}:end=0$(bc <<< "${to} - ${prev}")"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
-    ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "${config}" \
-        -map 0:v -vf "${filter},setpts=PTS-STARTPTS" \
-        -c:v libx264 -crf 1 -g 1 -f mpegts "${output}"
+    ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
+        -map v -vf "${filter},setpts=PTS-STARTPTS" \
+        -c libx264 -crf 1 -g 1 -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -140,8 +142,8 @@ function cut_video_copy {
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
-    ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "${config}" \
-        -map 0:v -c:v copy -f mpegts "${output}"
+    ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
+        -map v -c copy -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -177,8 +179,60 @@ function cut_video {
 
 function merge_video {
     local video_output="${WORKDIR}/video.mkv"
-    ffmpeg -y -hide_banner -loglevel warning -stats \
-        -f concat -safe 0 -i "${VIDEO_CONCAT}" -map 0:v -c:v copy "${video_output}"
+    ffmpeg $COMMON -f concat -safe 0 -i "${VIDEO_CONCAT}" \
+        -map v -c copy "${video_output}"
+}
+
+function cut_audio {
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local streams="$(ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name \
+                        -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
+
+    local i=0
+    while read -r stream; do
+        local base="${WORKDIR}/audio$(printf '%02d' "${i}")"
+        local output="${base}-${from}-${to}"
+
+        echo "base: '${base}'"
+        echo "output: '${output}'"
+        echo "stream: '${stream}'"
+        echo "from: '${from}'"
+        echo "to: '${to}'"
+        echo "i: '${i}'"
+        echo "--------------------------------"
+
+
+        if [[ "${stream}" == "mp3" ]]; then
+            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c copy -f mp3 \"${output}.mp3\""
+            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f mp3 "${output}.mp3"
+
+            echo "cat \"${output}.mp3\" >> \"${base}.mp3\""
+            cat "${output}.mp3" >> "${base}.mp3"
+        elif [[ "${stream}" == "aac" ]]; then
+            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c copy -f adts \"${output}.aac\""
+            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f adts "${output}.aac"
+
+            echo "cat \"${output}.aac\" >> \"${base}.aac\""
+            cat "${output}.aac" >> "${base}.aac"
+        elif [[ "${stream}" == "ac3" ]]; then
+            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c copy -f ac3 \"${output}.ac3\""
+            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f ac3 "${output}.ac3"
+
+            echo "cat \"${output}.ac3\" >> \"${base}.ac3\""
+            cat "${output}.ac3" >> "${base}.ac3"
+        elif [[ "${stream}" == "flac" ]]; then
+            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c pcm_s16le \"${output}.wav\""
+            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c pcm_s16le "${output}.wav"
+
+            echo "echo \"file '${output}.wav'\" >> \"${base}.txt\""
+            echo "file '${output}.wav'" >> "${base}.txt"
+        fi
+
+        (( ++i ))
+    done <<< "${streams}"
 }
 
 
@@ -203,11 +257,16 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 
-# rm "$VIDEO_CONCAT"
+rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
 # cut_video "$INPUT" "$FROM" "$TO"
 # merge_video
 # echo "$WORKDIR"
 # check_gap "${WORKDIR}/video.mkv"
+
+cut_audio "$INPUT" "10.969" "15.015"
+cut_audio "$INPUT" "15.015" "101.226"
+cut_audio "$INPUT" "101.226" "101.309"
+
 
 
 # ffmpeg -y -hide_banner -loglevel warning -stats \
@@ -221,26 +280,60 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 # ffmpeg -y -hide_banner -loglevel warning -stats \
 #     -f concat -safe 0 -i "audio.txt" -map 0 -c copy "audio.mkv"
 
-
-ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name -print_format json "$INPUT" \
-    | jq --raw-output '.streams[] | .codec_name'
+# INPUT="/mnt/c/AniStar/[AniStar.org] Planting Manual - 01 [720p].mkv"
+# ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name -print_format json "$INPUT" \
+#     | jq --raw-output '.streams[] | .codec_name'
 exit 0
 
 # --------------------------------------------------------------------
 
-ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  10.969 -to  15.015 -map 0:a:0 -c copy -f adts a0_1.aac
-ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  15.015 -to 101.226 -map 0:a:0 -c copy -f adts a0_2.aac
-ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss 101.226 -to 101.309 -map 0:a:0 -c copy -f adts a0_3.aac
+# FLAC
 
-cat a0_1.aac a0_2.aac a0_3.aac > a0_cat.aac
-ffmpeg -y -hide_banner -loglevel warning -stats -i a0_cat.aac -c copy a0.mka
 
-# echo "file 'a0_1.aac'" > "a0.txt"
-# echo "file 'a0_2.aac'" >> "a0.txt"
-# echo "file 'a0_3.aac'" >> "a0.txt"
+ffmpeg $COMMON -i "$INPUT" -ss  10.969 -to  15.015 -map a:0 -c pcm_s16le w1.wav
+ffmpeg $COMMON -i "$INPUT" -ss  15.015 -to 101.226 -map a:0 -c pcm_s16le w2.wav
+ffmpeg $COMMON -i "$INPUT" -ss 101.226 -to 101.309 -map a:0 -c pcm_s16le w3.wav
 
-# ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "a0.txt" -map 0:a -c:a copy "a0.mka"
-# ffmpeg -y -hide_banner -loglevel warning -stats -i "concat:a0_1.aac|a0_2.aac|a0_3.aac" -c copy a0.mka
+echo "file 'w1.wav'" >  "wav.txt"
+echo "file 'w2.wav'" >> "wav.txt"
+echo "file 'w3.wav'" >> "wav.txt"
+
+ffmpeg $COMMON -f concat -safe 0 -i wav.txt -c:a flac a0.mka
+check_gap a0.flac
+
+# ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  10.969 -to  15.015 -map 0:a:0 -c copy a0_1.mka
+# ffmpeg -y -hide_banner -loglevel warning -stats -i a0_1.mka -c copy -f flac a0_1.flac
+# ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  15.015 -to 101.226 -map 0:a:0 -c copy a0_2.mka
+# ffmpeg -y -hide_banner -loglevel warning -stats -i a0_2.mka -c copy -f flac a0_2.flac
+# ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss 101.226 -to 101.309 -map 0:a:0 -c copy a0_3.mka
+# ffmpeg -y -hide_banner -loglevel warning -stats -i a0_3.mka -c copy -f flac a0_3.flac
+
+# echo "file 'a0_1.flac'" > "a0.txt"
+# echo "file 'a0_2.flac'" >> "a0.txt"
+# echo "file 'a0_3.flac'" >> "a0.txt"
+
+# ffmpeg -y -hide_banner -loglevel warning -stats -f concat -safe 0 -i "a0.txt" -c copy "a0.mka"
+# check_gap a0.mka
+exit 0
+
+# --------------------------------------------------------------------
+
+# AC-3 | ASS
+type="adts" # "ass"
+
+ffmpeg $COMMON -i "$INPUT" -ss  10.969 -to  15.015 -map 0:a:0 -c copy -f "$type" "a0_1.$type"
+ffmpeg $COMMON -i "$INPUT" -ss  15.015 -to 101.226 -map 0:a:0 -c copy -f "$type" "a0_2.$type"
+ffmpeg $COMMON -i "$INPUT" -ss 101.226 -to 101.309 -map 0:a:0 -c copy -f "$type" "a0_3.$type"
+
+cat "a0_1.$type" "a0_2.$type" "a0_3.$type" > "a0_cat.$type"
+ffmpeg $COMMON -i "a0_cat.$type" -c copy "a0.mka"
+
+# echo "file 'a0_1.$type'" > "a0.txt"
+# echo "file 'a0_2.$type'" >> "a0.txt"
+# echo "file 'a0_3.$type'" >> "a0.txt"
+
+# ffmpeg $COMMON -f concat -safe 0 -i "a0.txt" -c copy "a0.mka"
+# ffmpeg $COMMON -i "concat:a0_1.$type|a0_2.$type|a0_3.$type" -c copy "a0.mka"
 
 check_gap a0.mka
 
@@ -249,9 +342,14 @@ exit 0
 
 # --------------------------------------------------------------------
 
-check_gap audio-file-*.mkv
-check_gap audio-concat-*.mkv
-check_gap audio-cut-*.mkv
+# check_gap audio-file-*.mkv
+# check_gap audio-concat-*.mkv
+# check_gap audio-cut-*.mkv
+
+SR=$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of csv=p=0 a0.mka)
+ffprobe -v error -select_streams a:0 -show_frames -show_entries frame=nb_samples -of csv=p=0 a0.mka \
+  | awk -v sr="$SR" '{sum+=$1} END{printf "%.6f\n", sum/sr}'
+
 
 exit 0
 
