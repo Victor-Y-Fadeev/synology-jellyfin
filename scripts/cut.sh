@@ -20,14 +20,15 @@ VIDEO_CONCAT="${WORKDIR}/video.txt"
 
 
 function info {
-    ffprobe -loglevel quiet -select_streams v -show_streams -print_format json "$1"
+    ffprobe -loglevel quiet -select_streams "${2:-v}" -show_streams -print_format json "$1"
 }
 
 function check_gap {
     local input="$1"
-    local gap="${2:-$GAP}"
+    local stream="${2:-v}"
+    local gap="${3:-$GAP}"
 
-    ffprobe -loglevel quiet -select_streams a:0 -show_entries frame=pts_time -print_format json "${input}" \
+    ffprobe -loglevel quiet -select_streams "${stream}" -show_entries frame=pts_time -print_format json "${input}" \
         | jq --arg gap "${gap}" '
             def step($prev; $next):
                 { prev: $prev, next: $next, diff: (if $prev | type == "object" then
@@ -177,12 +178,6 @@ function cut_video {
     fi
 }
 
-function merge_video {
-    local video_output="${WORKDIR}/video.mkv"
-    ffmpeg $COMMON -f concat -safe 0 -i "${VIDEO_CONCAT}" \
-        -map v -c copy "${video_output}"
-}
-
 function cut_audio {
     local input="$1"
     local from="$2"
@@ -196,38 +191,17 @@ function cut_audio {
         local base="${WORKDIR}/audio$(printf '%02d' "${i}")"
         local output="${base}-${from}-${to}"
 
-        echo "base: '${base}'"
-        echo "output: '${output}'"
-        echo "stream: '${stream}'"
-        echo "from: '${from}'"
-        echo "to: '${to}'"
-        echo "i: '${i}'"
-        echo "--------------------------------"
-
-
         if [[ "${stream}" == "mp3" ]]; then
-            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c copy -f mp3 \"${output}.mp3\""
             ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f mp3 "${output}.mp3"
-
-            echo "cat \"${output}.mp3\" >> \"${base}.mp3\""
             cat "${output}.mp3" >> "${base}.mp3"
         elif [[ "${stream}" == "aac" ]]; then
-            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c copy -f adts \"${output}.aac\""
             ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f adts "${output}.aac"
-
-            echo "cat \"${output}.aac\" >> \"${base}.aac\""
             cat "${output}.aac" >> "${base}.aac"
         elif [[ "${stream}" == "ac3" ]]; then
-            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c copy -f ac3 \"${output}.ac3\""
             ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f ac3 "${output}.ac3"
-
-            echo "cat \"${output}.ac3\" >> \"${base}.ac3\""
             cat "${output}.ac3" >> "${base}.ac3"
         elif [[ "${stream}" == "flac" ]]; then
-            echo "ffmpeg $COMMON -i \"${input}\" -ss \"${from}\" -to \"${to}\" -map \"a:${i}\" -c pcm_s16le \"${output}.wav\""
             ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c pcm_s16le "${output}.wav"
-
-            echo "echo \"file '${output}.wav'\" >> \"${base}.txt\""
             echo "file '${output}.wav'" >> "${base}.txt"
         fi
 
@@ -235,6 +209,32 @@ function cut_audio {
     done <<< "${streams}"
 }
 
+
+function merge {
+    local output="$1"
+
+    local video_output="${WORKDIR}/video.ts"
+    ffmpeg $COMMON -f concat -safe 0 -i "${VIDEO_CONCAT}" -c copy -f mpegts "${video_output}"
+
+    local -a input
+    input=(-i "${video_output}")
+    local -a maps
+    maps=(-map 0:v)
+
+    local i=1
+    while read -r audio; do
+        local audio_output="${audio/%txt/mkv}"
+        if [[ "${audio}" =~ \.txt$ ]]; then
+            ffmpeg $COMMON -f concat -safe 0 -i "${audio}" -c flac "${audio_output}"
+        fi
+
+        input+=(-i "${audio_output}")
+        maps+=(-map "${i}:a")
+        (( ++i ))
+    done <<< "$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*")"
+
+    ffmpeg $COMMON "${input[@]}" "${maps[@]}" -c copy "${output}"
+}
 
 
 
@@ -257,17 +257,39 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 
-rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
+# rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
 # cut_video "$INPUT" "$FROM" "$TO"
-# merge_video
-# echo "$WORKDIR"
-# check_gap "${WORKDIR}/video.mkv"
+# # merge_video
+# # echo "$WORKDIR"
+# # check_gap "${WORKDIR}/video.mkv"
 
-cut_audio "$INPUT" "10.969" "15.015"
-cut_audio "$INPUT" "15.015" "101.226"
-cut_audio "$INPUT" "101.226" "101.309"
+# cut_audio "$INPUT" "10.969" "15.015"
+# cut_audio "$INPUT" "15.015" "101.226"
+# cut_audio "$INPUT" "101.226" "101.309"
+
+# merge final.mkv
+# check_gap final.mkv
+# check_gap video.mkv
 
 
+ffmpeg $COMMON -f concat -safe 0 -i "video.txt" -c copy -f mpegts "video.ts"
+check_gap video.ts
+ffmpeg $COMMON -i video.ts -i audio00.aac -map 0:v -map 1:a -c copy video_audio.mkv
+check_gap video_audio.mkv
+
+
+# check_gap "audio00.aac" "a"
+# check_gap "audio01.ac3" "a"
+# check_gap "audio02.aac" "a"
+
+
+# ls -1 -f "${WORKDIR}"/audio[0-9][0-9]..*
+# for i in "${WORKDIR}"/audio[0-9][0-9].*; do
+# for i in $(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*"); do
+#     echo "'$(realpath "${i}")'"
+# done
+
+exit 0
 
 # ffmpeg -y -hide_banner -loglevel warning -stats \
 #   -i "$INPUT" -map 0:a? -map 0:s? -c copy "source.mkv"
@@ -283,7 +305,7 @@ cut_audio "$INPUT" "101.226" "101.309"
 # INPUT="/mnt/c/AniStar/[AniStar.org] Planting Manual - 01 [720p].mkv"
 # ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name -print_format json "$INPUT" \
 #     | jq --raw-output '.streams[] | .codec_name'
-exit 0
+# exit 0
 
 # --------------------------------------------------------------------
 
@@ -298,8 +320,8 @@ echo "file 'w1.wav'" >  "wav.txt"
 echo "file 'w2.wav'" >> "wav.txt"
 echo "file 'w3.wav'" >> "wav.txt"
 
-ffmpeg $COMMON -f concat -safe 0 -i wav.txt -c:a flac a0.mka
-check_gap a0.flac
+ffmpeg $COMMON -f concat -safe 0 -i wav.txt -c flac a0.mka
+check_gap a0.mka a
 
 # ffmpeg -y -hide_banner -loglevel warning -stats -i "$INPUT" -ss  10.969 -to  15.015 -map 0:a:0 -c copy a0_1.mka
 # ffmpeg -y -hide_banner -loglevel warning -stats -i a0_1.mka -c copy -f flac a0_1.flac
