@@ -157,7 +157,7 @@ function cut_video {
     local to="$3"
 
     local start="$(next_intra_frame "${input}" "${from}")"
-    if [[ -z "${start}" ]] || [[ -n "${to}" ]] && (( $(bc <<< "${to} <= ${start}") )); then
+    if [[ -z "${start}" ]] || { [[ -n "${to}" ]] && (( $(bc <<< "${to} <= ${start}") )) }; then
         cut_video_recoding "${input}" "${from}" "${to}"
         return
     elif (( $(bc <<< "${from} < ${start}") )); then
@@ -185,6 +185,11 @@ function cut_audio {
     local from="$2"
     local to="$3"
 
+    local segment="-ss ${from}"
+    if [[ -n "${to}" ]]; then
+        segment="${segment} -to ${to}"
+    fi
+
     local streams="$(ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name \
                         -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
 
@@ -194,16 +199,16 @@ function cut_audio {
         local output="${base}-${from}-${to}"
 
         if [[ "${stream}" == "mp3" ]]; then
-            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f mp3 "${output}.mp3"
+            ffmpeg $COMMON -i "${input}" $segment -map "a:${i}" -c copy -f mp3 "${output}.mp3"
             cat "${output}.mp3" >> "${base}.mp3"
         elif [[ "${stream}" == "aac" ]]; then
-            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f adts "${output}.aac"
+            ffmpeg $COMMON -i "${input}" $segment -map "a:${i}" -c copy -f adts "${output}.aac"
             cat "${output}.aac" >> "${base}.aac"
         elif [[ "${stream}" == "ac3" ]]; then
-            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c copy -f ac3 "${output}.ac3"
+            ffmpeg $COMMON -i "${input}" $segment -map "a:${i}" -c copy -f ac3 "${output}.ac3"
             cat "${output}.ac3" >> "${base}.ac3"
         elif [[ "${stream}" == "flac" ]]; then
-            ffmpeg $COMMON -i "${input}" -ss "${from}" -to "${to}" -map "a:${i}" -c pcm_s16le "${output}.wav"
+            ffmpeg $COMMON -i "${input}" $segment -map "a:${i}" -c pcm_s16le "${output}.wav"
             echo "file '${output}.wav'" >> "${base}.txt"
         fi
 
@@ -278,14 +283,21 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 # INPUT="/mnt/c/AniStar/[AniStar.org] Planting Manual - 01 [720p].mkv"
 
 rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
-cut_video "$INPUT" "$FROM" "$TO"
-# # merge_video
-# # echo "$WORKDIR"
-# # check_gap "${WORKDIR}/video.mkv"
+# cut_video "$INPUT" "$FROM" "$TO"
+# # # merge_video
+# # # echo "$WORKDIR"
+# # # check_gap "${WORKDIR}/video.mkv"
 
-cut_audio "$INPUT" "10.969" "15.015"
-cut_audio "$INPUT" "15.015" "101.226"
-cut_audio "$INPUT" "101.226" "101.309"
+# cut_audio "$INPUT" "10.969" "15.015"
+# cut_audio "$INPUT" "15.015" "101.226"
+# cut_audio "$INPUT" "101.226" "101.309"
+
+
+TEST="00:23:28.073"
+TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
+cut_video "$INPUT" "$TEST"
+cut_audio "$INPUT" "$TEST"
+
 
 merge final.mkv
 check_gap final.mkv
