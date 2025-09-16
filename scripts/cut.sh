@@ -2,16 +2,18 @@
 
 set -e
 
-
-COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
-
 DELTA="30"
 EPSILON="0.000001"
 GAP="0.002"
 
-# WORKDIR="$(mktemp --directory)"
+COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
+
 WORKDIR="$(realpath .)"
+# WORKDIR="$(mktemp --directory)"
 VIDEO_CONCAT="${WORKDIR}/video.txt"
+
+MERGE_INPUT=()
+MERGE_STREAMS=()
 
 # INPUT="$(realpath "$1")"
 
@@ -210,30 +212,45 @@ function cut_audio {
 }
 
 
+function merge_video {
+    local input="$1"
+    local output="${input/%txt/ts}"
+
+    ffmpeg $COMMON -f concat -safe 0 -i "${input}" -c copy -f mpegts "${output}"
+
+    local stream="$(bc <<< "${#MERGE_STREAMS[@]} / 2")"
+    MERGE_INPUT+=(-i "${output}")
+    MERGE_STREAMS+=(-map "${stream}:v")
+}
+
+function merge_audio {
+    local input="$1"
+    local output="${input/%txt/flac}"
+
+    if [[ "${input}" =~ \.txt$ ]]; then
+        ffmpeg $COMMON -f concat -safe 0 -i "${input}" -c flac "${output}"
+    fi
+
+    local stream="$(bc <<< "${#MERGE_STREAMS[@]} / 2")"
+    MERGE_INPUT+=(-i "${output}")
+    MERGE_STREAMS+=(-map "${stream}:a")
+}
+
 function merge {
     local output="$1"
+    merge_video "${VIDEO_CONCAT}"
 
-    local video_output="${WORKDIR}/video.ts"
-    ffmpeg $COMMON -f concat -safe 0 -i "${VIDEO_CONCAT}" -c copy -f mpegts "${video_output}"
+    local audio_streams="$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*")"
+    while read -r stream; do
+        merge_audio "${stream}"
+    done <<< "${audio_streams}"
 
-    local -a input
-    input=(-i "${video_output}")
-    local -a maps
-    maps=(-map 0:v)
+    # local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*")"
+    # while read -r stream; do
+    #     merge_subtitles "${stream}"
+    # done <<< "${subtitles_streams}"
 
-    local i=1
-    while read -r audio; do
-        local audio_output="${audio/%txt/mkv}"
-        if [[ "${audio}" =~ \.txt$ ]]; then
-            ffmpeg $COMMON -f concat -safe 0 -i "${audio}" -c flac "${audio_output}"
-        fi
-
-        input+=(-i "${audio_output}")
-        maps+=(-map "${i}:a")
-        (( ++i ))
-    done <<< "$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*")"
-
-    ffmpeg $COMMON "${input[@]}" "${maps[@]}" -c copy "${output}"
+    ffmpeg $COMMON "${MERGE_INPUT[@]}" "${MERGE_STREAMS[@]}" -c copy "${output}"
 }
 
 
@@ -256,6 +273,13 @@ TO="00:01:41.309"
 FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
+
+MERGE_STREAMS+=(-map "${#MERGE_STREAMS[@]}:v")
+echo "MERGE_STREAMS: '${#MERGE_STREAMS[@]}'"
+echo "MERGE_STREAMS len: '$(bc <<< "${#MERGE_STREAMS[@]} / 2")'"
+echo "'${MERGE_STREAMS[0]}'"
+
+exit 0
 
 # rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
 # cut_video "$INPUT" "$FROM" "$TO"
