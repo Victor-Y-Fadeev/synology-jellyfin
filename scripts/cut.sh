@@ -274,32 +274,31 @@ FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
 TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 
-MERGE_STREAMS+=(-map "${#MERGE_STREAMS[@]}:v")
-echo "MERGE_STREAMS: '${#MERGE_STREAMS[@]}'"
-echo "MERGE_STREAMS len: '$(bc <<< "${#MERGE_STREAMS[@]} / 2")'"
-echo "'${MERGE_STREAMS[0]}'"
 
-exit 0
+# INPUT="/mnt/c/AniStar/[AniStar.org] Planting Manual - 01 [720p].mkv"
 
-# rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
-# cut_video "$INPUT" "$FROM" "$TO"
+rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
+cut_video "$INPUT" "$FROM" "$TO"
 # # merge_video
 # # echo "$WORKDIR"
 # # check_gap "${WORKDIR}/video.mkv"
 
-# cut_audio "$INPUT" "10.969" "15.015"
-# cut_audio "$INPUT" "15.015" "101.226"
-# cut_audio "$INPUT" "101.226" "101.309"
+cut_audio "$INPUT" "10.969" "15.015"
+cut_audio "$INPUT" "15.015" "101.226"
+cut_audio "$INPUT" "101.226" "101.309"
 
-# merge final.mkv
-# check_gap final.mkv
+merge final.mkv
+check_gap final.mkv
+check_gap final.mkv "a:0"
+# check_gap final.mkv "a:1"
+# check_gap final.mkv "a:2"
 # check_gap video.mkv
 
 
-ffmpeg $COMMON -f concat -safe 0 -i "video.txt" -c copy -f mpegts "video.ts"
-check_gap video.ts
-ffmpeg $COMMON -i video.ts -i audio00.aac -map 0:v -map 1:a -c copy video_audio.mkv
-check_gap video_audio.mkv
+# ffmpeg $COMMON -f concat -safe 0 -i "video.txt" -c copy -f mpegts "video.ts"
+# check_gap video.ts
+# ffmpeg $COMMON -i video.ts -i audio00.aac -map 0:v -map 1:a -c copy video_audio.mkv
+# check_gap video_audio.mkv
 
 
 # check_gap "audio00.aac" "a"
