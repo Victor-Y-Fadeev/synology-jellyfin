@@ -2,56 +2,42 @@
 
 set -e
 
-DELTA="30"
-EPSILON="0.000001"
-GAP="0.002"
 
+DELTA="30"
 COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
 
 WORKDIR="$(realpath .)"
-# WORKDIR="$(mktemp --directory)"
 VIDEO_CONCAT="${WORKDIR}/video.txt"
 SUBTITLES_OFFSET="0"
 
 MERGE_INPUT=()
 MERGE_STREAMS=()
 
-# INPUT="$(realpath "$1")"
 
-# FROM="$(date --date "1970-01-01T${2}Z" +%s.%N)"
-# TO="$(date --date "1970-01-01T${3}Z" +%s.%N)"
+function parse_arguments {
+    INPUT="$1"
+    FROM=()
+    TO=()
 
+    shift
+    while read -r part; do
+        if [[ "${part}" =~ \- ]]; then
+            local from="${part%-*}"
+            local to="${part#*-}"
 
-function info {
-    ffprobe -loglevel quiet -select_streams "${2:-v}" -show_streams -print_format json "$1"
-}
+            if [[ "${from}"  =~ : ]]; then
+                FROM+=("$(date --date "1970-01-01T${from}Z" +%s.%N)")
+            else
+                FROM+=("${from:-0}")
+            fi
 
-function check_gap {
-    local input="$1"
-    local stream="${2:-v}"
-    local gap="${3:-$GAP}"
-
-    ffprobe -loglevel quiet -select_streams "${stream}" -show_entries frame=pts_time -print_format json "${input}" \
-        | jq --arg gap "${gap}" '
-            def step($prev; $next):
-                { prev: $prev, next: $next, diff: (if $prev | type == "object" then
-                    ($next.diff - $prev.diff) * 1000 | round / 1000
-                else
-                    ($next - $prev) * 1000 | round / 1000
-                end )};
-
-            def diff:
-                reduce .[1:][] as $item ({ prev: .[0], out: [] };
-                    .out += [step(.prev; $item)]
-                    | .prev = $item
-                ) | .out;
-
-            .frames | map(.pts_time | tonumber) | diff | diff
-                    | map(select(.diff > ($gap | tonumber)) | if .prev.diff > 0 then
-                            { time: .next.prev, duration: .next.diff, gap: .diff }
-                        else
-                            { time: .prev.prev, duration: .prev.diff, gap: .diff }
-                        end)'
+            if [[ "${to}"  =~ : ]]; then
+                TO+=("$(date --date "1970-01-01T${to}Z" +%s.%N)")
+            else
+                TO+=("${to}")
+            fi
+        fi
+    done <<< "$(sed 's/[^0-9.:-]/\n/g' <<< "$@")"
 }
 
 
@@ -81,7 +67,6 @@ function prev_intra_frame {
 
     local delta="${3:-$DELTA}"
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
-    # time="0$(bc <<< "${time} + ${EPSILON}")"
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
@@ -94,7 +79,6 @@ function prev_predicted_frame {
 
     local delta="${3:-$DELTA}"
     local start="0$(bc <<< "if (${time} < ${delta}) 0 else ${time} - ${delta}")"
-    # time="0$(bc <<< "${time} + ${EPSILON}")"
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
@@ -268,6 +252,16 @@ function cut_subtitles {
     done
 }
 
+function cut {
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    cut_video "${input}" "${from}" "${to}"
+    cut_audio "${input}" "${from}" "${to}"
+    cut_subtitles "${input}" "${from}" "${to}"
+}
+
 
 function merge_video {
     local input="$1"
@@ -336,7 +330,32 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 # --------------------------------------------------------------------
 
 
-# rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
+
+
+
+
+
+
+
+parse_arguments "$@"
+for i in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
+    echo "FROM: '${FROM[${i}]}'"
+    echo "TO: '${TO[${i}]}'"
+done
+
+
+
+
+
+
+
+exit 0
+
+
+rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
+cut "$INPUT" "$FROM" "$TO"
+
+
 # cut_video "$INPUT" "$FROM" "$TO"
 
 # cut_audio "$INPUT" "10.969" "15.015"
@@ -354,3 +373,6 @@ merge final.mkv
 # check_gap final.mkv "a:1"
 # check_gap final.mkv "a:2"
 # check_gap video.mkv
+
+# info final.mkv
+
