@@ -191,7 +191,7 @@ function cut_audio {
     fi
 
     local streams="$(ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name \
-                        -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
+                    -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
 
     local i=0
     while read -r stream; do
@@ -214,6 +214,28 @@ function cut_audio {
 
         (( ++i ))
     done <<< "${streams}"
+}
+
+function cut_subtitles {
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local segment="-ss ${from}"
+    if [[ -n "${to}" ]]; then
+        segment="${segment} -to ${to}"
+    fi
+
+    local count="$(ffprobe -loglevel quiet -select_streams s -show_entries stream=codec_name \
+                    -print_format json "${input}" | jq --raw-output '.streams | length - 1')"
+
+    for i in $(seq 0 $count); do
+        local base="${WORKDIR}/subtitles$(printf '%02d' "${i}")"
+        local output="${base}-${from}-${to}"
+
+        ffmpeg $COMMON -i "${input}" $segment -map "s:${i}" -c ass "${output}.ass"
+        echo "file '${output}.ass'" >> "${base}.txt"
+    done
 }
 
 
@@ -241,6 +263,17 @@ function merge_audio {
     MERGE_STREAMS+=(-map "${stream}:a")
 }
 
+function merge_subtitles {
+    local input="$1"
+    local output="${input/%txt/ass}"
+
+    ffmpeg $COMMON -f concat -safe 0 -i "${input}" -c ass "${output}"
+
+    local stream="$(bc <<< "${#MERGE_STREAMS[@]} / 2")"
+    MERGE_INPUT+=(-i "${output}")
+    MERGE_STREAMS+=(-map "${stream}:s")
+}
+
 function merge {
     local output="$1"
     merge_video "${VIDEO_CONCAT}"
@@ -254,6 +287,10 @@ function merge {
     # while read -r stream; do
     #     merge_subtitles "${stream}"
     # done <<< "${subtitles_streams}"
+
+    local stream="$(bc <<< "${#MERGE_STREAMS[@]} / 2")"
+    MERGE_INPUT+=(-i "final.mks")
+    MERGE_STREAMS+=(-map "${stream}:s")
 
     ffmpeg $COMMON "${MERGE_INPUT[@]}" "${MERGE_STREAMS[@]}" -c copy "${output}"
 }
@@ -282,7 +319,66 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 # INPUT="/mnt/c/AniStar/[AniStar.org] Planting Manual - 01 [720p].mkv"
 
-rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
+
+# ffprobe -loglevel quiet -select_streams s -show_entries stream=codec_name -print_format json "${INPUT}" | jq --raw-output '.streams | length - 1'
+
+# j="-1"
+# for i in $(seq -1 $j); do
+#     echo "i: $(( i ))"
+# done
+
+# i=10
+
+# (( --i ))
+# echo "i: ${i}"
+
+# --------------------------------------------------------------------
+
+# ASS
+
+# ffmpeg $COMMON -i "$INPUT" -ss  10.969 -to  15.015 -map s:0 -c ass "s0.ass"
+# ffmpeg $COMMON -i "$INPUT" -ss  15.015 -to 101.226 -map s:0 -c ass "s1.ass"
+# ffmpeg $COMMON -i "$INPUT" -ss 101.226 -to 101.309 -map s:0 -c ass "s2.ass"
+
+
+# Header
+# sed '/^\[Events\]/, $d' s2.ass
+# Events
+# sed -n '/^\[Events\]/, /^\[/ { /^\[/d; p }' s2.ass
+# sed '1, /^\[Events\]/d; /^\[/, $d' s2.ass
+# Footer
+sed --quiet '1, /^\[Aegisub Project Garbage\]/d; /^\[/, $p' s2.ass
+
+
+
+# echo "file 's0.ass'" >  "sub.txt"
+# echo "file 's1.ass'" >> "sub.txt"
+# echo "file 's2.ass'" >> "sub.txt"
+
+# ffmpeg $COMMON -f concat -safe 0 -i sub.txt -c ass final.ass
+
+
+# cat > subs.txt <<EOF
+# file '$INPUT'
+# inpoint 10.969000000
+# outpoint 15.015000
+# file '$INPUT'
+# inpoint 15.015000
+# outpoint 101.226000
+# file '$INPUT'
+# inpoint 101.226000
+# outpoint 101.309000000
+# EOF
+
+# ffmpeg $COMMON -f concat -safe 0 -i subs.txt -map s:0 -c ass final.ass
+# ffmpeg $COMMON -f concat -safe 0 -i subs.txt -map s:0 -c copy -f matroska final.mks
+
+exit 0
+
+# --------------------------------------------------------------------
+
+
+# rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
 # cut_video "$INPUT" "$FROM" "$TO"
 # # # merge_video
 # # # echo "$WORKDIR"
@@ -293,15 +389,20 @@ rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
 # cut_audio "$INPUT" "101.226" "101.309"
 
 
-TEST="00:23:28.073"
-TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
-cut_video "$INPUT" "$TEST"
-cut_audio "$INPUT" "$TEST"
+# cut_subtitles "$INPUT" "10.969" "15.015"
+# cut_subtitles "$INPUT" "15.015" "101.226"
+# cut_subtitles "$INPUT" "101.226" "101.309"
 
 
-merge final.mkv
-check_gap final.mkv
-check_gap final.mkv "a:0"
+# TEST="00:23:28.073"
+# TEST="$(date --date "1970-01-01T${TEST}Z" +%s.%N)"
+# cut_video "$INPUT" "$TEST"
+# cut_audio "$INPUT" "$TEST"
+
+
+# merge final.mkv
+# check_gap final.mkv
+# check_gap final.mkv "a:0"
 # check_gap final.mkv "a:1"
 # check_gap final.mkv "a:2"
 # check_gap video.mkv
