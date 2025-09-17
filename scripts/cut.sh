@@ -11,6 +11,7 @@ COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
 WORKDIR="$(realpath .)"
 # WORKDIR="$(mktemp --directory)"
 VIDEO_CONCAT="${WORKDIR}/video.txt"
+SUBTITLES_OFFSET="0"
 
 MERGE_INPUT=()
 MERGE_STREAMS=()
@@ -216,13 +217,38 @@ function cut_audio {
     done <<< "${streams}"
 }
 
+function cut_subtitles_common {
+    local input="$1"
+    local stream="$2"
+
+    local output="${WORKDIR}/subtitles$(printf '%02d' "${stream}").ass"
+    echo "${output}"
+
+    if [[ ! -f "${output}" ]]; then
+            ffmpeg $COMMON -i "${input}" -map "s:${stream}" -c ass "${output}"
+
+            local header="$(sed            '/^\[Events\]/, $d'         "${output}")"
+            local events="$(sed         '1, /^\[Events\]/d; /^\[/, $d' "${output}")"
+            local footer="$(sed --quiet '1, /^\[Events\]/d; /^\[/, $p' "${output}")"
+
+            echo "${header}" > "${output}"
+            echo "${footer}" >> "${output}"
+
+            echo "[Events]" >> "${output}"
+            echo "${events}" | head --lines 1 >> "${output}"
+    fi
+}
+
 function cut_subtitles {
     local input="$1"
     local from="$2"
     local to="$3"
 
+    local offset="${SUBTITLES_OFFSET}"
     local segment="-ss ${from}"
+
     if [[ -n "${to}" ]]; then
+        SUBTITLES_OFFSET="$(bc <<< "${SUBTITLES_OFFSET} + ${to} - ${from}")"
         segment="${segment} -to ${to}"
     fi
 
@@ -230,11 +256,15 @@ function cut_subtitles {
                     -print_format json "${input}" | jq --raw-output '.streams | length - 1')"
 
     for i in $(seq 0 $count); do
-        local base="${WORKDIR}/subtitles$(printf '%02d' "${i}")"
-        local output="${base}-${from}-${to}"
+        local common="$(cut_subtitles_common "${input}" "${i}")"
+        local cut="${common%.*}-${from}-${to}.ass"
+        local final="${cut%.*}-offset.ass"
 
-        ffmpeg $COMMON -i "${input}" $segment -map "s:${i}" -c ass "${output}.ass"
-        echo "file '${output}.ass'" >> "${base}.txt"
+        ffmpeg $COMMON -i "${input}" $segment -map "s:${i}" -c ass "${cut}"
+        ffmpeg $COMMON -itsoffset "${offset}" -i "${cut}" -map s -c ass "${final}"
+
+        local events="$(sed '1, /^\[Events\]/d; /^\[/, $d' "${final}")"
+        echo "${events}" | tail --lines +2 >> "${common}"
     done
 }
 
@@ -264,11 +294,7 @@ function merge_audio {
 }
 
 function merge_subtitles {
-    local input="$1"
-    local output="${input/%txt/ass}"
-
-    ffmpeg $COMMON -f concat -safe 0 -i "${input}" -c ass "${output}"
-
+    local output="$1"
     local stream="$(bc <<< "${#MERGE_STREAMS[@]} / 2")"
     MERGE_INPUT+=(-i "${output}")
     MERGE_STREAMS+=(-map "${stream}:s")
@@ -283,14 +309,10 @@ function merge {
         merge_audio "${stream}"
     done <<< "${audio_streams}"
 
-    # local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*")"
-    # while read -r stream; do
-    #     merge_subtitles "${stream}"
-    # done <<< "${subtitles_streams}"
-
-    local stream="$(bc <<< "${#MERGE_STREAMS[@]} / 2")"
-    MERGE_INPUT+=(-i "final.mks")
-    MERGE_STREAMS+=(-map "${stream}:s")
+    local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*")"
+    while read -r stream; do
+        merge_subtitles "${stream}"
+    done <<< "${subtitles_streams}"
 
     ffmpeg $COMMON "${MERGE_INPUT[@]}" "${MERGE_STREAMS[@]}" -c copy "${output}"
 }
@@ -336,9 +358,13 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 
 # ASS
 
-# ffmpeg $COMMON -i "$INPUT" -ss  10.969 -to  15.015 -map s:0 -c ass "s0.ass"
-# ffmpeg $COMMON -i "$INPUT" -ss  15.015 -to 101.226 -map s:0 -c ass "s1.ass"
-# ffmpeg $COMMON -i "$INPUT" -ss 101.226 -to 101.309 -map s:0 -c ass "s2.ass"
+# ffmpeg $COMMON -itsoffset "${SUBTITLES_OFFSET}" -i "$INPUT" -ss  10.969 -to  15.015 -map s:0 -c ass "s0.ass"
+# SUBTITLES_OFFSET="$(bc <<< "${SUBTITLES_OFFSET} + 15.015 - 10.969")"
+
+# ffmpeg $COMMON -itsoffset "${SUBTITLES_OFFSET}" -i "$INPUT" -ss  15.015 -to 101.226 -map s:0 -c ass "s1.ass"
+# SUBTITLES_OFFSET="$(bc <<< "${SUBTITLES_OFFSET} + 101.226 - 15.015")"
+
+# ffmpeg $COMMON -itsoffset "${SUBTITLES_OFFSET}" -i "$INPUT" -ss 101.226 -to 101.309 -map s:0 -c ass "s2.ass"
 
 
 # Header
@@ -347,7 +373,12 @@ TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
 # sed -n '/^\[Events\]/, /^\[/ { /^\[/d; p }' s2.ass
 # sed '1, /^\[Events\]/d; /^\[/, $d' s2.ass
 # Footer
-sed --quiet '1, /^\[Aegisub Project Garbage\]/d; /^\[/, $p' s2.ass
+# sed --quiet '1, /^\[Aegisub Project Garbage\]/d; /^\[/, $p' s2.ass
+
+# ss="$(bc <<< "23.46 * 2")"
+# ffmpeg $COMMON -i "$INPUT" -ss "${ss}" -map s:0 -c ass test.ass
+# ffmpeg $COMMON -itsoffset 23.46 -i test.ass -map s -c ass test.ass
+# exit 0
 
 
 
@@ -373,25 +404,25 @@ sed --quiet '1, /^\[Aegisub Project Garbage\]/d; /^\[/, $p' s2.ass
 # ffmpeg $COMMON -f concat -safe 0 -i subs.txt -map s:0 -c ass final.ass
 # ffmpeg $COMMON -f concat -safe 0 -i subs.txt -map s:0 -c copy -f matroska final.mks
 
-exit 0
+# exit 0
 
 # --------------------------------------------------------------------
 
 
-# rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
-# cut_video "$INPUT" "$FROM" "$TO"
-# # # merge_video
-# # # echo "$WORKDIR"
-# # # check_gap "${WORKDIR}/video.mkv"
+rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
+cut_video "$INPUT" "$FROM" "$TO"
+# # # # merge_video
+# # # # echo "$WORKDIR"
+# # # # check_gap "${WORKDIR}/video.mkv"
 
-# cut_audio "$INPUT" "10.969" "15.015"
-# cut_audio "$INPUT" "15.015" "101.226"
-# cut_audio "$INPUT" "101.226" "101.309"
+cut_audio "$INPUT" "10.969" "15.015"
+cut_audio "$INPUT" "15.015" "101.226"
+cut_audio "$INPUT" "101.226" "101.309"
 
-
-# cut_subtitles "$INPUT" "10.969" "15.015"
-# cut_subtitles "$INPUT" "15.015" "101.226"
-# cut_subtitles "$INPUT" "101.226" "101.309"
+# rm --force "${WORKDIR}/subtitles"*
+cut_subtitles "$INPUT" "10.969" "15.015"
+cut_subtitles "$INPUT" "15.015" "101.226"
+cut_subtitles "$INPUT" "101.226" "101.309"
 
 
 # TEST="00:23:28.073"
@@ -400,7 +431,7 @@ exit 0
 # cut_audio "$INPUT" "$TEST"
 
 
-# merge final.mkv
+merge final.mkv
 # check_gap final.mkv
 # check_gap final.mkv "a:0"
 # check_gap final.mkv "a:1"
