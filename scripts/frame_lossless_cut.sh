@@ -116,6 +116,8 @@ function cut_video_recoding {
         filter="${filter}:end=0$(bc <<< "${to} - ${prev}")"
     fi
 
+    echo "filter: ${filter}"
+
     local output="${WORKDIR}/video-${from}-${to}.ts"
     ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
         -map v -vf "${filter},setpts=PTS-STARTPTS" \
@@ -218,6 +220,7 @@ function cut_subtitles_common {
 
     if [[ ! -f "${output}" ]]; then
             ffmpeg $COMMON -i "${input}" -map "s:${stream}" -c ass "${output}"
+            cp "${output}" "${output}.bak"
 
             local header="$(sed            '/^\[Events\]/, $d'         "${output}")"
             local format="$(sed         '1, /^\[Events\]/d; /^\[/, $d' "${output}" | head --lines 1)"
@@ -241,6 +244,7 @@ function cut_subtitles {
 
     if [[ -n "${to}" ]]; then
         SUBTITLES_OFFSET="$(bc <<< "${SUBTITLES_OFFSET} + ${to} - ${from}")"
+        echo "from: ${from}, to: ${to}, offset: ${offset}, SUBTITLES_OFFSET: ${SUBTITLES_OFFSET}"
         segment="${segment} -to ${to}"
     fi
 
@@ -320,11 +324,113 @@ function merge {
 }
 
 
-parse_arguments "$@"
+WORKDIR="$(realpath .)"
+parse_arguments "/mnt/c/Yichang [Ad-Free]/New/01. Special Tenant with an Obtuse Mind.mkv" \
+    "00:00:10.969-00:02:18.555,00:02:38.825-00:21:08.058"
+# parse_arguments "$@"
 
+rm --force *.ass
 for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
     cut "${INPUT}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
+    # cut_subtitles "${INPUT}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
 done
 
-merge "${INPUT%.*}-merged.mkv"
-rm --force --recursive "${WORKDIR}"
+# merge final.mkv
+# ffmpeg $COMMON -i "subtitles00.mkv" -map "s:0" -c ass "final.ass"
+# mv final.ass final.ass.bak
+
+
+# ------------------------------
+
+# FST part
+# WAS 00:01:05.065
+# NOW 00:00:54.095
+
+# DIFF 10.970
+# EXPECTED 10.969
+
+# SND part
+# WAS 00:02:45.165
+# NOW 00:02:13.758
+
+# DIFF 31.407
+# EXPECTED 31.239
+
+# ------------------------------
+
+timestamp="00:00:10.969" # 10.969
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+timestamp="00:02:18.555" # 138.555
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+# DURATION: 127.586
+
+timestamp="00:02:38.825" # 158.825
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+timestamp="00:21:08.058" # 1268.058
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+# DURATION: 1109.233
+
+
+# BAK
+# Dialogue: 0,0:02:44.87,0:02:46.83,Default,,0,0,0,,My name is Hao Ren. I'm a good man.
+timestamp="0:02:44.87" # 164.87
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+
+# Cut
+# Dialogue: 0,0:00:06.05,0:00:08.01,Default,,0,0,0,,My name is Hao Ren. I'm a good man.
+timestamp="0:00:06.05" # 6.05
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+
+# Offset
+# Dialogue: 0,0:02:13.64,0:02:15.60,Default,,0,0,0,,My name is Hao Ren. I'm a good man.
+timestamp="0:02:13.64" # 133.64
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+
+# Merged
+# Dialogue: 0,0:02:13.64,0:02:15.60,Default,,0,0,0,,My name is Hao Ren. I'm a good man.
+timestamp="0:02:13.64" # 133.64
+# date --date "1970-01-01T${timestamp}Z" +%s.%N
+
+
+# ./check_stream_gap.sh final.mkv v
+# ./check_stream_gap.sh final.mkv a:0
+# ./check_stream_gap.sh final.mkv a:1
+# ./check_stream_gap.sh final.mkv a:2
+
+# merge "${INPUT%.*}-merged.mkv"
+# rm --force --recursive "${WORKDIR}"
+
+
+# ------------------------------
+
+# FRAMES  video-10.969000000-15.015000 (recording)
+# CONCAT  in 10.01, out 15.015000
+# FILTER  -vf "trim=start=0.959000000:end=05.005000,setpts=PTS-STARTPTS"
+#
+# ORIGIN FIRST FRAME  10.969
+# ORIGIN LAST  FRAME  14.889
+#
+# NEW    LAST  FRAME  3.920
+#
+# DURATION  3.962
+# EXPECTED  4.046
+#
+# END FRAMES ... P      B      P      I
+#                14.889 14.931 14.973 15.015
+
+# ------------------------------
+
+# FRAMES  video-15.015000-138.472000 (copy)
+# CONCAT  in 15.015000, out 138.472000
+#
+# ORIGIN FIRST FRAME  15.015
+# ORIGIN LAST  FRAME  138.263
+#
+# NEW    LAST  FRAME  123.248
+#
+# DURATION  123.331
+# EXPECTED  123.457
+#
+# END FRAMES ... P       B       B       B       P       B
+#                138.263 138.304 138.346 138.388 138.429 138.471
+
