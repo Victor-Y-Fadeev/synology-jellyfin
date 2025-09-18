@@ -6,7 +6,7 @@ set -e
 DELTA="30"
 COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
 
-WORKDIR="$(realpath .)"
+WORKDIR="$(mktemp --directory)"
 VIDEO_CONCAT="${WORKDIR}/video.txt"
 SUBTITLES_OFFSET="0"
 
@@ -312,67 +312,11 @@ function merge {
 }
 
 
-
-# --------------------------------------------------------------------
-
-# 03) 00:00:10.969-00:01:41.309,00:02:01.204-00:23:29.324
-INPUT="/mnt/c/Yichang [Ad-Free]/New/03. Your Quarrel Target Has Arrived.mkv"
-FROM="00:00:10.969"
-TO="00:01:41.309"
-
-# --------------------------------------------------------------------
-
-FROM="$(date --date "1970-01-01T${FROM}Z" +%s.%N)"
-TO="$(date --date "1970-01-01T${TO}Z" +%s.%N)"
-
-# INPUT="/mnt/c/AniStar/[AniStar.org] Planting Manual - 01 [720p].mkv"
-
-# --------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
 parse_arguments "$@"
-for i in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
-    echo "FROM: '${FROM[${i}]}'"
-    echo "TO: '${TO[${i}]}'"
+
+for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
+    cut "${INPUT}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
 done
 
-
-
-
-
-
-
-exit 0
-
-
-rm --force "${WORKDIR}/video"* "${WORKDIR}/audio"* "${WORKDIR}/subtitles"*
-cut "$INPUT" "$FROM" "$TO"
-
-
-# cut_video "$INPUT" "$FROM" "$TO"
-
-# cut_audio "$INPUT" "10.969" "15.015"
-# cut_audio "$INPUT" "15.015" "101.226"
-# cut_audio "$INPUT" "101.226" "101.309"
-
-# # rm --force "${WORKDIR}/subtitles"*
-# cut_subtitles "$INPUT" "10.969" "15.015"
-# cut_subtitles "$INPUT" "15.015" "101.226"
-# cut_subtitles "$INPUT" "101.226" "101.309"
-
-merge final.mkv
-# check_gap final.mkv
-# check_gap final.mkv "a:0"
-# check_gap final.mkv "a:1"
-# check_gap final.mkv "a:2"
-# check_gap video.mkv
-
-# info final.mkv
-
+merge "${INPUT%.*}-merged.mkv"
+rm --force --recursive "${WORKDIR}"
