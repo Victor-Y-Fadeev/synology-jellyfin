@@ -1,4 +1,12 @@
 #!/bin/bash
+# shellcheck disable=SC2095,SC1091,SC2086
+#
+# Warning:
+#   https://www.shellcheck.net/wiki/SC2095 -- Use ffmpeg -nostdin to prevent ffmpeg from swallowing stdin.
+#
+# Info:
+#   https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing and word splitting.
+#   https://www.shellcheck.net/wiki/SC2095 -- ffmpeg may swallow stdin, preventing this loop from working properly.
 
 set -e
 

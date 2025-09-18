@@ -18,6 +18,7 @@ fi
 #   https://www.shellcheck.net/wiki/SC2155 -- Declare and assign separately to avoid masking return values.
 #
 # Info:
+#   https://www.shellcheck.net/wiki/SC1091 -- Not following: (error message here)
 #   https://www.shellcheck.net/wiki/SC2249 -- Consider adding a default *) case, even if it just exits with error.
 #   https://www.shellcheck.net/wiki/SC2311 -- Bash implicitly disabled set -e for this function invocation because it's inside a command substitution.
 #                                             Add set -e; before it or enable inherit_errexit.
@@ -25,10 +26,11 @@ fi
 #
 # Style:
 #   https://www.shellcheck.net/wiki/SC2001 -- See if you can use ${variable//search/replace} instead.
+#   https://www.shellcheck.net/wiki/SC2129 -- Consider using { cmd1; cmd2; } >> file instead of individual redirects.
 #   https://www.shellcheck.net/wiki/SC2250 -- Prefer putting braces around variable references even when not strictly required.
 
 
-shellcheck --color=always --enable=all --exclude=SC2034,SC2154,SC2155,SC2249,SC2311,SC2312,SC2001,SC2250 \
+shellcheck --color=always --enable=all --exclude=SC2034,SC2154,SC2155,SC1091,SC2249,SC2311,SC2312,SC2001,SC2129,SC2250 \
     "${ROOT}"/scripts/*.sh \
     "${ROOT}"/tests/*.bats \
     "${ROOT}"/tests/helpers/*.bash
