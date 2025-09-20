@@ -223,7 +223,7 @@ function cut_subtitles {
     local from="$2"
     local to="$3"
 
-    local offset="$(bc <<< "scale=2; ((100 * ${SUBTITLES_OFFSET}) - 0.5) / 100")"
+    local offset="$(bc <<< "scale=2; ${SUBTITLES_OFFSET} / 1")"
     local segment="-ss ${from}"
 
     if [[ -n "${to}" ]]; then
