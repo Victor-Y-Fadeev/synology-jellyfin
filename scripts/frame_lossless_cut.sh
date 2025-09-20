@@ -27,6 +27,9 @@ function parse_arguments {
     FROM=()
     TO=()
 
+    LINK="${WORKDIR}/input.${INPUT##*.}"
+    ln --force --symbolic "${INPUT}" "${LINK}"
+
     shift
     while read -r part; do
         if [[ "${part}" =~ \- ]]; then
@@ -310,8 +313,8 @@ function merge {
 parse_arguments "$@"
 
 for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
-    cut "${INPUT}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
+    cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
 done
 
-merge "${INPUT%.*}-merged.mkv"
+merge "${INPUT%.*}.merged.mkv"
 rm --force --recursive "${WORKDIR}"
