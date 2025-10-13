@@ -28,7 +28,15 @@
 --- /etc/passwd
 +++ /etc/passwd
 @@ -42,0 +43 @@ victor:x:1026:100::/var/services/homes/victor:/bin/sh
-+victor.y.fadeev:x:1027:100::/var/services/homes/victor.y.fadeev:/bin/sh
++victor.y.fadeev:x:1027:100::/var/services/homes/victor:/bin/sh
+```
+
+```diff
+--- /etc/group
++++ /etc/group
+@@ -2 +2 @@
+-administrators:x:101:admin,victor
++administrators:x:101:admin,victor,victor.y.fadeev
 ```
 
 ```shell
