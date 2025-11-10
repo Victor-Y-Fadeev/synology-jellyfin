@@ -109,7 +109,7 @@ function cut_video_recoding {
     local output="${WORKDIR}/video-${from}-${to}.ts"
     ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
         -map v -vf "${filter},setpts=PTS-STARTPTS" \
-        -c libx264 -crf 1 -g 1 -f mpegts "${output}"
+        -c libx264 -crf 1 -bf 2 -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
