@@ -9,7 +9,7 @@ GAP="${3:-0.002}"
 
 
 ffprobe -loglevel quiet -select_streams "${STREAM}" -show_entries frame=pts_time -print_format json "${INPUT}" \
-    | jq --arg gap "${GAP}" '
+    | jq --argjson gap "${GAP}" '
         def step($prev; $next):
             { prev: $prev, next: $next, diff: (if $prev | type == "object" then
                 ($next.diff - $prev.diff) * 1000 | round / 1000
@@ -24,7 +24,7 @@ ffprobe -loglevel quiet -select_streams "${STREAM}" -show_entries frame=pts_time
             ) | .out;
 
         .frames | map(.pts_time | tonumber) | diff | diff
-                | map(select(.diff > ($gap | tonumber)) | if .prev.diff > 0 then
+                | map(select(.diff > $gap) | if .prev.diff > 0 then
                         { time: .next.prev, duration: .next.diff, gap: .diff }
                     else
                         { time: .prev.prev, duration: .prev.diff, gap: .diff }

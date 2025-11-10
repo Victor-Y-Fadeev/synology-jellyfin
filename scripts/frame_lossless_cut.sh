@@ -58,8 +58,8 @@ function next_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -print_format json \
             -read_intervals "${time}%" "${input}" \
-        | jq --null-input --raw-output --stream --arg time "${time}" '
-            first(inputs[1] | select(type == "string" and tonumber > ($time | tonumber)))'
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(inputs[1] | select(type == "string" and tonumber > $time))'
 }
 
 function next_intra_frame {
@@ -68,8 +68,8 @@ function next_intra_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${time}%" "${input}" \
-        | jq --null-input --raw-output --stream --arg time "${time}" '
-            first(inputs[1] | select(type == "string" and tonumber >= ($time | tonumber)))'
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(inputs[1] | select(type == "string" and tonumber >= $time))'
 }
 
 function prev_intra_frame {
@@ -81,7 +81,7 @@ function prev_intra_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
-        | jq --raw-output --arg time "${time}" '.frames | map(.pts_time | tonumber) | max'
+        | jq --raw-output '.frames | map(.pts_time | tonumber) | max'
 }
 
 
