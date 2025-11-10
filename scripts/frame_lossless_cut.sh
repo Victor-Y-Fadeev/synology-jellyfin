@@ -27,6 +27,7 @@ function parse_arguments {
     FROM=()
     TO=()
 
+    OUTPUT="${INPUT%.*}.merged.mkv"
     LINK="${WORKDIR}/input.${INPUT##*.}"
     ln --force --symbolic "${INPUT}" "${LINK}"
 
@@ -310,11 +311,46 @@ function merge {
 }
 
 
+function copy_metadata {
+    local input="$1"
+    local output="$2"
+    local args=()
+
+    local metadata="$(mkvmerge -J "${input}")"
+    local length="$(jq '.tracks | length' <<< "${metadata}")"
+
+    for i in $(seq 1 "${length}"); do
+        local properties="$(jq --argjson idx "${i}" '.tracks[$idx - 1].properties' <<< "${metadata}")"
+        args+=(--edit "track:${i}")
+
+        local name="$(jq --raw-output '.track_name' <<< "${properties}")"
+        if [[ "$name" != "null" ]]; then
+            args+=(--set "name=${name}")
+        fi
+
+        local language="$(jq --raw-output '.language' <<< "${properties}")"
+        if [[ "$language" != "und" ]]; then
+            args+=(--set "language=${language}")
+        fi
+
+        local default="$(jq --raw-output 'if .default_track then 1 else 0 end' <<< "${properties}")"
+        args+=(--set "flag-default=${default}")
+
+        local forced="$(jq --raw-output 'if .forced_track then 1 else 0 end' <<< "${properties}")"
+        args+=(--set "flag-forced=${forced}")
+    done
+
+    mkvpropedit "${output}" "${args[@]}" --tags all:
+}
+
+
 parse_arguments "$@"
 
 for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
     cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
 done
 
-merge "${INPUT%.*}.merged.mkv"
+merge "${OUTPUT}"
+copy_metadata "${INPUT}" "${OUTPUT}"
+
 rm --force --recursive "${WORKDIR}"
