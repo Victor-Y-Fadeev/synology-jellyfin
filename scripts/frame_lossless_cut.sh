@@ -178,7 +178,7 @@ function cut_audio {
                     -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
 
     local i=0
-    while read -r stream; do
+    while read -r stream && [[ -n "${stream}" ]]; do
         local base="${WORKDIR}/audio$(printf '%02d' "${i}")"
         local output="${base}-${from}-${to}"
 
@@ -297,13 +297,13 @@ function merge {
     local output="$1"
     merge_video "${VIDEO_CONCAT}"
 
-    local audio_streams="$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*")"
-    while read -r stream; do
+    local audio_streams="$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*" | sort)"
+    while read -r stream && [[ -n "${stream}" ]]; do
         merge_audio "${stream}"
     done <<< "${audio_streams}"
 
-    local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*")"
-    while read -r stream; do
+    local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*" | sort)"
+    while read -r stream && [[ -n "${stream}" ]]; do
         merge_subtitles "${stream}"
     done <<< "${subtitles_streams}"
 
