@@ -12,6 +12,7 @@ set -e
 
 
 DELTA="30"
+EPSILON="0.001"
 COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
 
 WORKDIR="$(mktemp --directory)"
@@ -73,6 +74,19 @@ function next_intra_frame {
             first(inputs[1] | select(type == "string" and tonumber >= $time))'
 }
 
+function prev_frame {
+    local input="$1"
+    local time="$2"
+
+    local start="0$(bc <<< "${time} - ${EPSILON}")"
+
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -print_format json \
+            -read_intervals "${start}%" "${input}" \
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(foreach (inputs[1] | select(type == "string") | tonumber) as $item
+                    ([0, 0]; [.[1], $item]) | select(.[1] >= $time) | .[0])'
+}
+
 function prev_intra_frame {
     local input="$1"
     local time="$2"
@@ -83,6 +97,18 @@ function prev_intra_frame {
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
         | jq --raw-output '.frames | map(.pts_time | tonumber) | max'
+}
+
+function prev_predicted_frame {
+    local input="$1"
+    local time="$2"
+
+    local epsilon="${3:-$EPSILON}"
+    local start="0$(bc <<< "${time} - ${epsilon}")"
+
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
+            -read_intervals "${start}%${time}" "${input}" \
+        | jq --raw-output '.frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max'
 }
 
 
