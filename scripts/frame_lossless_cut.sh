@@ -370,13 +370,15 @@ function copy_metadata {
 }
 
 
-parse_arguments "$@"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    parse_arguments "$@"
 
-for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
-    cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
-done
+    for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
+        cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
+    done
 
-merge "${OUTPUT}"
-copy_metadata "${INPUT}" "${OUTPUT}"
+    merge "${OUTPUT}"
+    copy_metadata "${INPUT}" "${OUTPUT}"
 
-rm --force --recursive "${WORKDIR}"
+    rm --force --recursive "${WORKDIR}"
+fi
