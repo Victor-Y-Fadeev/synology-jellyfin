@@ -74,6 +74,19 @@ function next_intra_frame {
             first(inputs[1] | select(type == "string" and tonumber >= $time))'
 }
 
+function next_predicted_frame {
+    local input="$1"
+    local time="$2"
+
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
+            -read_intervals "${time}%" "${input}" \
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(foreach (inputs | flatten | select(length == 4 and (.[2] == "pts_time" or .[2] == "pict_type"))
+                ) as $item ([[], []]; [.[1], $item])
+                    | select(.[0][1] == .[1][1] and (.[1][3] == "I" or .[1][3] == "P"))
+                    | .[0][3] | select(tonumber >= $time))'
+}
+
 function prev_frame {
     local input="$1"
     local time="$2"
@@ -147,17 +160,18 @@ function cut_video_copy {
     local from="$2"
     local to="$3"
 
-    local config="${WORKDIR}/video-${from}-${to}.txt"
-    echo "file '${input}'" > "${config}"
-
-    echo "inpoint ${from}" >> "${config}"
+    local segment="-ss ${from}"
     if [[ -n "${to}" ]]; then
-        echo "outpoint ${to}" >> "${config}"
+        local rate="$(ffprobe -loglevel quiet -select_streams v -show_entries stream=r_frame_rate \
+                        -print_format json "${input}" | jq --raw-output '.streams[0].r_frame_rate')"
+
+        local frames="$(bc <<< "scale=1; (${to} - ${from}) * ${rate}")"
+        frames="$(bc <<< "scale=0; (${frames} + 0.5) / 1")"
+        segment="${segment} -frames ${frames}"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
-    ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
-        -map v -c copy -f mpegts "${output}"
+    ffmpeg $COMMON -i "${input}" $segment -map v -c copy -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -180,13 +194,16 @@ function cut_video {
         return
     fi
 
-    local prev="$(prev_predicted_frame "${input}" "${to}")"
-    local cut="$(prev_frame "${input}" "${prev}")"
-    local end="${start}"
+    local next="$(next_predicted_frame "${input}" "${to}")"
+    if (( $(bc <<< "${next} == ${to}") )); then
+        cut_video_copy "${input}" "${start}" "${to}"
+        return
+    fi
 
-    if (( $(bc <<< "${start} < ${cut}") )); then
-        cut_video_copy "${input}" "${start}" "${cut}"
-        end="$(next_frame "${input}" "${prev}")"
+    local prev="$(prev_predicted_frame "${input}" "${to}")"
+    local end="$(next_frame "${input}" "${prev}")"
+    if (( $(bc <<< "${start} < ${prev}") )); then
+        cut_video_copy "${input}" "${start}" "${end}"
     fi
 
     if (( $(bc <<< "${end} < ${to}") )); then
