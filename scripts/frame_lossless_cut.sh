@@ -78,7 +78,8 @@ function prev_frame {
     local input="$1"
     local time="$2"
 
-    local start="0$(bc <<< "${time} - ${EPSILON}")"
+    local epsilon="${3:-$EPSILON}"
+    local start="0$(bc <<< "if (${time} < ${epsilon}) 0 else ${time} - ${epsilon}")"
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -print_format json \
             -read_intervals "${start}%" "${input}" \
@@ -96,7 +97,7 @@ function prev_intra_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
-        | jq --raw-output '.frames | map(.pts_time | tonumber) | max'
+        | jq --raw-output '.frames | map(.pts_time | tonumber) | max // 0'
 }
 
 function prev_predicted_frame {
@@ -104,11 +105,11 @@ function prev_predicted_frame {
     local time="$2"
 
     local epsilon="${3:-$EPSILON}"
-    local start="0$(bc <<< "${time} - ${epsilon}")"
+    local start="0$(bc <<< "if (${time} < ${epsilon}) 0 else ${time} - ${epsilon}")"
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
-        | jq --raw-output '.frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max'
+        | jq --raw-output '.frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max // 0'
 }
 
 
@@ -122,14 +123,14 @@ function cut_video_recoding {
 
     local prev="$(prev_intra_frame "${input}" "${from}")"
     echo "inpoint ${prev}" >> "${config}"
-
-    local next="$(next_intra_frame "${input}" "${from}")"
-    if [[ -n "${next}" ]]; then
-        echo "outpoint ${next}" >> "${config}"
-    fi
-
     local filter="trim=start=0$(bc <<< "${from} - ${prev}")"
+
     if [[ -n "${to}" ]]; then
+        local next="$(next_intra_frame "${input}" "${to}")"
+        if [[ -n "${next}" ]]; then
+            echo "outpoint ${next}" >> "${config}"
+        fi
+
         filter="${filter}:end=0$(bc <<< "${to} - ${prev}")"
     fi
 
