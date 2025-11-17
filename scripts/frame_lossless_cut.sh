@@ -180,10 +180,13 @@ function cut_video {
         return
     fi
 
-    local prev="$(prev_intra_frame "${input}" "${to}")"
-    local end="$(next_frame "${input}" "${prev}")"
-    if (( $(bc <<< "${start} < ${prev}") )); then
-        cut_video_copy "${input}" "${start}" "${end}"
+    local prev="$(prev_predicted_frame "${input}" "${to}")"
+    local cut="$(prev_frame "${input}" "${prev}")"
+    local end="${start}"
+
+    if (( $(bc <<< "${start} < ${cut}") )); then
+        cut_video_copy "${input}" "${start}" "${cut}"
+        end="$(next_frame "${input}" "${prev}")"
     fi
 
     if (( $(bc <<< "${end} < ${to}") )); then
