@@ -28,9 +28,11 @@ function parse_arguments {
     FROM=()
     TO=()
 
-    OUTPUT="${INPUT%.*}.merged.mkv"
     LINK="${WORKDIR}/input.${INPUT##*.}"
     ln --force --symbolic "${INPUT}" "${LINK}"
+
+    MERGED="${WORKDIR}/output.mkv"
+    OUTPUT="${INPUT%.*}.merged.mkv"
 
     shift
     while read -r part; do
@@ -403,8 +405,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
     done
 
-    merge "${OUTPUT}"
-    copy_metadata "${INPUT}" "${OUTPUT}"
+    merge "${MERGED}"
+    copy_metadata "${INPUT}" "${MERGED}"
 
+    mkvmerge --output "${OUTPUT}" "${MERGED}"
     rm --force --recursive "${WORKDIR}"
 fi
