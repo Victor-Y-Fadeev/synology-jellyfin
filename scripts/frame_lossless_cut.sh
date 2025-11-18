@@ -160,18 +160,23 @@ function cut_video_copy {
     local from="$2"
     local to="$3"
 
-    local segment="-ss ${from}"
+    local config="${WORKDIR}/video-${from}-${to}.txt"
+    echo "file '${input}'" > "${config}"
+    echo "inpoint ${from}" >> "${config}"
+
+    local frames=""
     if [[ -n "${to}" ]]; then
         local rate="$(ffprobe -loglevel quiet -select_streams v -show_entries stream=r_frame_rate \
                         -print_format json "${input}" | jq --raw-output '.streams[0].r_frame_rate')"
 
-        local frames="$(bc <<< "scale=1; (${to} - ${from}) * ${rate}")"
+        frames="$(bc --mathlib <<< "(${to} - ${from}) * (${rate})")"
         frames="$(bc <<< "scale=0; (${frames} + 0.5) / 1")"
-        segment="${segment} -frames ${frames}"
+        frames="-frames ${frames}"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
-    ffmpeg $COMMON -i "${input}" $segment -map v -c copy -f mpegts "${output}"
+    ffmpeg $COMMON -f concat -safe 0 -i "${config}" $frames \
+        -map v -c copy -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
