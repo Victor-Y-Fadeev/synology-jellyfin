@@ -53,6 +53,28 @@ function parse_arguments {
             fi
         fi
     done <<< "$(sed 's/[^0-9.:-]/\n/g' <<< "$@")"
+
+    normalize_frames "${LINK}" "FROM"
+    normalize_frames "${LINK}" "TO"
+}
+
+function normalize_frames {
+    local input="$1"
+    local -n array="$2"
+
+    for i in $(seq 0 $(( ${#array[@]} - 1 ))); do
+        local prev="$(prev_frame "${input}" "${array[${i}]}")"
+        local next="$(next_frame "${input}" "${prev}")"
+
+        local diff_prev="$(bc --mathlib <<< "${array[${i}]} - ${prev}")"
+        local diff_next="$(bc --mathlib <<< "${next} - ${array[${i}]}")"
+
+        if (( $(bc <<< "${diff_prev} < ${diff_next}") )); then
+            array[${i}]="${prev}"
+        else
+            array[${i}]="${next}"
+        fi
+    done
 }
 
 
@@ -281,7 +303,7 @@ function cut_subtitles {
     local from="$2"
     local to="$3"
 
-    local offset="$(bc <<< "scale=2; ${SUBTITLES_OFFSET} / 1")"
+    local offset="$(bc <<< "scale=2; (${SUBTITLES_OFFSET} + 0.005) / 1")"
     local segment="-ss ${from}"
 
     if [[ -n "${to}" ]]; then
@@ -406,7 +428,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     merge "${MERGED}"
-    copy_metadata "${INPUT}" "${MERGED}"
+    copy_metadata "${LINK}" "${MERGED}"
 
     mkvmerge --output "${OUTPUT}" "${MERGED}"
     rm --force --recursive "${WORKDIR}"
