@@ -23,7 +23,7 @@ ffprobe -loglevel quiet -select_streams "${STREAM}" -show_entries frame=pts_time
                 | .prev = $item
             ) | .out;
 
-        .frames | map(.pts_time | tonumber) | diff | diff
+        .frames | map(.pts_time | tonumber) | sort | diff | diff
                 | map(select(.diff > $gap) | if .prev.diff > 0 then
                         { time: .next.prev, duration: .next.diff, gap: .diff }
                     else
