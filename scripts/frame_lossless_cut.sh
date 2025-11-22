@@ -63,16 +63,16 @@ function normalize_frames {
     local -n array="$2"
 
     for i in $(seq 0 $(( ${#array[@]} - 1 ))); do
-        local prev="$(prev_frame "${input}" "${array[${i}]}")"
+        local prev="$(prev_frame "${input}" "${array[i]}")"
         local next="$(next_frame "${input}" "${prev}")"
 
-        local diff_prev="$(bc --mathlib <<< "${array[${i}]} - ${prev}")"
-        local diff_next="$(bc --mathlib <<< "${next} - ${array[${i}]}")"
+        local diff_prev="$(bc --mathlib <<< "${array[i]} - ${prev}")"
+        local diff_next="$(bc --mathlib <<< "${next} - ${array[i]}")"
 
         if (( $(bc <<< "${diff_prev} < ${diff_next}") )); then
-            array[${i}]="${prev}"
+            array[i]="${prev}"
         else
-            array[${i}]="${next}"
+            array[i]="${next}"
         fi
     done
 }
@@ -430,7 +430,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     parse_arguments "$@"
 
     for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
-        cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
+        cut "${LINK}" "${FROM[IDX]}" "${TO[IDX]}"
     done
 
     merge "${MERGED}"
