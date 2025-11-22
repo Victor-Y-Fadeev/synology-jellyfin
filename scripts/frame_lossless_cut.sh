@@ -150,6 +150,19 @@ function prev_predicted_frame {
 }
 
 
+function count_frames {
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local rate="$(ffprobe -loglevel quiet -select_streams v -show_entries stream=r_frame_rate \
+                    -print_format json "${input}" | jq --raw-output '.streams[0].r_frame_rate')"
+
+    local frames="$(bc --mathlib <<< "(${to} - ${from}) * (${rate})")"
+    frames="$(bc <<< "scale=0; (${frames} + 0.5) / 1")"
+    echo "${frames}"
+}
+
 function cut_video_recoding {
     local input="$1"
     local from="$2"
@@ -162,6 +175,7 @@ function cut_video_recoding {
     echo "inpoint ${prev}" >> "${config}"
     local filter="trim=start=0$(bc <<< "${from} - ${prev}")"
 
+    local params="scenecut=0"
     if [[ -n "${to}" ]]; then
         local next="$(next_intra_frame "${input}" "${to}")"
         if [[ -n "${next}" ]]; then
@@ -169,12 +183,15 @@ function cut_video_recoding {
         fi
 
         filter="${filter}:end=0$(bc <<< "${to} - ${prev}")"
+        keyint="$(( $(count_frames "${input}" "${from}" "${to}") - 1 ))"
+        params="keyint=${keyint}:min-keyint=${keyint}:${params}"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
     ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
         -map v -vf "${filter},setpts=PTS-STARTPTS" \
-        -c libx264 -crf 1 -bf 2 -f mpegts "${output}"
+        -c libx264 -x264-params "${params}" \
+        -crf 1 -bf 2 -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -190,12 +207,7 @@ function cut_video_copy {
 
     local frames=""
     if [[ -n "${to}" ]]; then
-        local rate="$(ffprobe -loglevel quiet -select_streams v -show_entries stream=r_frame_rate \
-                        -print_format json "${input}" | jq --raw-output '.streams[0].r_frame_rate')"
-
-        frames="$(bc --mathlib <<< "(${to} - ${from}) * (${rate})")"
-        frames="$(bc <<< "scale=0; (${frames} + 0.5) / 1")"
-        frames="-frames ${frames}"
+        frames="-frames $(count_frames "${input}" "${from}" "${to}")"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
