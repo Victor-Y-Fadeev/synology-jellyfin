@@ -235,15 +235,9 @@ function cut_video {
         return
     fi
 
-    local next="$(next_predicted_frame "${input}" "${to}")"
-    if (( $(bc <<< "${next} == ${to}") )); then
-        cut_video_copy "${input}" "${start}" "${to}"
-        return
-    fi
-
     local prev="$(prev_predicted_frame "${input}" "${to}")"
     local end="$(next_frame "${input}" "${prev}")"
-    if (( $(bc <<< "${start} < ${prev}") )); then
+    if (( $(bc <<< "${start} < ${end}") )); then
         cut_video_copy "${input}" "${start}" "${end}"
     fi
 
