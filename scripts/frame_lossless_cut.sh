@@ -12,6 +12,7 @@ set -e
 
 
 DELTA="30"
+EPSILON="0.001"
 COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
 
 WORKDIR="$(mktemp --directory)"
@@ -29,6 +30,9 @@ function parse_arguments {
 
     LINK="${WORKDIR}/input.${INPUT##*.}"
     ln --force --symbolic "${INPUT}" "${LINK}"
+
+    MERGED="${WORKDIR}/output.mkv"
+    OUTPUT="${INPUT%.*}.merged.mkv"
 
     shift
     while read -r part; do
@@ -49,6 +53,28 @@ function parse_arguments {
             fi
         fi
     done <<< "$(sed 's/[^0-9.:-]/\n/g' <<< "$@")"
+
+    normalize_frames "${LINK}" "FROM"
+    normalize_frames "${LINK}" "TO"
+}
+
+function normalize_frames {
+    local input="$1"
+    local -n array="$2"
+
+    for i in $(seq 0 $(( ${#array[@]} - 1 ))); do
+        local prev="$(prev_frame "${input}" "${array[i]}")"
+        local next="$(next_frame "${input}" "${prev}")"
+
+        local diff_prev="$(bc --mathlib <<< "${array[i]} - ${prev}")"
+        local diff_next="$(bc --mathlib <<< "${next} - ${array[i]}")"
+
+        if (( $(bc <<< "${diff_prev} < ${diff_next}") )); then
+            array[i]="${prev}"
+        else
+            array[i]="${next}"
+        fi
+    done
 }
 
 
@@ -58,8 +84,8 @@ function next_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -print_format json \
             -read_intervals "${time}%" "${input}" \
-        | jq --null-input --raw-output --stream --arg time "${time}" '
-            first(inputs[1] | select(type == "string" and tonumber > ($time | tonumber)))'
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(inputs[1] | select(type == "string" and tonumber > $time))'
 }
 
 function next_intra_frame {
@@ -68,8 +94,35 @@ function next_intra_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${time}%" "${input}" \
-        | jq --null-input --raw-output --stream --arg time "${time}" '
-            first(inputs[1] | select(type == "string" and tonumber >= ($time | tonumber)))'
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(inputs[1] | select(type == "string" and tonumber >= $time))'
+}
+
+function next_predicted_frame {
+    local input="$1"
+    local time="$2"
+
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
+            -read_intervals "${time}%" "${input}" \
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(foreach (inputs | flatten | select(length == 4 and (.[2] == "pts_time" or .[2] == "pict_type"))
+                ) as $item ([[], []]; [.[1], $item])
+                    | select(.[0][1] == .[1][1] and (.[1][3] == "I" or .[1][3] == "P"))
+                    | .[0][3] | select(tonumber >= $time))'
+}
+
+function prev_frame {
+    local input="$1"
+    local time="$2"
+
+    local epsilon="${3:-$EPSILON}"
+    local start="0$(bc <<< "if (${time} < ${epsilon}) 0 else ${time} - ${epsilon}")"
+
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -print_format json \
+            -read_intervals "${start}%" "${input}" \
+        | jq --null-input --raw-output --stream --argjson time "${time}" '
+            first(foreach (inputs[1] | select(type == "string") | tonumber) as $item
+                    ([0, 0]; [.[1], $item]) | select(.[1] >= $time) | .[0])'
 }
 
 function prev_intra_frame {
@@ -81,9 +134,34 @@ function prev_intra_frame {
 
     ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time -skip_frame nokey -print_format json \
             -read_intervals "${start}%${time}" "${input}" \
-        | jq --raw-output --arg time "${time}" '.frames | map(.pts_time | tonumber) | max'
+        | jq --raw-output '.frames | map(.pts_time | tonumber) | max // 0'
 }
 
+function prev_predicted_frame {
+    local input="$1"
+    local time="$2"
+
+    local epsilon="${3:-$EPSILON}"
+    local start="0$(bc <<< "if (${time} < ${epsilon}) 0 else ${time} - ${epsilon}")"
+
+    ffprobe -loglevel quiet -select_streams v -show_entries frame=pts_time,pict_type -print_format json \
+            -read_intervals "${start}%${time}" "${input}" \
+        | jq --raw-output '.frames | map(select(.pict_type == "I" or .pict_type == "P") | .pts_time | tonumber) | max // 0'
+}
+
+
+function count_frames {
+    local input="$1"
+    local from="$2"
+    local to="$3"
+
+    local rate="$(ffprobe -loglevel quiet -select_streams v -show_entries stream=r_frame_rate \
+                    -print_format json "${input}" | jq --raw-output '.streams[0].r_frame_rate')"
+
+    local frames="$(bc --mathlib <<< "(${to} - ${from}) * (${rate})")"
+    frames="$(bc <<< "scale=0; (${frames} + 0.5) / 1")"
+    echo "${frames}"
+}
 
 function cut_video_recoding {
     local input="$1"
@@ -95,21 +173,25 @@ function cut_video_recoding {
 
     local prev="$(prev_intra_frame "${input}" "${from}")"
     echo "inpoint ${prev}" >> "${config}"
-
-    local next="$(next_intra_frame "${input}" "${from}")"
-    if [[ -n "${next}" ]]; then
-        echo "outpoint ${next}" >> "${config}"
-    fi
-
     local filter="trim=start=0$(bc <<< "${from} - ${prev}")"
+
+    local params="scenecut=0"
     if [[ -n "${to}" ]]; then
+        local next="$(next_intra_frame "${input}" "${to}")"
+        if [[ -n "${next}" ]]; then
+            echo "outpoint ${next}" >> "${config}"
+        fi
+
         filter="${filter}:end=0$(bc <<< "${to} - ${prev}")"
+        keyint="$(( $(count_frames "${input}" "${from}" "${to}") - 1 ))"
+        params="keyint=${keyint}:min-keyint=${keyint}:${params}"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
     ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
         -map v -vf "${filter},setpts=PTS-STARTPTS" \
-        -c libx264 -crf 1 -g 1 -f mpegts "${output}"
+        -c libx264 -x264-params "${params}" \
+        -crf 1 -bf 2 -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
@@ -121,14 +203,15 @@ function cut_video_copy {
 
     local config="${WORKDIR}/video-${from}-${to}.txt"
     echo "file '${input}'" > "${config}"
-
     echo "inpoint ${from}" >> "${config}"
+
+    local frames=""
     if [[ -n "${to}" ]]; then
-        echo "outpoint ${to}" >> "${config}"
+        frames="-frames $(count_frames "${input}" "${from}" "${to}")"
     fi
 
     local output="${WORKDIR}/video-${from}-${to}.ts"
-    ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
+    ffmpeg $COMMON -f concat -safe 0 -i "${config}" $frames \
         -map v -c copy -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
@@ -152,9 +235,9 @@ function cut_video {
         return
     fi
 
-    local prev="$(prev_intra_frame "${input}" "${to}")"
+    local prev="$(prev_predicted_frame "${input}" "${to}")"
     local end="$(next_frame "${input}" "${prev}")"
-    if (( $(bc <<< "${start} < ${prev}") )); then
+    if (( $(bc <<< "${start} < ${end}") )); then
         cut_video_copy "${input}" "${start}" "${end}"
     fi
 
@@ -177,7 +260,7 @@ function cut_audio {
                     -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
 
     local i=0
-    while read -r stream; do
+    while read -r stream && [[ -n "${stream}" ]]; do
         local base="${WORKDIR}/audio$(printf '%02d' "${i}")"
         local output="${base}-${from}-${to}"
 
@@ -226,7 +309,7 @@ function cut_subtitles {
     local from="$2"
     local to="$3"
 
-    local offset="$(bc <<< "scale=2; ${SUBTITLES_OFFSET} / 1")"
+    local offset="$(bc <<< "scale=2; (${SUBTITLES_OFFSET} + 0.005) / 1")"
     local segment="-ss ${from}"
 
     if [[ -n "${to}" ]]; then
@@ -296,13 +379,13 @@ function merge {
     local output="$1"
     merge_video "${VIDEO_CONCAT}"
 
-    local audio_streams="$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*")"
-    while read -r stream; do
+    local audio_streams="$(find "${WORKDIR}" -type f -name "audio[0-9][0-9].*" | sort)"
+    while read -r stream && [[ -n "${stream}" ]]; do
         merge_audio "${stream}"
     done <<< "${audio_streams}"
 
-    local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*")"
-    while read -r stream; do
+    local subtitles_streams="$(find "${WORKDIR}" -type f -name "subtitles[0-9][0-9].*" | sort)"
+    while read -r stream && [[ -n "${stream}" ]]; do
         merge_subtitles "${stream}"
     done <<< "${subtitles_streams}"
 
@@ -310,11 +393,49 @@ function merge {
 }
 
 
-parse_arguments "$@"
+function copy_metadata {
+    local input="$1"
+    local output="$2"
+    local args=()
 
-for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
-    cut "${LINK}" "${FROM[${IDX}]}" "${TO[${IDX}]}"
-done
+    local metadata="$(mkvmerge -J "${input}")"
+    local length="$(jq '.tracks | length' <<< "${metadata}")"
 
-merge "${INPUT%.*}.merged.mkv"
-rm --force --recursive "${WORKDIR}"
+    for i in $(seq 1 "${length}"); do
+        local properties="$(jq --argjson idx "${i}" '.tracks[$idx - 1].properties' <<< "${metadata}")"
+        args+=(--edit "track:${i}")
+
+        local name="$(jq --raw-output '.track_name' <<< "${properties}")"
+        if [[ "$name" != "null" ]]; then
+            args+=(--set "name=${name}")
+        fi
+
+        local language="$(jq --raw-output '.language' <<< "${properties}")"
+        if [[ "$language" != "und" ]]; then
+            args+=(--set "language=${language}")
+        fi
+
+        local default="$(jq --raw-output 'if .default_track then 1 else 0 end' <<< "${properties}")"
+        args+=(--set "flag-default=${default}")
+
+        local forced="$(jq --raw-output 'if .forced_track then 1 else 0 end' <<< "${properties}")"
+        args+=(--set "flag-forced=${forced}")
+    done
+
+    mkvpropedit "${output}" "${args[@]}" --tags all:
+}
+
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    parse_arguments "$@"
+
+    for IDX in $(seq 0 $(( ${#FROM[@]} - 1 ))); do
+        cut "${LINK}" "${FROM[IDX]}" "${TO[IDX]}"
+    done
+
+    merge "${MERGED}"
+    copy_metadata "${LINK}" "${MERGED}"
+
+    mkvmerge --output "${OUTPUT}" "${MERGED}"
+    rm --force --recursive "${WORKDIR}"
+fi
