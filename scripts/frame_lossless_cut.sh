@@ -257,7 +257,7 @@ function cut_audio {
     fi
 
     local streams="$(ffprobe -loglevel quiet -select_streams a -show_entries stream=codec_name \
-                    -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
+                        -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
 
     local i=0
     while read -r stream && [[ -n "${stream}" ]]; do
@@ -282,7 +282,52 @@ function cut_audio {
     done <<< "${streams}"
 }
 
-function cut_subtitles_common {
+function cut_subtitles_srt_reindex {
+    local index=1
+    local expect=1
+
+    while read -r line; do
+        if [[ "${line}" == "${expect}" ]]; then
+            echo "${index}"
+            (( ++index ))
+            (( ++expect ))
+        elif [[ "${line}" == "1" ]]; then
+            echo "${index}"
+            (( ++index ))
+            expect=2
+        else
+            echo "${line}"
+        fi
+    done <<< "$(cat)"
+}
+
+function cut_subtitles_srt {
+    local input="$1"
+    local stream="$2"
+    local from="$3"
+    local to="$4"
+
+    local segment="-ss ${from}"
+    if [[ -n "${to}" ]]; then
+        segment="${segment} -to ${to}"
+    fi
+
+    local common="${WORKDIR}/subtitles$(printf '%02d' "${stream}").srt"
+    local cut="${common%.*}-${from}-${to}.srt"
+    local final="${cut%.*}-offset.srt"
+
+    ffmpeg $COMMON -i "${input}" $segment -map "s:${stream}" -c copy -f srt "${cut}"
+    ffmpeg $COMMON -itsoffset "${SUBTITLES_OFFSET}" -i "${cut}" -map s -c copy -f srt "${final}"
+
+    if [[ ! -f "${common}" ]]; then
+        touch "${common}"
+    fi
+
+    local subtitles="$(cat "${common}" "${final}" | cut_subtitles_srt_reindex)"
+    echo "${subtitles}" > "${common}"
+}
+
+function cut_subtitles_ass_common {
     local input="$1"
     local stream="$2"
 
@@ -290,18 +335,41 @@ function cut_subtitles_common {
     echo "${output}"
 
     if [[ ! -f "${output}" ]]; then
-            ffmpeg $COMMON -i "${input}" -map "s:${stream}" -c ass "${output}"
+        ffmpeg $COMMON -i "${input}" -map "s:${stream}" -c copy -f ass "${output}"
 
-            local header="$(sed            '/^\[Events\]/, $d'         "${output}")"
-            local format="$(sed         '1, /^\[Events\]/d; /^\[/, $d' "${output}" | head --lines 1)"
-            local footer="$(sed --quiet '1, /^\[Events\]/d; /^\[/, $p' "${output}")"
+        local header="$(sed            '/^\[Events\]/, $d'         "${output}")"
+        local format="$(sed         '1, /^\[Events\]/d; /^\[/, $d' "${output}" | head --lines 1)"
+        local footer="$(sed --quiet '1, /^\[Events\]/d; /^\[/, $p' "${output}")"
 
-            echo "${header}" > "${output}"
-            echo "${footer}" >> "${output}"
+        echo "${header}" > "${output}"
+        echo "${footer}" >> "${output}"
 
-            echo "[Events]" >> "${output}"
-            echo "${format}" >> "${output}"
+        echo "[Events]" >> "${output}"
+        echo "${format}" >> "${output}"
     fi
+}
+
+function cut_subtitles_ass {
+    local input="$1"
+    local stream="$2"
+    local from="$3"
+    local to="$4"
+
+    local segment="-ss ${from}"
+    if [[ -n "${to}" ]]; then
+        segment="${segment} -to ${to}"
+    fi
+
+    local common="$(cut_subtitles_ass_common "${input}" "${stream}")"
+    local cut="${common%.*}-${from}-${to}.ass"
+    local final="${cut%.*}-offset.ass"
+
+    ffmpeg $COMMON -i "${input}" $segment -map "s:${stream}" -c copy -f ass "${cut}"
+    local offset="$(bc <<< "scale=2; (${SUBTITLES_OFFSET} + 0.005) / 1")"
+    ffmpeg $COMMON -itsoffset "${offset}" -i "${cut}" -map s -c copy -f ass "${final}"
+
+    local events="$(sed '1, /^\[Events\]/d; /^\[/, $d' "${final}" | tail --lines +2)"
+    echo "${events}" >> "${common}"
 }
 
 function cut_subtitles {
@@ -309,28 +377,23 @@ function cut_subtitles {
     local from="$2"
     local to="$3"
 
-    local offset="$(bc <<< "scale=2; (${SUBTITLES_OFFSET} + 0.005) / 1")"
-    local segment="-ss ${from}"
+    local streams="$(ffprobe -loglevel quiet -select_streams s -show_entries stream=codec_name \
+                        -print_format json "${input}" | jq --raw-output '.streams[] | .codec_name')"
+
+    local i=0
+    while read -r stream && [[ -n "${stream}" ]]; do
+        if [[ "${stream}" == "ass" ]]; then
+            cut_subtitles_ass "${input}" "${i}" "${from}" "${to}"
+        elif [[ "${stream}" == "subrip" ]]; then
+            cut_subtitles_srt "${input}" "${i}" "${from}" "${to}"
+        fi
+
+        (( ++i ))
+    done <<< "${streams}"
 
     if [[ -n "${to}" ]]; then
         SUBTITLES_OFFSET="$(bc <<< "${SUBTITLES_OFFSET} + ${to} - ${from}")"
-        segment="${segment} -to ${to}"
     fi
-
-    local count="$(ffprobe -loglevel quiet -select_streams s -show_entries stream=codec_name \
-                    -print_format json "${input}" | jq --raw-output '.streams | length - 1')"
-
-    for i in $(seq 0 $count); do
-        local common="$(cut_subtitles_common "${input}" "${i}")"
-        local cut="${common%.*}-${from}-${to}.ass"
-        local final="${cut%.*}-offset.ass"
-
-        ffmpeg $COMMON -i "${input}" $segment -map "s:${i}" -c ass "${cut}"
-        ffmpeg $COMMON -itsoffset "${offset}" -i "${cut}" -map s -c ass "${final}"
-
-        local events="$(sed '1, /^\[Events\]/d; /^\[/, $d' "${final}" | tail --lines +2)"
-        echo "${events}" >> "${common}"
-    done
 }
 
 function cut {
