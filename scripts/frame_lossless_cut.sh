@@ -48,7 +48,7 @@ function parse_arguments {
 
             if [[ "${to}"  =~ : ]]; then
                 TO+=("$(date --date "1970-01-01T${to}Z" +%s.%N)")
-            else
+            elif [[ -n "${to}" ]]; then
                 TO+=("${to}")
             fi
         fi
