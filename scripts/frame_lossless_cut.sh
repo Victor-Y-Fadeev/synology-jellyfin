@@ -54,8 +54,30 @@ function parse_arguments {
         fi
     done <<< "$(sed 's/[^0-9.:-]/\n/g' <<< "$@")"
 
+    codec_settings "${LINK}"
     normalize_frames "${LINK}" "FROM"
     normalize_frames "${LINK}" "TO"
+}
+
+function codec_settings {
+    local input="$1"
+    local json="$(ffprobe -loglevel quiet -select_streams v \
+                    -show_entries stream=codec_name,has_b_frames,r_frame_rate \
+                    -print_format json "${input}")"
+
+    local codec="$(jq --raw-output '.streams[0].codec_name' <<< "${json}")"
+    if [[ "${codec}" == "h264" ]]; then
+        CODEC="libx264"
+        CODEC_PARAMS="-x264-params"
+    elif [[ "${codec}" == "hevc" ]]; then
+        CODEC="libx265"
+        CODEC_PARAMS="-x265-params"
+    else
+        exit 1
+    fi
+
+    B_FRAMES="$(jq --raw-output '.streams[0].has_b_frames' <<< "${json}")"
+    FRAME_RATE="($(jq --raw-output '.streams[0].r_frame_rate' <<< "${json}"))"
 }
 
 function normalize_frames {
@@ -64,8 +86,12 @@ function normalize_frames {
 
     for i in $(seq 0 $(( ${#array[@]} - 1 ))); do
         local prev="$(prev_frame "${input}" "${array[i]}")"
-        local next="$(next_frame "${input}" "${prev}")"
+        if [[ "${prev}" == "0" ]]; then
+            array[i]="$(next_intra_frame "${input}" "${prev}")"
+            continue
+        fi
 
+        local next="$(next_frame "${input}" "${prev}")"
         local diff_prev="$(bc --mathlib <<< "${array[i]} - ${prev}")"
         local diff_next="$(bc --mathlib <<< "${next} - ${array[i]}")"
 
@@ -155,10 +181,7 @@ function count_frames {
     local from="$2"
     local to="$3"
 
-    local rate="$(ffprobe -loglevel quiet -select_streams v -show_entries stream=r_frame_rate \
-                    -print_format json "${input}" | jq --raw-output '.streams[0].r_frame_rate')"
-
-    local frames="$(bc --mathlib <<< "(${to} - ${from}) * (${rate})")"
+    local frames="$(bc --mathlib <<< "(${to} - ${from}) * (${FRAME_RATE})")"
     frames="$(bc <<< "scale=0; (${frames} + 0.5) / 1")"
     echo "${frames}"
 }
@@ -190,8 +213,8 @@ function cut_video_recoding {
     local output="${WORKDIR}/video-${from}-${to}.ts"
     ffmpeg $COMMON -f concat -safe 0 -i "${config}" \
         -map v -vf "${filter},setpts=PTS-STARTPTS" \
-        -c libx264 -x264-params "${params}" \
-        -crf 1 -bf 2 -f mpegts "${output}"
+        -c $CODEC $CODEC_PARAMS "${params}" \
+        -crf 1 -bf "${B_FRAMES}" -f mpegts "${output}"
 
     echo "file '${output}'" >> "${VIDEO_CONCAT}"
 }
