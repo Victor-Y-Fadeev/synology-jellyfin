@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2095,SC1091,SC2086
+# shellcheck disable=SC2095,SC1091,SC2086,SC2248
 #
 # Warning:
 #   https://www.shellcheck.net/wiki/SC2095 -- Use ffmpeg -nostdin to prevent ffmpeg from swallowing stdin.
