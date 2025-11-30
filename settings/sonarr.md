@@ -12,7 +12,7 @@
 	  - [ ] `Series Folder Format` -> `{Series TitleYear} [tvdbid-{TvdbId}]`
 	  - [ ] `Season Folder Format` -> `Season {season:00}`
 	  - [ ] `Specials Folder Format` -> `Specials`
-	  - [ ] `Multi Episode Style` -> `Range`
+	  - [ ] `Multi Episode Style` -> `Prefixed Range`
 	- [ ] `Folders`
 	  - [ ] `Create Empty Series Folders` -> `Off`
 	  - [ ] `Delete Empty Folders` -> `Off`
