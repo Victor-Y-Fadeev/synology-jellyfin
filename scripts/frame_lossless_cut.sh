@@ -7,6 +7,9 @@
 # Info:
 #   https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing and word splitting.
 #   https://www.shellcheck.net/wiki/SC2095 -- ffmpeg may swallow stdin, preventing this loop from working properly.
+#
+# Style:
+#   https://www.shellcheck.net/wiki/SC2248 -- Prefer double quoting even when variables don't contain special characters.
 
 set -e
 
