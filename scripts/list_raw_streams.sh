@@ -3,7 +3,8 @@
 set -e
 
 
-COMMON="-y -nostdin -hide_banner -loglevel warning -stats"
+INPUT="$(realpath "$1")"
+EXTENSION="$2"
 
 
 function show_streams {
@@ -162,26 +163,45 @@ function subtitle_stream_suffix {
 function list_streams {
     local input="$1"
     local json="$(show_streams "${input}")"
-    video_stream_suffix "${json}"
+
+    local video="$(video_streams "${json}")"
+    if (( $(streams_length "${video}") > 0 )); then
+        video_stream_suffix "${json}"
+    fi
 
     local audio="$(audio_streams "${json}")"
     audio="$(streams_length "${audio}")"
-    audio="$((audio - 1))"
-
-    for i in $(seq 0 "${audio}"); do
+    for i in $(seq 0 "$((audio - 1))"); do
         audio_stream_suffix "${json}" "${i}"
     done
 
     local subtitles="$(subtitle_streams "${json}")"
     subtitles="$(streams_length "${subtitles}")"
-    subtitles="$((subtitles - 1))"
-
-    for i in $(seq 0 "${subtitles}"); do
+    for i in $(seq 0 "$((subtitles - 1))"); do
         subtitle_stream_suffix "${json}" "${i}"
     done
 }
 
+function apply_function {
+    local apply="$1"
+    local directory="$2"
+    local extension="$3"
+
+    if [[ -n "${extension}" ]]; then
+        extension="-name *.${extension}"
+    fi
+
+    while read -r file; do
+        echo "${file}"
+        $apply "${file}"
+    done <<< "$(find "${directory}" -maxdepth 1 -type f $extension)"
+}
+
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    list_streams "${1}"
+    if [[ -d "${INPUT}" ]]; then
+        apply_function "list_streams" "${INPUT}" "${EXTENSION}"
+    else
+        list_streams "${INPUT}"
+    fi
 fi
