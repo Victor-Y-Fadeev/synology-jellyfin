@@ -1,4 +1,10 @@
 #!/bin/bash
+# shellcheck disable=SC2086,SC2310
+#
+# Info:
+#   https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing and word splitting.
+#   https://www.shellcheck.net/wiki/SC2310 -- This function is invoked in an 'if' condition so set -e will be disabled.
+#                                             Invoke separately if failures should cause the script to exit.
 
 set -e
 

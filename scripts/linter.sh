@@ -32,5 +32,6 @@ fi
 
 shellcheck --color=always --enable=all --exclude=SC2034,SC2154,SC2155,SC1091,SC2249,SC2311,SC2312,SC2001,SC2129,SC2250 \
     "${ROOT}"/scripts/*.sh \
+    "${ROOT}"/scripts/video/*.sh \
     "${ROOT}"/tests/*.bats \
     "${ROOT}"/tests/helpers/*.bash
