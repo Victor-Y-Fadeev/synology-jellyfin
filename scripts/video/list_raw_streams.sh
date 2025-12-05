@@ -9,6 +9,7 @@
 set -e
 
 
+ILLEGAL='["*/:<>?\|]'
 INPUT="$(realpath "$1")"
 EXTENSION="$2"
 
@@ -102,7 +103,7 @@ function common_stream_suffix {
 
     local title="$(jq --raw-output '.tags.title' <<< "${json}")"
     if [[ -n "${title}" && "${title}" != "null" ]]; then
-        suffix="${suffix}, ${title}"
+        suffix="${suffix}, ${title//${ILLEGAL}/ }"
     fi
 
     echo "${suffix}"

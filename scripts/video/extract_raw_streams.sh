@@ -19,7 +19,7 @@ function extract_video_stream {
 
     local json="$(show_streams "${input}")"
     local suffix="$(video_stream_suffix "${json}")"
-    local output="${input%.*}.video.[${suffix}].ts"
+    local output="${input%.*}.video.${suffix}.ts"
 
     ffmpeg $COMMON -i "${input}" -map v -c copy -f mpegts "${output}"
 }
@@ -32,7 +32,7 @@ function extract_audio_stream {
     json="$(audio_streams "${json}")"
 
     local suffix="$(audio_stream_suffix "${json}" "${index}")"
-    local output="${input%.*}.audio$(printf '%02d' "${index}").[${suffix}]"
+    local output="${input%.*}.audio$(printf '%02d' "${index}").${suffix}"
 
     json="$(jq --argjson idx "${index}" '.[$idx]' <<< "${json}")"
     local codec_name="$(jq --raw-output '.codec_name' <<< "${json}")"
@@ -58,7 +58,7 @@ function extract_subtitle_stream {
     json="$(subtitle_streams "${json}")"
 
     local suffix="$(subtitle_stream_suffix "${json}" "${index}")"
-    local output="${input%.*}.subtitles$(printf '%02d' "${index}").[${suffix}]"
+    local output="${input%.*}.subtitles$(printf '%02d' "${index}").${suffix}"
 
     json="$(jq --argjson idx "${index}" '.[$idx]' <<< "${json}")"
     local codec_name="$(jq --raw-output '.codec_name' <<< "${json}")"
