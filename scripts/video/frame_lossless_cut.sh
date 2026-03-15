@@ -494,6 +494,14 @@ function copy_metadata {
         local properties="$(jq --argjson idx "${i}" '.tracks[$idx - 1].properties' <<< "${metadata}")"
         args+=(--edit "track:${i}")
 
+        local display_dimensions="$(jq --raw-output '.display_dimensions' <<< "${properties}")"
+        if [[ "$display_dimensions" != "null" ]]; then
+            local display_unit="$(jq --raw-output '.display_unit' <<< "${properties}")"
+            args+=(--set "display-unit=${display_unit}")
+            args+=(--set "display-width=${display_dimensions%x*}")
+            args+=(--set "display-height=${display_dimensions#*x}")
+        fi
+
         local name="$(jq --raw-output '.track_name' <<< "${properties}")"
         if [[ "$name" != "null" ]]; then
             args+=(--set "name=${name}")
