@@ -88,16 +88,17 @@ services:
       - radarr
       - sonarr
 
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
     restart: unless-stopped
+    init: true
     env_file:
       - ./.env
     ports:
       - 5055:5055
     volumes:
-      - ./config/jellyseerr:/app/config
+      - ./config/seerr:/app/config
     depends_on:
       - sing-box
       - radarr
@@ -117,7 +118,7 @@ services:
       - sonarr
       - prowlarr
       - jellyfin
-      - jellyseerr
+      - seerr
     command: tunnel run
 
 networks:

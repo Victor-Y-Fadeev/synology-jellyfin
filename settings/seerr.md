@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/jellyseerr.svg" width="32"/> [Jellyseerr](http://localhost:5055/)
+# <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/seerr.svg" width="32"/> [Seerr](http://localhost:5055/)
 
 - [ ] `Settings`
   - [ ] `General`
