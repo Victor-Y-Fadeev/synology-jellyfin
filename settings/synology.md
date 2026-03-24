@@ -72,3 +72,8 @@
             - [ ] `Port:` -> `5000` / `7000` / `10002`
     - [ ] `Regional Options` -> `Language`
       - [ ] `Display language:` -> `Russian`
+- [ ] `Package Center`
+  - [ ] `Settings`
+    - [ ] `Package Sources` -> `Add`
+      - [ ] `Name:` -> `SynoCommunity`
+      - [ ] `Location:` -> `https://packages.synocommunity.com`
