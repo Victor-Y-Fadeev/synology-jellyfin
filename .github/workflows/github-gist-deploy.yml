@@ -13,7 +13,7 @@ on:
       - 'docs/**'
 
 env:
-  GIST_DESCRIPTION: 'How to setup Jellyfin with Sonarr, Radarr, Prowlarr, Jellyseerr and qBittorrent using Docker'
+  GIST_DESCRIPTION: 'How to setup Jellyfin with Sonarr, Radarr, Prowlarr, Seerr and qBittorrent using Docker'
 
 jobs:
   deploy:
