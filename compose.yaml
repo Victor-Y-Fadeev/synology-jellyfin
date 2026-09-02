@@ -16,7 +16,7 @@ services:
       - ${TORRENTING_PORT}:${TORRENTING_PORT}/udp
       - ${WEBUI_PORT}:${WEBUI_PORT}
     networks:
-      custom_net:
+      default:
         ipv4_address: 10.10.10.10
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -88,8 +88,8 @@ services:
     container_name: jellyfin
     restart: unless-stopped
     environment:
-      - HTTP_PROXY=socks5://proxy:2080
-      - HTTPS_PROXY=socks5://proxy:2080
+      - HTTP_PROXY=http://proxy:2080
+      - HTTPS_PROXY=http://proxy:2080
     env_file:
       - ./.env
     volumes:
