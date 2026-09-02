@@ -1,15 +1,23 @@
 name: synology
 
 services:
-  sing-box:
-    image: ghcr.io/sagernet/sing-box:latest
-    container_name: sing-box
+  proxy:
+    image: ghcr.io/xtls/xray-core:latest
+    container_name: proxy
     restart: unless-stopped
+    env_file:
+      - ./.env
     volumes:
-      - ./config/sing-box:/etc/sing-box/
+      - ./config/xray:/usr/local/etc/xray
+    cap_add:
+      - NET_ADMIN
     ports:
-      - 2080:2080
-    command: -D /var/lib/sing-box -C /etc/sing-box/ run
+      - ${TORRENTING_PORT}:${TORRENTING_PORT}
+      - ${TORRENTING_PORT}:${TORRENTING_PORT}/udp
+      - ${WEBUI_PORT}:${WEBUI_PORT}
+    networks:
+      custom_net:
+        ipv4_address: 10.10.10.10
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -19,28 +27,9 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
+    network_mode: service:proxy
     depends_on:
-      - sing-box
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    restart: unless-stopped
-    environment:
-      - HTTP_PROXY=http://sing-box:2080
-      - HTTPS_PROXY=http://sing-box:2080
-    env_file:
-      - ./.env
-    volumes:
-      - ./config/jellyfin:/config
-      - ./data:/data
-    ports:
-      - 8096:8096
-    depends_on:
-      - sing-box
+      - proxy
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -51,10 +40,12 @@ services:
     volumes:
       - ./config/radarr:/config
       - ./data:/data
+    dns:
+      - 10.10.10.10
     ports:
       - 7878:7878
     depends_on:
-      - sing-box
+      - proxy
       - qbittorrent
       - jellyfin
   sonarr:
@@ -66,10 +57,12 @@ services:
     volumes:
       - ./config/sonarr:/config
       - ./data:/data
+    dns:
+      - 10.10.10.10
     ports:
       - 8989:8989
     depends_on:
-      - sing-box
+      - proxy
       - qbittorrent
       - jellyfin
   prowlarr:
@@ -80,14 +73,34 @@ services:
       - ./.env
     volumes:
       - ./config/prowlarr:/config
+    dns:
+      - 10.10.10.10
     ports:
       - 9696:9696
     depends_on:
-      - sing-box
+      - proxy
       - qbittorrent
       - radarr
       - sonarr
 
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - HTTP_PROXY=socks5://proxy:2080
+      - HTTPS_PROXY=socks5://proxy:2080
+    env_file:
+      - ./.env
+    volumes:
+      - ./config/jellyfin:/config
+      - ./data:/data
+    dns:
+      - 10.10.10.10
+    ports:
+      - 8096:8096
+    depends_on:
+      - proxy
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     container_name: seerr
@@ -95,12 +108,20 @@ services:
     init: true
     env_file:
       - ./.env
+    dns:
+      - 10.10.10.10
     ports:
       - 5055:5055
     volumes:
       - ./config/seerr:/app/config
     depends_on:
-      - sing-box
+      - proxy
       - radarr
       - sonarr
       - jellyfin
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
