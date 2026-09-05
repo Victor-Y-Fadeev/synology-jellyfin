@@ -29,8 +29,6 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
-    dns:
-      - 10.10.10.10
     depends_on:
       - proxy
 
