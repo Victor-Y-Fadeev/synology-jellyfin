@@ -8,14 +8,6 @@ services:
     user: 0:0
     volumes:
       - ./config/xray:/usr/local/etc/xray
-    devices:
-      - /dev/net/tun
-    cap_add:
-      - NET_ADMIN
-    ports:
-      - ${TORRENTING_PORT}:${TORRENTING_PORT}
-      - ${TORRENTING_PORT}:${TORRENTING_PORT}/udp
-      - ${WEBUI_PORT}:${WEBUI_PORT}
     networks:
       default:
         ipv4_address: 10.10.10.10
@@ -23,7 +15,7 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     restart: unless-stopped
-    network_mode: service:proxy
+    network_mode: host
     env_file:
       - ./.env
     volumes:
