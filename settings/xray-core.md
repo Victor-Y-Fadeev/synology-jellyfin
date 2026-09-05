@@ -4,7 +4,9 @@
 ```json
 {
   "dns": {
-    "https://cloudflare-dns.com/dns-query"
+    "servers": [
+      "https://cloudflare-dns.com/dns-query"
+    ]
   }
 }
 ```
