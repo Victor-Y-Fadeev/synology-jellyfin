@@ -14,6 +14,16 @@
 `./config/xray/03_routing.json`:
 ```json
 {
+  "routing": {
+    "rules": [
+      {
+        "inboundTag": [
+          "dns-in"
+        ],
+        "outboundTag": "dns-out"
+      }
+    ]
+  }
 }
 ```
 
@@ -22,9 +32,17 @@
 {
   "inbounds": [
     {
+      "tag": "proxy",
       "protocol": "socks",
-      "port": 2080,
-      "tag": "proxy"
+      "port": 2080
+    },
+    {
+      "tag": "dns-in",
+      "protocol": "tunnel",
+      "port": 53,
+      "settings": {
+        "allowedNetwork": "tcp,udp"
+      }
     }
   ]
 }
@@ -58,6 +76,10 @@
           "path": ""
         }
       }
+    },
+    {
+      "tag": "dns-out",
+      "protocol": "dns"
     }
   ]
 }
