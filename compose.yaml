@@ -2,7 +2,7 @@ name: synology
 
 services:
   proxy:
-    image: ghcr.io/xtls/xray-core:latest
+    image: ghcr.io/xtls/xray-core:pre-release
     container_name: proxy
     restart: unless-stopped
     user: 0:0

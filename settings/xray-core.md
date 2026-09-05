@@ -52,7 +52,10 @@ lsmod | grep "^tun " || sudo insmod /lib/modules/tun.ko
       "tag": "tun",
       "protocol": "tun",
       "settings": {
-        "name": "tun0"
+        "name": "tun0",
+        "gateway": [
+          "169.254.10.1/30"
+        ]
       }
     }
   ]
