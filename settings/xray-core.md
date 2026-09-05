@@ -1,5 +1,9 @@
 # <img src="https://raw.githubusercontent.com/Victor-Y-Fadeev/synology-jellyfin/refs/heads/master/icons/xray-core.svg" width="32"/> Xray-core
 
+```shell
+lsmod | grep "^tun " || sudo insmod /lib/modules/tun.ko
+```
+
 `./config/xray/02_dns.json`:
 ```json
 {
@@ -42,6 +46,13 @@
       "port": 53,
       "settings": {
         "allowedNetwork": "tcp,udp"
+      }
+    },
+    {
+      "tag": "tun",
+      "protocol": "tun",
+      "settings": {
+        "name": "tun0"
       }
     }
   ]

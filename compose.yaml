@@ -6,10 +6,10 @@ services:
     container_name: proxy
     restart: unless-stopped
     user: 0:0
-    env_file:
-      - ./.env
     volumes:
       - ./config/xray:/usr/local/etc/xray
+    devices:
+      - /dev/net/tun
     cap_add:
       - NET_ADMIN
     ports:
@@ -29,6 +29,8 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data:/data
+    dns:
+      - 10.10.10.10
     depends_on:
       - proxy
 
