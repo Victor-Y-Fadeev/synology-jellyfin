@@ -17,19 +17,27 @@
         - [ ] `Hostname or static IP:` -> `*.synology.me`
         - [ ] `DSM (HTTP):` -> `80`
         - [ ] `DSM (HTTPS):` -> `443`
-    - [ ] `Network` -> `General`
-      - [ ] `Server name:` -> `SYNOLOGY-DS723`
-      - [ ] `Manually configure DNS server` -> `On`
-          - [ ] `Preferred DNS server:` -> `8.8.8.8`
-          - [ ] `Alternative DNS server:` -> `8.8.4.4`
-    - [ ] `Security` -> `Certificate`
-      - [ ] `Add` -> `Add a new certificate` -> `Get a certificate from Let's Encrypt`
-        - [ ] `Description:` -> `Synology DDNS Certificate`
-        - [ ] `Set as default certificate` -> `On`
-        - [ ] `Domain name:` -> `*.synology.me`
-        - [ ] `Subject Alternative Name:` -> `*.*.synology.me`
-      - [ ] `Settings` -> `Configure`
-        - [ ] `Certificate` -> `*.synology.me`
+    - [ ] `Network`
+      - [ ] `General`
+        - [ ] `Server name:` -> `SYNOLOGY-DS723`
+        - [ ] `Manually configure DNS server` -> `On`
+          - [ ] `Preferred DNS server:` -> `9.9.9.9`
+          - [ ] `Alternative DNS server:` -> `149.112.112.112`
+      - [ ] `Connectivity`
+        - [ ] `Enable HTTP/2` -> `On`
+        - [ ] `Enable reuseport to enhance high concurrent connection capability for web service` -> `On`
+    - [ ] `Security`
+      - [ ] `Certificate`
+        - [ ] `Add` -> `Add a new certificate` -> `Get a certificate from Let's Encrypt`
+          - [ ] `Description:` -> `Synology DDNS Certificate`
+          - [ ] `Set as default certificate` -> `On`
+          - [ ] `Domain name:` -> `*.synology.me`
+          - [ ] `Subject Alternative Name:` -> `*.*.synology.me`
+        - [ ] `Settings` -> `Configure`
+          - [ ] `Certificate` -> `*.synology.me`
+      - [ ] `Advanced`
+        - [ ] `Enable HTTP Compression` -> `On`
+        - [ ] `TLS / SSL Profile Level` -> `Intermediate compatibility`
     - [ ] `Terminal & SNMP` -> `Terminal`
       - [ ] `Enable SSH service` -> `On`
       - [ ] `Port:` -> `22`
@@ -60,20 +68,23 @@
             - [ ] `Enabling HSTS forces browsers to use secured connections.` -> `On`
       - [ ] `Advanced`
         - [ ] `Reverse Proxy` -> `Create`
-          - [ ] `Reverse Proxy Name:` -> `synology` / `file` / `drive`
-          - [ ] `Source`
-            - [ ] `Protocol:` -> `HTTPS`
-            - [ ] `Hostname:` -> `*` / `file.*` / `drive.*`
-            - [ ] `Port:` -> `443`
-            - [ ] `Enable HSTS` -> `On`
-          - [ ] `Destination`
-            - [ ] `Protocol:` -> `HTTP`
-            - [ ] `Hostname:` -> `localhost`
-            - [ ] `Port:` -> `5000` / `7000` / `10002`
+          - [ ] `General`
+            - [ ] `Reverse Proxy Name:` -> `synology` / `file` / `drive`
+            - [ ] `Source`
+              - [ ] `Protocol:` -> `HTTPS`
+              - [ ] `Hostname:` -> `*` / `file.*` / `drive.*`
+              - [ ] `Port:` -> `443`
+              - [ ] `Enable HSTS` -> `On`
+            - [ ] `Destination`
+              - [ ] `Protocol:` -> `HTTP`
+              - [ ] `Hostname:` -> `localhost`
+              - [ ] `Port:` -> `5000` / `7000` / `10002`
+          - [ ] `Custom Header`
+            - [ ] `Create` -> `WebSocket`
     - [ ] `Regional Options` -> `Language`
       - [ ] `Display language:` -> `Russian`
 - [ ] `Package Center`
   - [ ] `Settings`
     - [ ] `Package Sources` -> `Add`
       - [ ] `Name:` -> `SynoCommunity`
-      - [ ] `Location:` -> `https://packages.synocommunity.com`
+      - [ ] `Location:` -> `https://synopackage.com/repository/spk/all`

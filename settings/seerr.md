@@ -73,7 +73,7 @@
             - [ ] `Quality Profile` -> `Any`
   - [ ] `Network`
     - [ ] `HTTP(S) Proxy` -> `On`
-      - [ ] `Proxy Hostname` -> `sing-box`
+      - [ ] `Proxy Hostname` -> `proxy`
       - [ ] `Proxy Port` -> `2080`
       - [ ] `Proxy Ignored Addresses` -> `jellyfin, radarr, sonarr`
       - [ ] `Bypass Proxy for Local Addresses` -> `On`

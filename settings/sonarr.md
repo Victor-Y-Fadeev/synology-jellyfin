@@ -62,7 +62,7 @@
 	- [ ] `Proxy`
 	  - [ ] `Use Proxy` -> `On`
 	  - [ ] `Proxy Type` -> `Socks5 (Support TOR)`
-	  - [ ] `Hostname` -> `sing-box`
+	  - [ ] `Hostname` -> `proxy`
 	  - [ ] `Port` -> `2080`
 	  - [ ] `Bypass Proxy for Local Addresses` -> `On`
   - [ ] `UI`

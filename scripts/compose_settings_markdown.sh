@@ -18,8 +18,9 @@ fi
 
 rm --force "$SETTINGS_FILE"
 
-for i in $(yq --output-format tsv '.services | keys' "$DOCKER_COMPOSE"); do
-    markdown="${SETTINGS_DIR}/${i}.md"
+for i in $(yq --output-format tsv '.services[] | .image' "$DOCKER_COMPOSE"); do
+    container="${i%%:*}"
+    markdown="${SETTINGS_DIR}/${container##*/}.md"
 
     if [[ -f "$markdown" ]]; then
         cat "$markdown" >> "$SETTINGS_FILE"
