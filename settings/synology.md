@@ -83,6 +83,14 @@
             - [ ] `Create` -> `WebSocket`
     - [ ] `Regional Options` -> `Language`
       - [ ] `Display language:` -> `Russian`
+  - [ ] `Services`
+    - [ ] `Task Scheduler` -> `Create` -> `Triggered Task` -> `User-defined script`
+      - [ ] `General`
+        - [ ] `Task:` -> `Max User Watches`
+        - [ ] `User:` -> `root`
+        - [ ] `Event:` -> `Boot-up`
+      - [ ] `Task Settings`
+        - [ ] `User-defined script` -> `sysctl --write fs.inotify.max_user_watches=524288`
 - [ ] `Package Center`
   - [ ] `Settings`
     - [ ] `Package Sources` -> `Add`
