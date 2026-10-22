@@ -55,7 +55,7 @@
             - [ ] `/data/series/tv`
       - [ ] `Manage library` -> `Library Settings`
         - [ ] `Metadata downloaders (TV Shows)`
-          - [ ] `Missing Episode Fetcher`
+          - [ ] `Missing Episode Fetcher` -> `Off`
           - [ ] `TheTVDB`
           - [ ] `TheMovieDb`
           - [ ] `The Open Movie Database`
